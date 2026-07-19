@@ -26,7 +26,7 @@ export function BottomNav() {
           return (
             <li key={tab.to} className="flex-1">
               <Link
-                to={tab.to}
+                to={tab.to as any}
                 className={`flex flex-col items-center gap-1 rounded-pill px-2 py-1.5 text-[10px] font-medium transition-colors ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
