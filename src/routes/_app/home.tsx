@@ -33,9 +33,9 @@ function HomePage() {
     queryFn: async () => {
       const { data } = await supabase.from("bookings")
         .select("id, status, classes(id, type, title, starts_at, coaches(name))")
-        .eq("member_id", user!.id).eq("status", "upcoming")
-        .order("created_at", { ascending: false });
-      const upcoming = (data ?? []).filter((b: any) => new Date(b.classes.starts_at) > new Date())
+        .eq("member_id", user!.id).eq("status", "upcoming");
+      const upcoming = (data ?? [])
+        .filter((b: any) => b.classes && new Date(b.classes.starts_at).getTime() > Date.now() - 60 * 60 * 1000)
         .sort((a: any, b: any) => new Date(a.classes.starts_at).getTime() - new Date(b.classes.starts_at).getTime());
       return upcoming[0] ?? null;
     },
@@ -44,6 +44,16 @@ function HomePage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
 
+  const formatWhen = (iso: string) => {
+    const d = new Date(iso);
+    const today = new Date();
+    const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+    const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+    if (sameDay(d, today)) return `Today · ${time}`;
+    if (sameDay(d, tomorrow)) return `Tomorrow · ${time}`;
+    return `${d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })} · ${time}`;
+  };
 
   return (
     <div>
@@ -52,14 +62,21 @@ function HomePage() {
       <div className="space-y-4 px-5">
         {/* Next class */}
         <div className="card-surface p-5">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.nextClass}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t.nextClass}</p>
           {nextBooking ? (
             <div className="mt-2">
-              <h3 className="font-display text-2xl">{(nextBooking as any).classes.title}</h3>
+              <h3 className="font-display text-3xl uppercase leading-tight">
+                {((nextBooking as any).classes.title as string).replace(/\s*muay thai\s*/i, "").trim() || (nextBooking as any).classes.title}
+                {" · "}
+                {new Date((nextBooking as any).classes.starts_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+              </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {new Date((nextBooking as any).classes.starts_at).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })}
-                {(nextBooking as any).classes.coaches?.name && ` • ${(nextBooking as any).classes.coaches.name}`}
+                {formatWhen((nextBooking as any).classes.starts_at)}
+                {(nextBooking as any).classes.coaches?.name && ` with ${(nextBooking as any).classes.coaches.name}`}
               </p>
+              <Link to="/profile/bookings" className="mt-4 inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+                View Details
+              </Link>
             </div>
           ) : (
             <div className="mt-2">
@@ -70,6 +87,7 @@ function HomePage() {
             </div>
           )}
         </div>
+
 
 
         {/* Stats */}
