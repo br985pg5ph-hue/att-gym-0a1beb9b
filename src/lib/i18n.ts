@@ -1,6 +1,7 @@
 export type Lang = "en" | "ar";
 
-export const dict = {
+export type Dict = Record<string, string>;
+export const dict: Record<Lang, Dict> = {
   en: {
     appName: "ATT Academy",
     tagline: "Martial Arts & Functional Training",
@@ -55,6 +56,4 @@ export const dict = {
     specialty: "التخصص", bio: "نبذة", photoUrl: "رابط الصورة", type: "النوع", coach: "المدرب", capacity: "السعة", startsAt: "يبدأ في",
     membershipActive: "عضو نشط", hours: "ساعات العمل",
   },
-} as const;
-
-export type Dict = typeof dict.en;
+};
