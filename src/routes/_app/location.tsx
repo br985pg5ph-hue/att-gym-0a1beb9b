@@ -25,11 +25,14 @@ function LocationPage() {
       <PageHeader title={t.ourLocation} subtitle={gym.name} />
       <div className="space-y-4 px-5">
         <div className="card-surface overflow-hidden">
-          <div className="relative h-52 bg-gradient-to-br from-primary/20 via-surface to-silver/10">
-            <div className="absolute inset-0 grid place-items-center">
-              <MapPin size={56} className="text-primary" />
-            </div>
-          </div>
+          <iframe
+            title="Gym location map"
+            src={`https://www.google.com/maps?q=${gym.lat},${gym.lng}&z=17&output=embed`}
+            className="h-64 w-full border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+
           <div className="p-5">
             <p className="text-sm">{gym.address}</p>
             <div className="mt-4 grid grid-cols-2 gap-2">
