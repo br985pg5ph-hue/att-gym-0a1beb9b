@@ -23,7 +23,7 @@ function PaymentsPage() {
 
   const topUp = useMutation({
     mutationFn: async (amount: number) => {
-      const { error } = await supabase.from("transactions").insert({ member_id: user!.id, amount, type: "credit", description: `Wallet top-up +$${amount}` });
+      const { error } = await supabase.from("transactions").insert({ member_id: user!.id, amount, type: "credit", description: `Wallet top-up +${amount} JOD` });
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Wallet topped up"); await refresh(); qc.invalidateQueries({ queryKey: ["txns"] }); },
@@ -39,12 +39,13 @@ function PaymentsPage() {
       <div className="space-y-4 px-5">
         <div className="card-surface p-6 bg-gradient-to-br from-primary/25 to-transparent">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.wallet}</p>
-          <p className="font-display mt-1 text-5xl">${Number(profile?.wallet_balance ?? 0).toFixed(2)}</p>
+          <p className="font-display mt-1 text-5xl">{Number(profile?.wallet_balance ?? 0).toFixed(2)} <span className="text-2xl text-muted-foreground">JOD</span></p>
           <div className="mt-4 flex gap-2">
-            {[20, 50, 100].map(v => (
+            {[10, 25, 50].map(v => (
               <button key={v} disabled={topUp.isPending} onClick={()=>topUp.mutate(v)}
-                className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+${v}</button>
+                className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+{v} JOD</button>
             ))}
+
           </div>
         </div>
 
@@ -80,7 +81,7 @@ function PaymentsPage() {
                   <p className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString()}</p>
                 </div>
                 <p className={`shrink-0 font-display text-lg ${tx.type === "credit" ? "text-emerald-400" : "text-destructive"}`}>
-                  {tx.type === "credit" ? "+" : "-"}${Number(tx.amount).toFixed(2)}
+                  {tx.type === "credit" ? "+" : "-"}{Number(tx.amount).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span>
                 </p>
               </div>
             ))}
