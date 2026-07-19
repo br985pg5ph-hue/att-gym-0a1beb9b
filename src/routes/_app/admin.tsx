@@ -241,7 +241,7 @@ function MembersAdmin() {
             <p className="font-display text-lg leading-none">{m.name || "—"}</p>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status}</p>
           </div>
-          <p className="shrink-0 font-display text-xl">${Number(m.wallet_balance).toFixed(2)}</p>
+          <p className="shrink-0 font-display text-xl">{Number(m.wallet_balance).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span></p>
         </div>
       ))}
     </div>
