@@ -393,6 +393,37 @@ function EditProfilePage() {
       <PageHeader title="Edit Profile" />
 
       <div className="space-y-5 px-5 pb-8">
+        {/* Avatar */}
+        <section className="card-surface flex items-center gap-4 p-4">
+          <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <User size={32} />
+            )}
+          </div>
+          <div className="flex-1 space-y-2">
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarSaving}
+              className="flex w-full items-center justify-center gap-2 rounded-pill bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              <Camera size={14} />
+              {avatarSaving ? "Saving…" : profile?.avatar_url ? "Change Photo" : "Upload Photo"}
+            </button>
+            {profile?.avatar_url && (
+              <button
+                onClick={handleAvatarRemove}
+                disabled={avatarSaving}
+                className="flex w-full items-center justify-center gap-2 rounded-pill border hairline py-2 text-xs font-medium text-muted-foreground"
+              >
+                <Trash2 size={14} /> Remove
+              </button>
+            )}
+          </div>
+        </section>
+
         {/* Personal info */}
         <section className="card-surface p-4 space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Personal Info</h2>
