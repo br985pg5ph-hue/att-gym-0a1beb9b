@@ -19,7 +19,7 @@ const COUNTRY_CODES = [
   { code: "+49", name: "Germany" }, { code: "+90", name: "Turkey" },
 ];
 
-const INTERESTS = ["pt", "women_only", "mixed", "kids"] as const;
+
 
 function SignUpPage() {
   const nav = useNavigate();
@@ -30,10 +30,8 @@ function SignUpPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const toggle = (i: string) => setInterests((prev) => prev.includes(i) ? prev.filter(x=>x!==i) : [...prev, i]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +45,6 @@ function SignUpPage() {
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
-    if (data.user && interests.length) {
-      await supabase.from("profiles").update({ interests }).eq("id", data.user.id);
-    }
     setLoading(false);
     toast.success("Account created!");
     nav({ to: "/home" });
@@ -60,8 +55,6 @@ function SignUpPage() {
     if (r.error) toast.error("Sign-in failed");
     else if (!r.redirected) nav({ to: "/home" });
   };
-
-  const labels: Record<string, string> = { pt: t.pt, women_only: t.womenOnly, mixed: t.mixed, kids: t.kids };
 
   return (
     <div className="mx-auto w-full max-w-md px-6 py-10">
@@ -87,22 +80,9 @@ function SignUpPage() {
         <input required type="password" placeholder={t.confirmPassword} value={confirm} onChange={(e)=>setConfirm(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
 
-        <div>
-          <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">{t.interests}</p>
-          <div className="flex flex-wrap gap-2">
-            {INTERESTS.map(i => (
-              <button type="button" key={i} onClick={()=>toggle(i)}
-                className={`rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
-                  interests.includes(i) ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
-                }`}>
-                {labels[i]}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <button disabled={loading} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
           {loading ? "…" : t.createAccount}
+
         </button>
       </form>
       <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
