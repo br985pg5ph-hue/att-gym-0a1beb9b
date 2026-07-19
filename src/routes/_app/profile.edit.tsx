@@ -72,10 +72,10 @@ function EditProfilePage() {
         <section className="card-surface p-4 space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Personal Info</h2>
           <Field icon={<User size={16} />} label={t.name}>
-            <input value={name} onChange={(e)=>setName(e.target.value)} className="input-bare" />
+            <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full bg-transparent text-sm outline-none" />
           </Field>
           <Field icon={<Phone size={16} />} label={t.phone}>
-            <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="input-bare" placeholder="+962 …" />
+            <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="w-full bg-transparent text-sm outline-none" placeholder="+962 …" />
           </Field>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
@@ -86,7 +86,7 @@ function EditProfilePage() {
         <section className="card-surface p-4 space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground">{t.email}</h2>
           <Field icon={<Mail size={16} />} label={t.email}>
-            <input value={email} onChange={(e)=>setEmail(e.target.value)} type="email" className="input-bare" />
+            <input value={email} onChange={(e)=>setEmail(e.target.value)} type="email" className="w-full bg-transparent text-sm outline-none" />
           </Field>
           <p className="text-[11px] text-muted-foreground">You'll receive a confirmation link at both the old and new address.</p>
           <button onClick={()=>saveEmail.mutate()} disabled={saveEmail.isPending} className="w-full rounded-pill border border-primary/40 py-3 text-sm font-semibold text-primary">
@@ -98,11 +98,12 @@ function EditProfilePage() {
         <section className="card-surface p-4 space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground">{t.password}</h2>
           <Field icon={<Lock size={16} />} label="New password">
-            <input value={pw} onChange={(e)=>setPw(e.target.value)} type="password" className="input-bare" placeholder="••••••••" />
+            <input value={pw} onChange={(e)=>setPw(e.target.value)} type="password" className="w-full bg-transparent text-sm outline-none" placeholder="••••••••" />
           </Field>
           <Field icon={<Lock size={16} />} label={t.confirmPassword}>
-            <input value={pw2} onChange={(e)=>setPw2(e.target.value)} type="password" className="input-bare" placeholder="••••••••" />
+            <input value={pw2} onChange={(e)=>setPw2(e.target.value)} type="password" className="w-full bg-transparent text-sm outline-none" placeholder="••••••••" />
           </Field>
+
           <button onClick={()=>savePassword.mutate()} disabled={savePassword.isPending} className="w-full rounded-pill border border-primary/40 py-3 text-sm font-semibold text-primary">
             {savePassword.isPending ? "Updating…" : "Update Password"}
           </button>
