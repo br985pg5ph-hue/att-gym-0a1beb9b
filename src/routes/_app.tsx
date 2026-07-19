@@ -8,9 +8,10 @@ export const Route = createFileRoute("/_app")({
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
     if (location.pathname !== "/onboarding") {
-      const { data: p } = await supabase.from("profiles").select("onboarded").eq("id", data.user.id).maybeSingle();
-      if (p && !p.onboarded) throw redirect({ to: "/onboarding" });
+      const { data: p } = await supabase.from("profiles").select("onboarded, is_parent").eq("id", data.user.id).maybeSingle();
+      if (p && !p.onboarded && !p.is_parent) throw redirect({ to: "/onboarding" });
     }
+
   },
   component: () => (
     <AppShell><Outlet /></AppShell>
