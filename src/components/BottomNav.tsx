@@ -18,7 +18,7 @@ export function BottomNav() {
   if (isStaff) tabs.push({ to: "/admin", label: t.admin, icon: Shield });
 
   return (
-    <nav className="tab-blur fixed inset-x-0 bottom-0 z-40 border-t hairline pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
       <ul className="mx-auto flex max-w-md items-center justify-around px-2">
         {tabs.map((tab) => {
           const active = tab.exact ? path === tab.to : path.startsWith(tab.to);
