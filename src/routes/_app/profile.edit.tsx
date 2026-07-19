@@ -350,12 +350,17 @@ function EditProfilePage() {
           <Field icon={<User size={16} />} label={t.name}>
             <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full bg-transparent text-sm outline-none" />
           </Field>
-          <div className="flex items-end gap-2">
-            <CountrySelect value={cc} onChange={setCc} />
-            <Field icon={<Phone size={16} />} label={t.phone} className="flex-1">
-              <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="w-full bg-transparent text-sm outline-none" placeholder="7xxxxxxx" />
-            </Field>
-          </div>
+          <label className="block">
+            <span className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+              <Phone size={16} />{t.phone}
+            </span>
+            <div className="flex items-end gap-2">
+              <CountrySelect value={cc} onChange={setCc} />
+              <div className="flex-1 rounded-2xl border hairline bg-background px-3 py-2.5">
+                <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="w-full bg-transparent text-sm outline-none" placeholder="7xxxxxxx" />
+              </div>
+            </div>
+          </label>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
           </button>
