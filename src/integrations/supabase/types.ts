@@ -178,6 +178,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           classes_attended: number
+          classes_remaining: number
           created_at: string
           disciplines: string[]
           experience_level: string | null
@@ -198,6 +199,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           classes_attended?: number
+          classes_remaining?: number
           created_at?: string
           disciplines?: string[]
           experience_level?: string | null
@@ -218,6 +220,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           classes_attended?: number
+          classes_remaining?: number
           created_at?: string
           disciplines?: string[]
           experience_level?: string | null
