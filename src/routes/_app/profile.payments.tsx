@@ -23,7 +23,7 @@ function PaymentsPage() {
 
   const topUp = useMutation({
     mutationFn: async (amount: number) => {
-      const { error } = await supabase.from("transactions").insert({ member_id: user!.id, amount, type: "credit", description: `Wallet top-up +$${amount}` });
+      const { error } = await supabase.from("transactions").insert({ member_id: user!.id, amount, type: "credit", description: `Wallet top-up +${amount} JOD` });
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Wallet topped up"); await refresh(); qc.invalidateQueries({ queryKey: ["txns"] }); },
