@@ -77,7 +77,7 @@ function SignUpPage() {
         <div className="flex gap-2">
           <select value={cc} onChange={(e)=>setCc(e.target.value)}
             className="rounded-xl border hairline bg-card px-3 py-3 text-sm outline-none focus:border-primary">
-            {COUNTRY_CODES.map(c => <option key={c.code} value={c.code}>{c.code} {c.name}</option>)}
+            {COUNTRY_CODES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <input required type="tel" placeholder={t.phone} value={phone} onChange={(e)=>setPhone(e.target.value)}
             className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
