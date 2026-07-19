@@ -4,8 +4,24 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
-import { ChevronLeft, User, Mail, Phone, Lock } from "lucide-react";
+import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+async function fileToAvatarDataUrl(file: File, size = 256): Promise<string> {
+  const bmp = await createImageBitmap(file);
+  const scale = Math.min(size / bmp.width, size / bmp.height, 1);
+  const w = Math.round(bmp.width * scale);
+  const h = Math.round(bmp.height * scale);
+  const side = Math.min(w, h);
+  const canvas = document.createElement("canvas");
+  canvas.width = side; canvas.height = side;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(bmp, (w - side) / 2 / scale * -1 + 0, 0, w, h);
+  // recentre crop
+  ctx.clearRect(0, 0, side, side);
+  ctx.drawImage(bmp, (bmp.width - Math.min(bmp.width, bmp.height)) / 2, (bmp.height - Math.min(bmp.width, bmp.height)) / 2, Math.min(bmp.width, bmp.height), Math.min(bmp.width, bmp.height), 0, 0, side, side);
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
 
 function flagEmoji(iso: string) {
   return iso
@@ -276,8 +292,9 @@ export const Route = createFileRoute("/_app/profile/edit")({
 
 function EditProfilePage() {
   const { t } = useLang();
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth();
   const qc = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [cc, setCc] = useState("+962");
@@ -285,6 +302,38 @@ function EditProfilePage() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
+  const [avatarSaving, setAvatarSaving] = useState(false);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image");
+    try {
+      setAvatarSaving(true);
+      const dataUrl = await fileToAvatarDataUrl(file);
+      const { error } = await supabase.from("profiles").update({ avatar_url: dataUrl }).eq("id", user.id);
+      if (error) throw error;
+      await refresh();
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message ?? "Upload failed");
+    } finally {
+      setAvatarSaving(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setAvatarSaving(true);
+    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+    setAvatarSaving(false);
+    if (error) return toast.error(error.message);
+    await refresh();
+    qc.invalidateQueries({ queryKey: ["profile"] });
+    toast.success("Photo removed");
+  };
 
   useEffect(() => {
     if (profile) {
