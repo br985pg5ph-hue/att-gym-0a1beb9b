@@ -22,6 +22,7 @@ import { Route as AppHomeRouteImport } from './routes/_app/home'
 import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
 import { Route as AppBookRouteImport } from './routes/_app/book'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppProfileIndexRouteImport } from './routes/_app/profile.index'
 import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
 import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
 import { Route as AppProfilePaymentsRouteImport } from './routes/_app/profile.payments'
@@ -91,6 +92,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProfileIndexRoute = AppProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProfileRoute,
+} as any)
 const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/profile/payments': typeof AppProfilePaymentsRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
+  '/profile/': typeof AppProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,11 +149,11 @@ export interface FileRoutesByTo {
   '/home': typeof AppHomeRoute
   '/location': typeof AppLocationRoute
   '/news': typeof AppNewsRoute
-  '/profile': typeof AppProfileRouteWithChildren
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/payments': typeof AppProfilePaymentsRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
+  '/profile': typeof AppProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,6 +174,7 @@ export interface FileRoutesById {
   '/_app/profile/payments': typeof AppProfilePaymentsRoute
   '/_app/profile/referral': typeof AppProfileReferralRoute
   '/_app/profile/settings': typeof AppProfileSettingsRoute
+  '/_app/profile/': typeof AppProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,6 +195,7 @@ export interface FileRouteTypes {
     | '/profile/payments'
     | '/profile/referral'
     | '/profile/settings'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -200,11 +209,11 @@ export interface FileRouteTypes {
     | '/home'
     | '/location'
     | '/news'
-    | '/profile'
     | '/profile/bookings'
     | '/profile/payments'
     | '/profile/referral'
     | '/profile/settings'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
     | '/_app/profile/payments'
     | '/_app/profile/referral'
     | '/_app/profile/settings'
+    | '/_app/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -328,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile/': {
+      id: '/_app/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AppProfileIndexRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
     '/_app/profile/settings': {
       id: '/_app/profile/settings'
       path: '/settings'
@@ -364,6 +381,7 @@ interface AppProfileRouteChildren {
   AppProfilePaymentsRoute: typeof AppProfilePaymentsRoute
   AppProfileReferralRoute: typeof AppProfileReferralRoute
   AppProfileSettingsRoute: typeof AppProfileSettingsRoute
+  AppProfileIndexRoute: typeof AppProfileIndexRoute
 }
 
 const AppProfileRouteChildren: AppProfileRouteChildren = {
@@ -371,6 +389,7 @@ const AppProfileRouteChildren: AppProfileRouteChildren = {
   AppProfilePaymentsRoute: AppProfilePaymentsRoute,
   AppProfileReferralRoute: AppProfileReferralRoute,
   AppProfileSettingsRoute: AppProfileSettingsRoute,
+  AppProfileIndexRoute: AppProfileIndexRoute,
 }
 
 const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
