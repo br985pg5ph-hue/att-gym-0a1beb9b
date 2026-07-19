@@ -149,28 +149,34 @@ export type Database = {
           address: string
           hours: Json
           id: number
+          instagram_url: string | null
           lat: number
           lng: number
           name: string
           phone: string
+          whatsapp_number: string | null
         }
         Insert: {
           address: string
           hours?: Json
           id?: number
+          instagram_url?: string | null
           lat: number
           lng: number
           name?: string
           phone: string
+          whatsapp_number?: string | null
         }
         Update: {
           address?: string
           hours?: Json
           id?: number
+          instagram_url?: string | null
           lat?: number
           lng?: number
           name?: string
           phone?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
