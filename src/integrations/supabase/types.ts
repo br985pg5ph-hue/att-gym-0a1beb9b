@@ -179,42 +179,60 @@ export type Database = {
           avatar_url: string | null
           classes_attended: number
           created_at: string
+          disciplines: string[]
+          experience_level: string | null
+          goals: string[]
           id: string
+          injuries: string | null
           interests: string[]
           membership_status: string
           name: string
+          onboarded: boolean
           phone: string | null
           referral_code: string
           role: Database["public"]["Enums"]["app_role"]
           streak: number
+          training_frequency: string | null
           wallet_balance: number
         }
         Insert: {
           avatar_url?: string | null
           classes_attended?: number
           created_at?: string
+          disciplines?: string[]
+          experience_level?: string | null
+          goals?: string[]
           id: string
+          injuries?: string | null
           interests?: string[]
           membership_status?: string
           name?: string
+          onboarded?: boolean
           phone?: string | null
           referral_code?: string
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
+          training_frequency?: string | null
           wallet_balance?: number
         }
         Update: {
           avatar_url?: string | null
           classes_attended?: number
           created_at?: string
+          disciplines?: string[]
+          experience_level?: string | null
+          goals?: string[]
           id?: string
+          injuries?: string | null
           interests?: string[]
           membership_status?: string
           name?: string
+          onboarded?: boolean
           phone?: string | null
           referral_code?: string
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
+          training_frequency?: string | null
           wallet_balance?: number
         }
         Relationships: []

@@ -47,13 +47,13 @@ function SignUpPage() {
     if (error) { setLoading(false); return toast.error(error.message); }
     setLoading(false);
     toast.success("Account created!");
-    nav({ to: "/home" });
+    nav({ to: "/onboarding" });
   };
 
   const oauth = async (provider: "google" | "apple") => {
     const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (r.error) toast.error("Sign-in failed");
-    else if (!r.redirected) nav({ to: "/home" });
+    else if (!r.redirected) nav({ to: "/onboarding" });
   };
 
   return (
