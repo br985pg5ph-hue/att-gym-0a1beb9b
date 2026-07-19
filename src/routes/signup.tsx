@@ -286,6 +286,7 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isParent, setIsParent] = useState(false);
 
 
   const submit = async (e: React.FormEvent) => {
@@ -300,9 +301,13 @@ function SignUpPage() {
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
+    // Flag account as parent so the app switches into Parent Mode.
+    if (isParent && data.user) {
+      await supabase.from("profiles").update({ is_parent: true, onboarded: true }).eq("id", data.user.id);
+    }
     setLoading(false);
     toast.success("Account created!");
-    nav({ to: "/onboarding" });
+    nav({ to: isParent ? "/profile/children" : "/onboarding" });
   };
 
   const oauth = async (provider: "google" | "apple") => {
@@ -310,6 +315,7 @@ function SignUpPage() {
     if (r.error) toast.error("Sign-in failed");
     else if (!r.redirected) nav({ to: "/onboarding" });
   };
+
 
   return (
     <div className="mx-auto w-full max-w-md px-6 py-10">
