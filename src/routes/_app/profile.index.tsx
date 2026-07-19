@@ -32,7 +32,7 @@ function ProfilePage() {
   const qc = useQueryClient();
   const { data: gym } = useQuery({
     queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
+    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data as (typeof gym) & { instagram_url?: string; whatsapp_number?: string } | null,
   });
 
   const signOut = async () => {
