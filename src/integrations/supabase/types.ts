@@ -43,6 +43,7 @@ export type Database = {
       }
       bookings: {
         Row: {
+          child_id: string | null
           class_id: string
           created_at: string
           id: string
@@ -50,6 +51,7 @@ export type Database = {
           status: Database["public"]["Enums"]["booking_status"]
         }
         Insert: {
+          child_id?: string | null
           class_id: string
           created_at?: string
           id?: string
@@ -57,6 +59,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["booking_status"]
         }
         Update: {
+          child_id?: string | null
           class_id?: string
           created_at?: string
           id?: string
@@ -65,10 +68,79 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "bookings_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_class_id_fkey"
             columns: ["class_id"]
             isOneToOne: false
             referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      children: {
+        Row: {
+          avatar_url: string | null
+          classes_attended: number
+          classes_remaining: number
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          experience_level: string | null
+          gender: string | null
+          id: string
+          injuries_notes: string | null
+          name: string
+          parent_id: string
+          streak: number
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          classes_attended?: number
+          classes_remaining?: number
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          experience_level?: string | null
+          gender?: string | null
+          id?: string
+          injuries_notes?: string | null
+          name: string
+          parent_id: string
+          streak?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          classes_attended?: number
+          classes_remaining?: number
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          experience_level?: string | null
+          gender?: string | null
+          id?: string
+          injuries_notes?: string | null
+          name?: string
+          parent_id?: string
+          streak?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "children_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -192,6 +264,7 @@ export type Database = {
           id: string
           injuries: string | null
           interests: string[]
+          is_parent: boolean
           membership_status: string
           name: string
           onboarded: boolean
@@ -213,6 +286,7 @@ export type Database = {
           id: string
           injuries?: string | null
           interests?: string[]
+          is_parent?: boolean
           membership_status?: string
           name?: string
           onboarded?: boolean
@@ -234,6 +308,7 @@ export type Database = {
           id?: string
           injuries?: string | null
           interests?: string[]
+          is_parent?: boolean
           membership_status?: string
           name?: string
           onboarded?: boolean
