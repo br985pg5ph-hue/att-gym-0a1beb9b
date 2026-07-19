@@ -280,21 +280,34 @@ function EditProfilePage() {
   const qc = useQueryClient();
 
   const [name, setName] = useState("");
+  const [cc, setCc] = useState("+962");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
 
   useEffect(() => {
-    if (profile) { setName(profile.name || ""); setPhone(profile.phone || ""); }
+    if (profile) {
+      setName(profile.name || "");
+      const full = profile.phone || "";
+      const matched = COUNTRIES.slice().sort((a, b) => b.code.length - a.code.length).find((c) => full.startsWith(c.code));
+      if (matched) {
+        setCc(matched.code);
+        setPhone(full.slice(matched.code.length));
+      } else {
+        setPhone(full);
+      }
+    }
     if (user) setEmail(user.email || "");
   }, [profile, user]);
+
+  const fullPhone = `${cc}${phone}`.trim();
 
   const saveProfile = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not signed in");
       if (!name.trim()) throw new Error("Name is required");
-      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: phone.trim() || null }).eq("id", user.id);
+      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null }).eq("id", user.id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Profile updated"); qc.invalidateQueries({ queryKey: ["profile"] }); },
