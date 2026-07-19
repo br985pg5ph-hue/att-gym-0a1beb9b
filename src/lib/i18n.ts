@@ -5,7 +5,7 @@ export const dict: Record<Lang, Dict> = {
   en: {
     appName: "ATT Academy",
     tagline: "Martial Arts & Functional Training",
-    home: "Home", book: "Book & Calendar", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin",
+    home: "Home", book: "Booking", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin",
     signIn: "Sign In", signUp: "Sign Up", signOut: "Sign Out", email: "Email", password: "Password", forgotPassword: "Forgot password?",
     createAccount: "Create Account", name: "Full name", phone: "Phone", confirmPassword: "Confirm password",
     interests: "Interests", pt: "Personal Training", womenOnly: "Women Only", mixed: "Mixed", kids: "Kids",
@@ -32,7 +32,7 @@ export const dict: Record<Lang, Dict> = {
   ar: {
     appName: "أكاديمية ATT",
     tagline: "فنون قتالية وتدريب وظيفي",
-    home: "الرئيسية", book: "الحجز والتقويم", coaches: "المدربون", news: "الأخبار", profile: "الملف", admin: "الإدارة",
+    home: "الرئيسية", book: "الحجز", coaches: "المدربون", news: "الأخبار", profile: "الملف", admin: "الإدارة",
     signIn: "تسجيل الدخول", signUp: "إنشاء حساب", signOut: "تسجيل الخروج", email: "البريد الإلكتروني", password: "كلمة المرور", forgotPassword: "نسيت كلمة المرور؟",
     createAccount: "إنشاء الحساب", name: "الاسم الكامل", phone: "الهاتف", confirmPassword: "تأكيد كلمة المرور",
     interests: "الاهتمامات", pt: "تدريب خاص", womenOnly: "للنساء فقط", mixed: "مختلط", kids: "أطفال",
