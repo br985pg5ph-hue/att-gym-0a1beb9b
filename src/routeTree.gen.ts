@@ -21,6 +21,7 @@ import { Route as AppLocationRouteImport } from './routes/_app/location'
 import { Route as AppHomeRouteImport } from './routes/_app/home'
 import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
 import { Route as AppBookRouteImport } from './routes/_app/book'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
 import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
 import { Route as AppProfilePaymentsRouteImport } from './routes/_app/profile.payments'
@@ -85,6 +86,11 @@ const AppBookRoute = AppBookRouteImport.update({
   path: '/book',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/forgot': typeof ForgotRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/forgot': typeof ForgotRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/forgot': typeof ForgotRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/book': typeof AppBookRoute
   '/_app/coaches': typeof AppCoachesRoute
   '/_app/home': typeof AppHomeRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/forgot'
     | '/reset-password'
     | '/signup'
+    | '/admin'
     | '/book'
     | '/coaches'
     | '/home'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/forgot'
     | '/reset-password'
     | '/signup'
+    | '/admin'
     | '/book'
     | '/coaches'
     | '/home'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/forgot'
     | '/reset-password'
     | '/signup'
+    | '/_app/admin'
     | '/_app/book'
     | '/_app/coaches'
     | '/_app/home'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile/settings': {
       id: '/_app/profile/settings'
       path: '/settings'
@@ -359,6 +378,7 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppBookRoute: typeof AppBookRoute
   AppCoachesRoute: typeof AppCoachesRoute
   AppHomeRoute: typeof AppHomeRoute
@@ -368,6 +388,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppBookRoute: AppBookRoute,
   AppCoachesRoute: AppCoachesRoute,
   AppHomeRoute: AppHomeRoute,
