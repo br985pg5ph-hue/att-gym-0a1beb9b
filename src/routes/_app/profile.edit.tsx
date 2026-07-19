@@ -392,9 +392,9 @@ function EditProfilePage() {
   );
 }
 
-function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function Field({ icon, label, children, className = "" }: { icon: React.ReactNode; label: string; children: React.ReactNode; className?: string }) {
   return (
-    <label className="block">
+    <label className={`block ${className}`}>
       <span className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
         {icon}{label}
       </span>
