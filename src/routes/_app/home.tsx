@@ -72,6 +72,19 @@ function HomePage() {
         </div>
 
 
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest">{t.classesAttended}</span></div>
+            <p className="font-display mt-1 text-3xl">{profile?.classes_attended ?? 0}</p>
+          </div>
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground"><Flame size={16} /><span className="text-[10px] uppercase tracking-widest">{t.currentStreak}</span></div>
+            <p className="font-display mt-1 text-3xl">{profile?.streak ?? 0} <span className="text-sm text-muted-foreground">{t.days}</span></p>
+          </div>
+        </div>
+
+
         {/* Location teaser */}
         <Link to="/location" className="card-surface block overflow-hidden">
           {gym && (
@@ -92,19 +105,6 @@ function HomePage() {
             <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
           </div>
         </Link>
-
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest">{t.classesAttended}</span></div>
-            <p className="font-display mt-1 text-3xl">{profile?.classes_attended ?? 0}</p>
-          </div>
-          <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Flame size={16} /><span className="text-[10px] uppercase tracking-widest">{t.currentStreak}</span></div>
-            <p className="font-display mt-1 text-3xl">{profile?.streak ?? 0} <span className="text-sm text-muted-foreground">{t.days}</span></p>
-          </div>
-        </div>
       </div>
     </div>
   );
