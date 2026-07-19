@@ -32,8 +32,9 @@ function ProfilePage() {
   const qc = useQueryClient();
   const { data: gym } = useQuery({
     queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data as (typeof gym) & { instagram_url?: string; whatsapp_number?: string } | null,
+    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
   });
+  const gymInfo = gym as (NonNullable<typeof gym> & { instagram_url?: string | null; whatsapp_number?: string | null }) | null;
 
   const signOut = async () => {
     await qc.cancelQueries();
