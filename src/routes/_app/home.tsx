@@ -57,7 +57,19 @@ function HomePage() {
 
   return (
     <div>
-      <PageHeader title={`${greeting},`} subtitle={profile?.name || ""} right={<Logo size={44} />} />
+      <PageHeader
+        title={`${greeting},`}
+        subtitle={profile?.name || ""}
+        right={
+          <Link to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <Logo size={44} />
+            )}
+          </Link>
+        }
+      />
 
       <div className="space-y-4 px-5">
         {/* Next class */}
