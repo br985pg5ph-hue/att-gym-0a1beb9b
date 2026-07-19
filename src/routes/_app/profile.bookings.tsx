@@ -98,9 +98,15 @@ function BookingsPage() {
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{b.classes.title}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{new Date(b.classes.starts_at).toLocaleString([], { weekday:"short", month:"short", day:"numeric" })}</p>
+                  {parentMode && b.child_id && (
+                    <span className="mt-2 inline-flex items-center gap-1 rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold">
+                      <User size={10} /> {childName(b.child_id)}
+                    </span>
+                  )}
                 </div>
                 <span className="rounded-pill bg-muted px-3 py-1 text-[10px] font-semibold uppercase text-muted-foreground">{b.status === "cancelled" ? t.cancelled : t.completed}</span>
               </div>
+
             ))}
           </div>
         </section>
