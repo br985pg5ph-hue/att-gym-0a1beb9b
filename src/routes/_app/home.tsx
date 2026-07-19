@@ -21,12 +21,6 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
 function HomePage() {
   const { profile, user } = useAuth();
   const { t } = useLang();
-  const [coords, setCoords] = useState<{lat:number; lng:number} | null>(null);
-
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((p) => setCoords({ lat: p.coords.latitude, lng: p.coords.longitude }), () => {});
-  }, []);
 
   const { data: gym } = useQuery({
     queryKey: ["gym"],
@@ -50,8 +44,6 @@ function HomePage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
 
-  const distanceKm = coords && gym ? haversine(coords.lat, coords.lng, Number(gym.lat), Number(gym.lng)) : null;
-  const etaMin = distanceKm ? Math.max(3, Math.round((distanceKm / 30) * 60)) : null;
 
   return (
     <div>
