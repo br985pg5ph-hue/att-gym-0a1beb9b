@@ -350,9 +350,12 @@ function EditProfilePage() {
           <Field icon={<User size={16} />} label={t.name}>
             <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full bg-transparent text-sm outline-none" />
           </Field>
-          <Field icon={<Phone size={16} />} label={t.phone}>
-            <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="w-full bg-transparent text-sm outline-none" placeholder="+962 …" />
-          </Field>
+          <div className="flex items-end gap-2">
+            <CountrySelect value={cc} onChange={setCc} />
+            <Field icon={<Phone size={16} />} label={t.phone} className="flex-1">
+              <input value={phone} onChange={(e)=>setPhone(e.target.value)} inputMode="tel" className="w-full bg-transparent text-sm outline-none" placeholder="7xxxxxxx" />
+            </Field>
+          </div>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
           </button>
