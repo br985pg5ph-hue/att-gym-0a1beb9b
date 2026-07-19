@@ -1,84 +1,71 @@
 
-# ATT Academy — Build Plan
+# Parent Mode
 
-Mobile-first PWA-style web app for Antaki Top Team with Supabase auth + Postgres, dark/light theme, EN/AR (RTL), member and staff roles.
+Let a parent manage one or more kids from a single account. No separate login for kids. Same 5-tab shell — a child-switcher pill in the header scopes Home, Booking, and My Bookings to the selected child. Parent keeps one wallet; each child has their own classes-left counter and streak.
 
-## Assumptions (flag anything to change)
-- **Social login**: Lovable Cloud supports Google + Apple natively — I'll wire both. (Email/password is default.)
-- **Payments**: UI + transactions ledger now; real Stripe wired in a later phase when you say go.
-- **Push notifications**: In-app banner previews only for now (real web push is a later phase).
-- **Gym info**: I'll seed a placeholder address/lat-lng/hours you can edit later in the Admin section (or I can add a gym_info admin editor — say the word).
-- **First staff account**: I'll seed one admin email you provide, OR create a one-time SQL migration promoting the first signup — please tell me your admin email. Default: I'll add a `role` column defaulting to `member`, and you promote via SQL/admin.
-- **Logo assets**: use both uploaded logos (dark version for light theme, light/silver version for dark theme).
-- **Map**: static placeholder + "Open in Maps" deep link (no Mapbox/Leaflet unless requested).
-- **i18n**: lightweight in-house dictionary (no i18next dep) — nav + headers + key CTAs translated; long-form content (announcement bodies, coach bios) stays in whatever language it's authored in.
+## Data model
 
-## Phase 1 — Foundation (this turn)
-1. Enable Lovable Cloud (Supabase).
-2. Design system in `src/styles.css`: dark/light tokens (#0a0a0a/#efece5, #c8102e accent, silver, hairlines), Bebas Neue via `<link>` in `__root.tsx`, Inter, pill radius utilities.
-3. Theme provider (dark/light, persisted) + Language provider (EN/AR, RTL via `dir` on `<html>`).
-4. App shell: fixed blurred bottom tab bar (Home/Book/Coaches/News/Profile + Admin for staff), safe-area padding.
-5. Upload logos as Lovable Assets; `<Logo />` component that swaps by theme.
-6. Update `__root.tsx` head (title, description, OG).
+New table `children` (sub-profiles under a parent):
+- `parent_id` → `profiles.id`
+- `name`, `date_of_birth`, `gender`
+- `experience_level`, `injuries_notes` (same fields as the onboarding questionnaire, but per child)
+- `emergency_contact_name`, `emergency_contact_phone`
+- `classes_remaining` (per child)
+- `streak`, `classes_attended` (per child)
+- `avatar_url`
 
-## Phase 2 — Data model & auth
-Migrations:
-- `app_role` enum: `member`, `staff`
-- `profiles` (id → auth.users, name, phone, role, membership_status, wallet_balance numeric, referral_code unique, streak, classes_attended, avatar_url, interests text[])
-- `coaches` (id, name, specialty, bio, photo_url)
-- `classes` (id, type, coach_id, starts_at timestamptz, duration_min, capacity)
-- `bookings` (id, member_id, class_id, status, created_at) + unique(member,class)
-- `announcements` (id, tag, title, body, created_at, author_id)
-- `transactions` (id, member_id, amount, type: credit/debit, description, created_at)
-- `gym_info` (single row: address, lat, lng, hours jsonb, phone)
-- Auto-create profile on signup trigger, auto-generate referral_code.
-- `has_role(uid, role)` SECURITY DEFINER function.
-- GRANTs + RLS: members read/write own bookings/transactions, read public tables; staff writes to classes/coaches/announcements/other bookings.
-- Seed: 4 coaches, ~14 days of classes across PT/Women Only/Mixed/Kids, 3 announcements, gym_info row.
+Changes to existing tables:
+- `profiles.is_parent` (bool) — flips the UI into Parent Mode.
+- `bookings.child_id` (nullable FK → `children.id`) — when set, the booking is for that child instead of the parent. `member_id` stays as the parent (owner of the booking / who pays).
 
-Auth pages (`/auth`, `/auth/signup`, `/auth/forgot`, `/reset-password`):
-- Email/password + Google + Apple (via `lovable.auth.signInWithOAuth`).
-- Signup collects name, phone (with country-code picker), interests chips.
-- `_authenticated` layout gates the app (integration-managed).
+RLS:
+- Parents can read/write only their own `children` rows and any `bookings` where `member_id = auth.uid()`.
+- Staff (admin) can read all children and see child names in the class roster.
+- Capacity trigger unchanged (it counts bookings per class regardless of who they're for).
 
-## Phase 3 — Member screens
-Routes under `_authenticated/`:
-- `/` Home — greeting, next class card, "time to gym" ETA (geolocation + haversine @ 30km/h), location teaser, stats.
-- `/location` — address, Directions/Call buttons, hours, map placeholder.
-- `/book` — month calendar with booked-day dots, filter chips, day slot list (capacity-aware, disables full/booked), sticky Confirm.
-- `/coaches` — coach cards.
-- `/news` — announcements feed with tag pill + relative time.
-- `/profile` — avatar, membership badge, wallet card, menu rows.
-- `/profile/bookings` — Upcoming (Cancel) / Past.
-- `/profile/referral` — code + Copy (✓ Copied 1.8s), share, how it works, stats.
-- `/profile/payments` — wallet hero, top-up chips (writes a transaction), plan, saved methods (UI), color-coded history.
-- `/profile/settings` — theme, language, notification toggles, legal, Delete Account.
-- In-app banner component for leave-by + new-announcement previews.
+## Signup + onboarding
 
-Server functions for: booking create/cancel (capacity check in a transaction), wallet top-up (insert transaction + update balance atomically), referral code generation.
+- Signup page adds a toggle: **"I'm training"** vs **"I'm signing up my kid(s)"**.
+- Choosing kids flow:
+  1. Parent basic info (name, phone, email, password) — no interest chips.
+  2. "Add a child" step: name, DOB, gender, experience, injuries, emergency contact. Add another / finish.
+  3. Sets `profiles.is_parent = true`.
+- Same flow reachable later from **Profile → Settings → Parent Mode** (toggle on + "Add child") so any existing member can switch.
 
-## Phase 4 — Staff Admin
-`/admin` visible only when `role = staff`:
-- Announcements CRUD.
-- Classes CRUD + roster view per class + remove attendee.
-- Coaches CRUD (photo upload to Supabase Storage).
-- Members list (read-only): name, membership, wallet.
+## UI — Parent Mode on
 
-## Phase 5 — Polish
-Sitemap/robots, SEO on public `/auth`, empty states, loading skeletons, verify build.
+Header child-switcher (shown on Home, Booking, My Bookings, Profile):
+- Small pill with the active child's avatar + first name; tap to open a sheet listing all children + "Add child" + "Me" (parent viewing their own stuff, e.g. for wallet).
+- Selection persists in local state (per session) and defaults to the first child.
 
----
+Screens, scoped to the selected child:
+- **Home** — greeting says "Hi [Parent name]" with subtitle "Viewing [Child]". Next Session card reads that child's next booking. Classes Left + streak + attendance come from the child row. Location widget unchanged.
+- **Booking** — class list filters to `type = 'kids'` automatically when a child is selected. Confirm writes a booking with `member_id = parent`, `child_id = selected child`. Capacity check unchanged.
+- **My Bookings** (Profile → My Bookings) — grouped by child, each row shows which child it's for. 12-hour cancel rule unchanged.
+- **Profile** — parent's own name, avatar, contact info; a new **"My Children"** section lists each child with edit (name/DOB/experience/injuries/emergency contact/avatar/remove). Wallet + payments + referrals + socials stay parent-scoped.
+- **News, Coaches, Location** — unchanged (shared content).
+
+Staff Admin additions:
+- Class roster row shows child name + "(child of [Parent])" when `child_id` is set.
+- Member list gets a "Children" count column; tap a parent to see their kids and each kid's classes-left.
+
+## Copy / small polish
+
+- Empty child switcher (parent with 0 kids): pill says "Add child" and opens the add-child sheet directly.
+- "Classes Left" card on Home is per-child in Parent Mode; admins can top up per child from the member detail.
+- The onboarding questionnaire is skipped for the parent themselves in kids-flow — they answer it per child instead.
+
+## Out of scope for this pass
+
+- Kids logging in with their own accounts (upgrade path can come later).
+- Per-child wallets. Wallet stays parent-level; classes-left is the per-child counter.
+- Payments integration (still UI-only until Stripe step).
 
 ## Technical notes
-- TanStack Start + TanStack Query loaders (`ensureQueryData` + `useSuspenseQuery`).
-- Booking create uses a Postgres function with row lock for capacity safety.
-- Wallet balance derived-or-cached: keep `profiles.wallet_balance` updated by a trigger on `transactions` insert (single source of truth = transactions table).
-- Theme + language stored in `localStorage`, applied on hydration via `useEffect` to avoid SSR mismatch; server renders default (dark, EN).
-- RTL via `dir="rtl"` on `<html>` — Tailwind's logical properties (`ms-`, `me-`, `ps-`, `pe-`) used where directionality matters.
 
-## What I need from you before starting
-1. **Admin email** to seed as the first staff account (or say "I'll do it via SQL later").
-2. **Gym address + phone** (or use placeholder — Beirut, Lebanon by default?).
-3. Confirm assumptions above (payments UI-only for now, no real push, i18n scope).
-
-Reply "go" (with any tweaks) and I'll start with Phase 1.
+- New `children` table + migration with GRANTs + RLS scoped to `parent_id = auth.uid()`, plus admin-read policy via `has_role`.
+- `bookings.child_id` nullable so existing member bookings keep working.
+- Add a `ChildContext` provider (selected child id) mounted inside the `_app` layout; hooks like `useSelectedChild()` power the switcher and scoped queries.
+- Query keys include child id: `["bookings", parentId, childId]`, `["stats", childId]` so switching children refetches cleanly.
+- Booking cancel/12h rule and capacity trigger untouched.
+- Update `handle_new_user` only if we want to write `is_parent` from signup metadata; otherwise set it via a client-side update right after signup completes.
