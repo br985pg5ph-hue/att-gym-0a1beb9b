@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, Gift, CreditCard, Settings, LogOut, ChevronRight, User, Phone } from "lucide-react";
+import { CalendarCheck, Gift, CreditCard, Settings, LogOut, ChevronRight, User, Phone, Users } from "lucide-react";
+import { useChildren } from "@/lib/providers";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
