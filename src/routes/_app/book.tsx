@@ -1,0 +1,176 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/AppShell";
+import { useAuth, useLang } from "@/lib/providers";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_app/book")({
+  component: BookPage,
+});
+
+const TYPES = [
+  { key: "all", labelKey: "all" as const },
+  { key: "pt", labelKey: "pt" as const },
+  { key: "women_only", labelKey: "womenOnly" as const },
+  { key: "mixed", labelKey: "mixed" as const },
+  { key: "kids", labelKey: "kids" as const },
+];
+
+function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
+
+function BookPage() {
+  const { t } = useLang();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [selectedDate, setSelectedDate] = useState(fmtDay(new Date()));
+  const [filter, setFilter] = useState<string>("all");
+  const [pickedId, setPickedId] = useState<string | null>(null);
+
+  const { data: classes = [] } = useQuery({
+    queryKey: ["classes"],
+    queryFn: async () => {
+      const { data } = await supabase.from("classes")
+        .select("id, type, title, starts_at, duration_min, capacity, coaches(name)")
+        .gte("starts_at", new Date(Date.now() - 24*3600*1000).toISOString())
+        .order("starts_at");
+      return data ?? [];
+    },
+  });
+
+  const { data: myBookings = [] } = useQuery({
+    queryKey: ["my-bookings", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await supabase.from("bookings").select("id, class_id, status").eq("member_id", user!.id)).data ?? [],
+  });
+
+  const { data: counts = {} } = useQuery({
+    queryKey: ["class-counts"],
+    queryFn: async () => {
+      const { data } = await supabase.from("bookings").select("class_id, status").eq("status", "upcoming");
+      const map: Record<string, number> = {};
+      (data ?? []).forEach((b: any) => { map[b.class_id] = (map[b.class_id] ?? 0) + 1; });
+      return map;
+    },
+  });
+
+  const bookedClassIds = new Set(myBookings.filter((b: any) => b.status === "upcoming").map((b: any) => b.class_id));
+  const daysWithBookings = new Set(
+    myBookings.filter((b: any) => b.status === "upcoming")
+      .map((b: any) => classes.find((c: any) => c.id === b.class_id))
+      .filter(Boolean).map((c: any) => c.starts_at.slice(0, 10))
+  );
+
+  const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (filter === "all" || c.type === filter));
+
+  const book = useMutation({
+    mutationFn: async (classId: string) => {
+      const { error } = await supabase.from("bookings").insert({ member_id: user!.id, class_id: classId, status: "upcoming" });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Booked!");
+      setPickedId(null);
+      qc.invalidateQueries({ queryKey: ["my-bookings"] });
+      qc.invalidateQueries({ queryKey: ["class-counts"] });
+      qc.invalidateQueries({ queryKey: ["next-booking"] });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Booking failed"),
+  });
+
+  // Month grid
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = today.getMonth();
+  const first = new Date(y, m, 1);
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const startPad = first.getDay();
+  const cells: Array<Date | null> = [];
+  for (let i = 0; i < startPad; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
+
+  return (
+    <div>
+      <PageHeader title={t.book} subtitle={first.toLocaleString([], { month: "long", year: "numeric" })} />
+
+      <div className="px-5">
+        <div className="card-surface p-4">
+          <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
+            {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
+          </div>
+          <div className="mt-2 grid grid-cols-7 gap-1">
+            {cells.map((d, i) => {
+              if (!d) return <div key={i} />;
+              const key = fmtDay(d);
+              const hasBooking = daysWithBookings.has(key);
+              const active = key === selectedDate;
+              const isToday = key === fmtDay(new Date());
+              return (
+                <button key={i} onClick={() => setSelectedDate(key)}
+                  className={`relative aspect-square rounded-lg text-sm transition ${
+                    active ? "bg-primary text-primary-foreground font-semibold" :
+                    isToday ? "border hairline" : "hover:bg-muted"
+                  }`}>
+                  {d.getDate()}
+                  {hasBooking && !active && <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+          {TYPES.map((tp) => (
+            <button key={tp.key} onClick={() => setFilter(tp.key)}
+              className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
+                filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+              }`}>
+              {t[tp.labelKey]}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-2 space-y-2">
+          {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
+          {daySlots.map((c: any) => {
+            const cnt = counts[c.id] ?? 0;
+            const full = cnt >= c.capacity;
+            const booked = bookedClassIds.has(c.id);
+            const picked = pickedId === c.id;
+            const disabled = full || booked;
+            return (
+              <button key={c.id} onClick={() => !disabled && setPickedId(picked ? null : c.id)}
+                className={`card-surface flex w-full items-center justify-between p-4 text-start transition ${
+                  picked ? "border-primary ring-1 ring-primary" : ""
+                } ${disabled ? "opacity-60" : ""}`}>
+                <div className="min-w-0">
+                  <p className="font-display text-lg leading-none">{c.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {c.coaches?.name && ` • ${c.coaches.name}`}
+                  </p>
+                </div>
+                <span className={`shrink-0 rounded-pill px-3 py-1 text-[10px] font-semibold uppercase ${
+                  booked ? "bg-silver/20 text-silver" : full ? "bg-destructive/20 text-destructive" : "bg-primary/15 text-primary"
+                }`}>
+                  {booked ? t.booked : full ? t.full : `${c.capacity - cnt} ${t.slotsLeft}`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
+        <button
+          disabled={!pickedId || book.isPending}
+          onClick={() => pickedId && book.mutate(pickedId)}
+          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:opacity-40"
+        >
+          {book.isPending ? "…" : pickedId ? t.confirmBooking : t.selectSlot}
+        </button>
+      </div>
+    </div>
+  );
+}
