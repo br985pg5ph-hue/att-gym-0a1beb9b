@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
-import { MapPin, Phone, Navigation } from "lucide-react";
+import { Phone, Navigation } from "lucide-react";
 
 export const Route = createFileRoute("/_app/location")({
   component: LocationPage,
