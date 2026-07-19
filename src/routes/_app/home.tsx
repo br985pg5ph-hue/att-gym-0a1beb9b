@@ -80,19 +80,6 @@ function HomePage() {
           )}
         </div>
 
-        {/* Time to gym */}
-        <div className="card-surface p-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary"><Clock size={20} /></div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.timeToGym}</p>
-              <p className="font-display text-2xl leading-none mt-1">
-                {etaMin ? `${etaMin} min` : "—"}
-              </p>
-              {distanceKm && <p className="text-xs text-muted-foreground">{distanceKm.toFixed(1)} km away</p>}
-            </div>
-          </div>
-        </div>
 
         {/* Location teaser */}
         <Link to="/location" className="card-surface block overflow-hidden">
