@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useLang, useTheme } from "@/lib/providers";
-import { ChevronLeft, Moon, Sun, Languages, Bell, FileText, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/settings")({
@@ -30,7 +30,16 @@ function SettingsPage() {
       </div>
       <PageHeader title={t.settings} />
       <div className="space-y-4 px-5">
+        <Link to="/profile/edit" className="card-surface flex items-center gap-3 p-4 hover:bg-muted/40">
+          <UserCog size={18} className="text-muted-foreground" />
+          <div className="flex-1">
+            <p className="text-sm font-medium">Edit Profile</p>
+            <p className="text-xs text-muted-foreground">Name, phone, email, password</p>
+          </div>
+          <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
+        </Link>
         <div className="card-surface divide-y hairline overflow-hidden">
+
           <div className="flex items-center gap-3 p-4">
             {theme === "dark" ? <Moon size={18} className="text-muted-foreground"/> : <Sun size={18} className="text-muted-foreground"/>}
             <span className="flex-1 text-sm font-medium">{t.theme}</span>
