@@ -15,6 +15,19 @@ function relTime(d: string) {
   if (s < 86400) return `${Math.floor(s/3600)}h ago`;
   return `${Math.floor(s/86400)}d ago`;
 }
+function dayLabel(d: string) {
+  const date = new Date(d);
+  const now = new Date();
+  const startOfDay = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  return date.toLocaleDateString([], { month: "short", day: "numeric", year: date.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+}
+function timeLabel(d: string) {
+  return new Date(d).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
 const TAG_COLORS: Record<string,string> = {
   Event: "bg-primary/15 text-primary",
   News: "bg-silver/20 text-silver",
@@ -39,7 +52,14 @@ function NewsPage() {
             </div>
             <h2 className="font-display mt-3 text-2xl leading-tight">{a.title}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{a.body}</p>
+            <div className="mt-3 flex items-center gap-2 border-t border-hairline pt-3 text-[11px] text-muted-foreground">
+              <span className="font-medium text-foreground">{dayLabel(a.created_at)}</span>
+              <span>·</span>
+              <span>{timeLabel(a.created_at)}</span>
+              <span className="ml-auto">{new Date(a.created_at).toLocaleDateString([], { year: "numeric", month: "short", day: "numeric" })}</span>
+            </div>
           </article>
+
         ))}
       </div>
     </div>
