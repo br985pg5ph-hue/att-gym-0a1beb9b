@@ -39,12 +39,13 @@ function PaymentsPage() {
       <div className="space-y-4 px-5">
         <div className="card-surface p-6 bg-gradient-to-br from-primary/25 to-transparent">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.wallet}</p>
-          <p className="font-display mt-1 text-5xl">${Number(profile?.wallet_balance ?? 0).toFixed(2)}</p>
+          <p className="font-display mt-1 text-5xl">{Number(profile?.wallet_balance ?? 0).toFixed(2)} <span className="text-2xl text-muted-foreground">JOD</span></p>
           <div className="mt-4 flex gap-2">
-            {[20, 50, 100].map(v => (
+            {[10, 25, 50].map(v => (
               <button key={v} disabled={topUp.isPending} onClick={()=>topUp.mutate(v)}
-                className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+${v}</button>
+                className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+{v} JOD</button>
             ))}
+
           </div>
         </div>
 
