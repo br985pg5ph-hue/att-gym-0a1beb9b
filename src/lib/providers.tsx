@@ -14,7 +14,7 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict 
 type Profile = {
   id: string; name: string; phone: string | null; avatar_url: string | null;
   role: "member" | "staff"; membership_status: string; wallet_balance: number;
-  referral_code: string; streak: number; classes_attended: number; interests: string[];
+  referral_code: string; streak: number; classes_attended: number; classes_remaining: number; interests: string[];
 };
 const AuthCtx = createContext<{ user: User | null; profile: Profile | null; loading: boolean; refresh: () => Promise<void> }>({
   user: null, profile: null, loading: true, refresh: async () => {},

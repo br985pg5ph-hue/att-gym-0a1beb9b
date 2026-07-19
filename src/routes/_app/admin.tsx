@@ -231,7 +231,7 @@ function CoachesAdmin() {
 function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
-    queryFn: async () => (await supabase.from("profiles").select("id, name, membership_status, wallet_balance, role").order("name")).data ?? [],
+    queryFn: async () => (await supabase.from("profiles").select("id, name, membership_status, wallet_balance, classes_remaining, role").order("name")).data ?? [],
   });
   return (
     <div className="space-y-2">
@@ -239,7 +239,7 @@ function MembersAdmin() {
         <div key={m.id} className="card-surface flex items-center justify-between p-4">
           <div className="min-w-0">
             <p className="font-display text-lg leading-none">{m.name || "—"}</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status}</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
           </div>
           <p className="shrink-0 font-display text-xl">{Number(m.wallet_balance).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span></p>
         </div>
