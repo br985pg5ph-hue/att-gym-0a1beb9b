@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
-import { MapPin, Flame, Trophy, ChevronRight } from "lucide-react";
+import { MapPin, Flame, Trophy, ChevronRight, Ticket } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -89,6 +89,22 @@ function HomePage() {
         </div>
 
 
+
+        {/* Classes remaining */}
+        <div className="card-surface p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Ticket size={16} />
+                <span className="text-[10px] uppercase tracking-widest">{t.classesLeft}</span>
+              </div>
+              <p className="font-display mt-1 text-4xl">{profile?.classes_remaining ?? 0}</p>
+            </div>
+            <Link to="/book" className="shrink-0 rounded-pill bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground">
+              {t.book}
+            </Link>
+          </div>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
