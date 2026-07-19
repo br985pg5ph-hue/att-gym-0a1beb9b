@@ -81,8 +81,8 @@ function SignUpPage() {
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
 
         <button disabled={loading} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
-
           {loading ? "…" : t.createAccount}
+
         </button>
       </form>
       <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
