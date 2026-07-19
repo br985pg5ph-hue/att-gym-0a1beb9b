@@ -24,10 +24,13 @@ function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
 
 function BookPage() {
   const { t } = useLang();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { selectedChild } = useChildren();
+  const parentMode = !!profile?.is_parent;
+  const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(fmtDay(new Date()));
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
   const { data: classes = [] } = useQuery({
@@ -42,9 +45,14 @@ function BookPage() {
   });
 
   const { data: myBookings = [] } = useQuery({
-    queryKey: ["my-bookings", user?.id],
+    queryKey: ["my-bookings", user?.id, bookingForChild?.id ?? "self"],
     enabled: !!user,
-    queryFn: async () => (await supabase.from("bookings").select("id, class_id, status").eq("member_id", user!.id)).data ?? [],
+    queryFn: async () => {
+      let q = supabase.from("bookings").select("id, class_id, status, child_id").eq("member_id", user!.id);
+      if (bookingForChild) q = q.eq("child_id", bookingForChild.id);
+      else q = q.is("child_id", null);
+      return (await q).data ?? [];
+    },
   });
 
   const { data: counts = {} } = useQuery({
@@ -64,17 +72,21 @@ function BookPage() {
       .filter(Boolean).map((c: any) => c.starts_at.slice(0, 10))
   );
 
-  const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (filter === "all" || c.type === filter));
+  const effectiveFilter = bookingForChild ? "kids" : filter;
+  const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (effectiveFilter === "all" || c.type === effectiveFilter));
 
   const book = useMutation({
     mutationFn: async (classId: string) => {
-      const { error } = await supabase.from("bookings").insert({ member_id: user!.id, class_id: classId, status: "upcoming" });
+      const payload: any = { member_id: user!.id, class_id: classId, status: "upcoming" };
+      if (bookingForChild) payload.child_id = bookingForChild.id;
+      const { error } = await supabase.from("bookings").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Booked!");
+      toast.success(bookingForChild ? `Booked for ${bookingForChild.name}!` : "Booked!");
       setPickedId(null);
       qc.invalidateQueries({ queryKey: ["my-bookings"] });
+      qc.invalidateQueries({ queryKey: ["all-bookings"] });
       qc.invalidateQueries({ queryKey: ["class-counts"] });
       qc.invalidateQueries({ queryKey: ["next-booking"] });
     },
@@ -94,7 +106,12 @@ function BookPage() {
 
   return (
     <div>
-      <PageHeader title={t.book} subtitle={first.toLocaleString([], { month: "long", year: "numeric" })} />
+      <PageHeader
+        title={t.book}
+        subtitle={bookingForChild ? `Booking for ${bookingForChild.name}` : first.toLocaleString([], { month: "long", year: "numeric" })}
+        right={<ChildSwitcher />}
+      />
+
 
       <div className="px-5">
         <div className="card-surface p-4">
