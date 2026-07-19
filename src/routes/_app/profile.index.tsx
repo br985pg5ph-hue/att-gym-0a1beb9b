@@ -48,7 +48,7 @@ function ProfilePage() {
         <Link to="/profile/payments" className="card-surface block p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.wallet}</p>
           <div className="mt-1 flex items-end justify-between">
-            <p className="font-display text-4xl">${Number(profile?.wallet_balance ?? 0).toFixed(2)}</p>
+            <p className="font-display text-4xl">{Number(profile?.wallet_balance ?? 0).toFixed(2)} <span className="text-xl text-muted-foreground">JOD</span></p>
             <span className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">{t.topUp}</span>
           </div>
         </Link>
