@@ -9,38 +9,257 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ForgotRouteImport } from './routes/forgot'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppNewsRouteImport } from './routes/_app/news'
+import { Route as AppLocationRouteImport } from './routes/_app/location'
+import { Route as AppHomeRouteImport } from './routes/_app/home'
+import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
+import { Route as AppBookRouteImport } from './routes/_app/book'
+import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
+import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
+import { Route as AppProfilePaymentsRouteImport } from './routes/_app/profile.payments'
+import { Route as AppProfileBookingsRouteImport } from './routes/_app/profile.bookings'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotRoute = ForgotRouteImport.update({
+  id: '/forgot',
+  path: '/forgot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNewsRoute = AppNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLocationRoute = AppLocationRouteImport.update({
+  id: '/location',
+  path: '/location',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCoachesRoute = AppCoachesRouteImport.update({
+  id: '/coaches',
+  path: '/coaches',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBookRoute = AppBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppProfileRoute,
+} as any)
+const AppProfileReferralRoute = AppProfileReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
+  getParentRoute: () => AppProfileRoute,
+} as any)
+const AppProfilePaymentsRoute = AppProfilePaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AppProfileRoute,
+} as any)
+const AppProfileBookingsRoute = AppProfileBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AppProfileRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/forgot': typeof ForgotRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/book': typeof AppBookRoute
+  '/coaches': typeof AppCoachesRoute
+  '/home': typeof AppHomeRoute
+  '/location': typeof AppLocationRoute
+  '/news': typeof AppNewsRoute
+  '/profile': typeof AppProfileRouteWithChildren
+  '/profile/bookings': typeof AppProfileBookingsRoute
+  '/profile/payments': typeof AppProfilePaymentsRoute
+  '/profile/referral': typeof AppProfileReferralRoute
+  '/profile/settings': typeof AppProfileSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/forgot': typeof ForgotRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/book': typeof AppBookRoute
+  '/coaches': typeof AppCoachesRoute
+  '/home': typeof AppHomeRoute
+  '/location': typeof AppLocationRoute
+  '/news': typeof AppNewsRoute
+  '/profile': typeof AppProfileRouteWithChildren
+  '/profile/bookings': typeof AppProfileBookingsRoute
+  '/profile/payments': typeof AppProfilePaymentsRoute
+  '/profile/referral': typeof AppProfileReferralRoute
+  '/profile/settings': typeof AppProfileSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/forgot': typeof ForgotRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/_app/book': typeof AppBookRoute
+  '/_app/coaches': typeof AppCoachesRoute
+  '/_app/home': typeof AppHomeRoute
+  '/_app/location': typeof AppLocationRoute
+  '/_app/news': typeof AppNewsRoute
+  '/_app/profile': typeof AppProfileRouteWithChildren
+  '/_app/profile/bookings': typeof AppProfileBookingsRoute
+  '/_app/profile/payments': typeof AppProfilePaymentsRoute
+  '/_app/profile/referral': typeof AppProfileReferralRoute
+  '/_app/profile/settings': typeof AppProfileSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/forgot'
+    | '/reset-password'
+    | '/signup'
+    | '/book'
+    | '/coaches'
+    | '/home'
+    | '/location'
+    | '/news'
+    | '/profile'
+    | '/profile/bookings'
+    | '/profile/payments'
+    | '/profile/referral'
+    | '/profile/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/forgot'
+    | '/reset-password'
+    | '/signup'
+    | '/book'
+    | '/coaches'
+    | '/home'
+    | '/location'
+    | '/news'
+    | '/profile'
+    | '/profile/bookings'
+    | '/profile/payments'
+    | '/profile/referral'
+    | '/profile/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/forgot'
+    | '/reset-password'
+    | '/signup'
+    | '/_app/book'
+    | '/_app/coaches'
+    | '/_app/home'
+    | '/_app/location'
+    | '/_app/news'
+    | '/_app/profile'
+    | '/_app/profile/bookings'
+    | '/_app/profile/payments'
+    | '/_app/profile/referral'
+    | '/_app/profile/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ForgotRoute: typeof ForgotRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot': {
+      id: '/forgot'
+      path: '/forgot'
+      fullPath: '/forgot'
+      preLoaderRoute: typeof ForgotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +267,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/news': {
+      id: '/_app/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof AppNewsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/location': {
+      id: '/_app/location'
+      path: '/location'
+      fullPath: '/location'
+      preLoaderRoute: typeof AppLocationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/coaches': {
+      id: '/_app/coaches'
+      path: '/coaches'
+      fullPath: '/coaches'
+      preLoaderRoute: typeof AppCoachesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/book': {
+      id: '/_app/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof AppBookRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile/settings': {
+      id: '/_app/profile/settings'
+      path: '/settings'
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof AppProfileSettingsRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
+    '/_app/profile/referral': {
+      id: '/_app/profile/referral'
+      path: '/referral'
+      fullPath: '/profile/referral'
+      preLoaderRoute: typeof AppProfileReferralRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
+    '/_app/profile/payments': {
+      id: '/_app/profile/payments'
+      path: '/payments'
+      fullPath: '/profile/payments'
+      preLoaderRoute: typeof AppProfilePaymentsRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
+    '/_app/profile/bookings': {
+      id: '/_app/profile/bookings'
+      path: '/bookings'
+      fullPath: '/profile/bookings'
+      preLoaderRoute: typeof AppProfileBookingsRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
   }
 }
 
+interface AppProfileRouteChildren {
+  AppProfileBookingsRoute: typeof AppProfileBookingsRoute
+  AppProfilePaymentsRoute: typeof AppProfilePaymentsRoute
+  AppProfileReferralRoute: typeof AppProfileReferralRoute
+  AppProfileSettingsRoute: typeof AppProfileSettingsRoute
+}
+
+const AppProfileRouteChildren: AppProfileRouteChildren = {
+  AppProfileBookingsRoute: AppProfileBookingsRoute,
+  AppProfilePaymentsRoute: AppProfilePaymentsRoute,
+  AppProfileReferralRoute: AppProfileReferralRoute,
+  AppProfileSettingsRoute: AppProfileSettingsRoute,
+}
+
+const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
+  AppProfileRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppBookRoute: typeof AppBookRoute
+  AppCoachesRoute: typeof AppCoachesRoute
+  AppHomeRoute: typeof AppHomeRoute
+  AppLocationRoute: typeof AppLocationRoute
+  AppNewsRoute: typeof AppNewsRoute
+  AppProfileRoute: typeof AppProfileRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppBookRoute: AppBookRoute,
+  AppCoachesRoute: AppCoachesRoute,
+  AppHomeRoute: AppHomeRoute,
+  AppLocationRoute: AppLocationRoute,
+  AppNewsRoute: AppNewsRoute,
+  AppProfileRoute: AppProfileRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ForgotRoute: ForgotRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
