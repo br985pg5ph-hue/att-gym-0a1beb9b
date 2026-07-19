@@ -81,7 +81,7 @@ function PaymentsPage() {
                   <p className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString()}</p>
                 </div>
                 <p className={`shrink-0 font-display text-lg ${tx.type === "credit" ? "text-emerald-400" : "text-destructive"}`}>
-                  {tx.type === "credit" ? "+" : "-"}${Number(tx.amount).toFixed(2)}
+                  {tx.type === "credit" ? "+" : "-"}{Number(tx.amount).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span>
                 </p>
               </div>
             ))}
