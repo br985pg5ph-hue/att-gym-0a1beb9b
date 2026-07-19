@@ -3,12 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
-import { useAuth, useLang } from "@/lib/providers";
+import { ChildSwitcher } from "@/components/ChildSwitcher";
+import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/book")({
   component: BookPage,
 });
+
 
 const TYPES = [
   { key: "all", labelKey: "all" as const },
