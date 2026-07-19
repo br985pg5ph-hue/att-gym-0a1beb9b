@@ -14,16 +14,256 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      announcements: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          tag: string
+          title: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          tag?: string
+          title: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          tag?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          member_id: string
+          status: Database["public"]["Enums"]["booking_status"]
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          member_id: string
+          status?: Database["public"]["Enums"]["booking_status"]
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          capacity: number
+          coach_id: string | null
+          created_at: string
+          duration_min: number
+          id: string
+          starts_at: string
+          title: string | null
+          type: Database["public"]["Enums"]["class_type"]
+        }
+        Insert: {
+          capacity?: number
+          coach_id?: string | null
+          created_at?: string
+          duration_min?: number
+          id?: string
+          starts_at: string
+          title?: string | null
+          type: Database["public"]["Enums"]["class_type"]
+        }
+        Update: {
+          capacity?: number
+          coach_id?: string | null
+          created_at?: string
+          duration_min?: number
+          id?: string
+          starts_at?: string
+          title?: string | null
+          type?: Database["public"]["Enums"]["class_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coaches: {
+        Row: {
+          bio: string
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          sort_order: number
+          specialty: string
+        }
+        Insert: {
+          bio?: string
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          sort_order?: number
+          specialty: string
+        }
+        Update: {
+          bio?: string
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          sort_order?: number
+          specialty?: string
+        }
+        Relationships: []
+      }
+      gym_info: {
+        Row: {
+          address: string
+          hours: Json
+          id: number
+          lat: number
+          lng: number
+          name: string
+          phone: string
+        }
+        Insert: {
+          address: string
+          hours?: Json
+          id?: number
+          lat: number
+          lng: number
+          name?: string
+          phone: string
+        }
+        Update: {
+          address?: string
+          hours?: Json
+          id?: number
+          lat?: number
+          lng?: number
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          classes_attended: number
+          created_at: string
+          id: string
+          interests: string[]
+          membership_status: string
+          name: string
+          phone: string | null
+          referral_code: string
+          role: Database["public"]["Enums"]["app_role"]
+          streak: number
+          wallet_balance: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          classes_attended?: number
+          created_at?: string
+          id: string
+          interests?: string[]
+          membership_status?: string
+          name?: string
+          phone?: string | null
+          referral_code?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          streak?: number
+          wallet_balance?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          classes_attended?: number
+          created_at?: string
+          id?: string
+          interests?: string[]
+          membership_status?: string
+          name?: string
+          phone?: string | null
+          referral_code?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          streak?: number
+          wallet_balance?: number
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          member_id: string
+          type: Database["public"]["Enums"]["txn_type"]
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string
+          id?: string
+          member_id: string
+          type: Database["public"]["Enums"]["txn_type"]
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          member_id?: string
+          type?: Database["public"]["Enums"]["txn_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "member" | "staff"
+      booking_status: "upcoming" | "completed" | "cancelled"
+      class_type: "pt" | "women_only" | "mixed" | "kids"
+      txn_type: "credit" | "debit"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +390,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["member", "staff"],
+      booking_status: ["upcoming", "completed", "cancelled"],
+      class_type: ["pt", "women_only", "mixed", "kids"],
+      txn_type: ["credit", "debit"],
+    },
   },
 } as const
