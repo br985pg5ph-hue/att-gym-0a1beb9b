@@ -286,6 +286,7 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isParent, setIsParent] = useState(false);
 
 
   const submit = async (e: React.FormEvent) => {
@@ -300,9 +301,13 @@ function SignUpPage() {
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
+    // Flag account as parent so the app switches into Parent Mode.
+    if (isParent && data.user) {
+      await supabase.from("profiles").update({ is_parent: true, onboarded: true }).eq("id", data.user.id);
+    }
     setLoading(false);
     toast.success("Account created!");
-    nav({ to: "/onboarding" });
+    nav({ to: isParent ? "/profile/children" : "/onboarding" });
   };
 
   const oauth = async (provider: "google" | "apple") => {
@@ -311,12 +316,26 @@ function SignUpPage() {
     else if (!r.redirected) nav({ to: "/onboarding" });
   };
 
+
   return (
     <div className="mx-auto w-full max-w-md px-6 py-10">
       <div className="mb-6 flex flex-col items-center">
         <Logo size={80} />
         <h1 className="font-display mt-3 text-3xl">{t.createAccount}</h1>
       </div>
+
+      {/* Signing up as: self vs parent-of-kids. Parent flow skips personal onboarding and goes to add a child. */}
+      <div className="mb-4 grid grid-cols-2 gap-2 rounded-2xl border hairline bg-card p-1">
+        <button type="button" onClick={() => setIsParent(false)}
+          className={`rounded-pill py-2 text-xs font-semibold transition ${!isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+          I'm training
+        </button>
+        <button type="button" onClick={() => setIsParent(true)}
+          className={`rounded-pill py-2 text-xs font-semibold transition ${isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+          I'm signing up my kid(s)
+        </button>
+      </div>
+
       <form onSubmit={submit} className="space-y-3">
         <input required placeholder={t.name} value={name} onChange={(e)=>setName(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />

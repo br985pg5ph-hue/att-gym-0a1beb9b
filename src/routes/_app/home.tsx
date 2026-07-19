@@ -3,24 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
-import { useAuth, useLang } from "@/lib/providers";
+import { ChildSwitcher } from "@/components/ChildSwitcher";
+import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { MapPin, Flame, Trophy, ChevronRight, Ticket } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
 });
 
-function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
-
 function HomePage() {
   const { profile, user } = useAuth();
   const { t } = useLang();
+  const { selectedChild } = useChildren();
+  const parentMode = !!profile?.is_parent;
+  const scope = parentMode && selectedChild ? "child" : "self";
 
   const { data: gym } = useQuery({
     queryKey: ["gym"],
@@ -28,12 +24,15 @@ function HomePage() {
   });
 
   const { data: nextBooking } = useQuery({
-    queryKey: ["next-booking", user?.id],
+    queryKey: ["next-booking", user?.id, scope === "child" ? selectedChild?.id : "self"],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("bookings")
-        .select("id, status, classes(id, type, title, starts_at, coaches(name))")
+      let q = supabase.from("bookings")
+        .select("id, status, child_id, classes(id, type, title, starts_at, coaches(name))")
         .eq("member_id", user!.id).eq("status", "upcoming");
+      if (scope === "child") q = q.eq("child_id", selectedChild!.id);
+      else q = q.is("child_id", null);
+      const { data } = await q;
       const upcoming = (data ?? [])
         .filter((b: any) => b.classes && new Date(b.classes.starts_at).getTime() > Date.now() - 60 * 60 * 1000)
         .sort((a: any, b: any) => new Date(a.classes.starts_at).getTime() - new Date(b.classes.starts_at).getTime());
@@ -43,6 +42,14 @@ function HomePage() {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
+
+  const stats = scope === "child" && selectedChild
+    ? { remaining: selectedChild.classes_remaining, attended: selectedChild.classes_attended, streak: selectedChild.streak }
+    : { remaining: profile?.classes_remaining ?? 0, attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
+
+  const subtitleText = parentMode && selectedChild
+    ? `${profile?.name || ""} · Viewing ${selectedChild.name}`
+    : profile?.name || "";
 
   const formatWhen = (iso: string) => {
     const d = new Date(iso);
@@ -59,17 +66,21 @@ function HomePage() {
     <div>
       <PageHeader
         title={`${greeting},`}
-        subtitle={profile?.name || ""}
+        subtitle={subtitleText}
         right={
-          <Link to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <Logo size={44} />
-            )}
-          </Link>
+          <div className="flex items-center gap-2">
+            <ChildSwitcher />
+            <Link to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <Logo size={44} />
+              )}
+            </Link>
+          </div>
         }
       />
+
 
       <div className="space-y-4 px-5">
         {/* Next class */}
@@ -110,7 +121,7 @@ function HomePage() {
                 <Ticket size={16} />
                 <span className="text-[10px] uppercase tracking-widest">{t.classesLeft}</span>
               </div>
-              <p className="font-display mt-1 text-4xl">{profile?.classes_remaining ?? 0}</p>
+              <p className="font-display mt-1 text-4xl">{stats.remaining}</p>
             </div>
             <Link to="/book" className="shrink-0 rounded-pill bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground">
               {t.book}
@@ -122,13 +133,14 @@ function HomePage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest">{t.classesAttended}</span></div>
-            <p className="font-display mt-1 text-3xl">{profile?.classes_attended ?? 0}</p>
+            <p className="font-display mt-1 text-3xl">{stats.attended}</p>
           </div>
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground"><Flame size={16} /><span className="text-[10px] uppercase tracking-widest">{t.currentStreak}</span></div>
-            <p className="font-display mt-1 text-3xl">{profile?.streak ?? 0} <span className="text-sm text-muted-foreground">{t.days}</span></p>
+            <p className="font-display mt-1 text-3xl">{stats.streak} <span className="text-sm text-muted-foreground">{t.days}</span></p>
           </div>
         </div>
+
 
 
         {/* Location teaser */}
