@@ -166,7 +166,7 @@ function BookPage() {
         <button
           disabled={!pickedId || book.isPending}
           onClick={() => pickedId && book.mutate(pickedId)}
-          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:opacity-40"
+          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed"
         >
           {book.isPending ? "…" : pickedId ? t.confirmBooking : t.selectSlot}
         </button>
