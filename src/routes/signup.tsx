@@ -323,10 +323,7 @@ function SignUpPage() {
         <input required type="email" placeholder={t.email} value={email} onChange={(e)=>setEmail(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         <div className="flex gap-2">
-          <select value={cc} onChange={(e)=>setCc(e.target.value)}
-            className="rounded-xl border hairline bg-card px-3 py-3 text-sm outline-none focus:border-primary">
-            {COUNTRY_CODES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <CountrySelect value={cc} onChange={setCc} />
           <input required type="tel" placeholder={t.phone} value={phone} onChange={(e)=>setPhone(e.target.value)}
             className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         </div>
