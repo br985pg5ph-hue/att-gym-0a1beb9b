@@ -89,6 +89,27 @@ function ProfilePage() {
             <span className="flex-1 text-sm font-medium">{t.signOut}</span>
           </button>
         </div>
+
+        <div className="card-surface p-5">
+          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground">{t.connectWithUs}</p>
+          <div className="mt-4 flex items-center justify-center gap-4">
+            {gym?.instagram_url && (
+              <a href={gym.instagram_url} target="_blank" rel="noreferrer" className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground transition-transform active:scale-95">
+                <InstagramIcon className="h-6 w-6" />
+              </a>
+            )}
+            {gym?.whatsapp_number && (
+              <a href={`https://wa.me/${String(gym.whatsapp_number).replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground transition-transform active:scale-95">
+                <WhatsAppIcon className="h-6 w-6" />
+              </a>
+            )}
+            {gym?.phone && (
+              <a href={`tel:${gym.phone}`} className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground transition-transform active:scale-95">
+                <Phone className="h-6 w-6" />
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
