@@ -1,11 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
-import { MapPin, Flame, Trophy, Clock, ChevronRight } from "lucide-react";
+import { MapPin, Flame, Trophy, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -22,12 +21,6 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
 function HomePage() {
   const { profile, user } = useAuth();
   const { t } = useLang();
-  const [coords, setCoords] = useState<{lat:number; lng:number} | null>(null);
-
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((p) => setCoords({ lat: p.coords.latitude, lng: p.coords.longitude }), () => {});
-  }, []);
 
   const { data: gym } = useQuery({
     queryKey: ["gym"],
@@ -51,8 +44,6 @@ function HomePage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
 
-  const distanceKm = coords && gym ? haversine(coords.lat, coords.lng, Number(gym.lat), Number(gym.lng)) : null;
-  const etaMin = distanceKm ? Math.max(3, Math.round((distanceKm / 30) * 60)) : null;
 
   return (
     <div>
@@ -80,19 +71,6 @@ function HomePage() {
           )}
         </div>
 
-        {/* Time to gym */}
-        <div className="card-surface p-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary"><Clock size={20} /></div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.timeToGym}</p>
-              <p className="font-display text-2xl leading-none mt-1">
-                {etaMin ? `${etaMin} min` : "—"}
-              </p>
-              {distanceKm && <p className="text-xs text-muted-foreground">{distanceKm.toFixed(1)} km away</p>}
-            </div>
-          </div>
-        </div>
 
         {/* Location teaser */}
         <Link to="/location" className="card-surface block overflow-hidden">
