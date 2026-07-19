@@ -139,16 +139,24 @@ function BookPage() {
           </div>
         </div>
 
-        <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-          {TYPES.map((tp) => (
-            <button key={tp.key} onClick={() => setFilter(tp.key)}
-              className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
-                filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
-              }`}>
-              {t[tp.labelKey]}
-            </button>
-          ))}
-        </div>
+        {!bookingForChild && (
+          <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+            {TYPES.map((tp) => (
+              <button key={tp.key} onClick={() => setFilter(tp.key)}
+                className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
+                  filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+                }`}>
+                {t[tp.labelKey]}
+              </button>
+            ))}
+          </div>
+        )}
+        {bookingForChild && (
+          <p className="mt-3 rounded-pill bg-primary/10 px-3 py-2 text-center text-[11px] font-medium text-primary">
+            Showing Kids classes only
+          </p>
+        )}
+
 
         <div className="mt-2 space-y-2">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
