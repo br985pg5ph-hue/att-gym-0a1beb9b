@@ -323,6 +323,19 @@ function SignUpPage() {
         <Logo size={80} />
         <h1 className="font-display mt-3 text-3xl">{t.createAccount}</h1>
       </div>
+
+      {/* Signing up as: self vs parent-of-kids. Parent flow skips personal onboarding and goes to add a child. */}
+      <div className="mb-4 grid grid-cols-2 gap-2 rounded-2xl border hairline bg-card p-1">
+        <button type="button" onClick={() => setIsParent(false)}
+          className={`rounded-pill py-2 text-xs font-semibold transition ${!isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+          I'm training
+        </button>
+        <button type="button" onClick={() => setIsParent(true)}
+          className={`rounded-pill py-2 text-xs font-semibold transition ${isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+          I'm signing up my kid(s)
+        </button>
+      </div>
+
       <form onSubmit={submit} className="space-y-3">
         <input required placeholder={t.name} value={name} onChange={(e)=>setName(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
