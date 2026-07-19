@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useLang, useTheme } from "@/lib/providers";
-import { ChevronLeft, Moon, Sun, Languages, Bell, FileText, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/settings")({
