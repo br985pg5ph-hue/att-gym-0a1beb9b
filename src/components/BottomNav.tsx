@@ -9,7 +9,7 @@ export function BottomNav() {
   const isStaff = profile?.role === "staff";
 
   const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
-    { to: "/", label: t.home, icon: Home, exact: true },
+    { to: "/home", label: t.home, icon: Home, exact: true },
     { to: "/book", label: t.book, icon: CalendarDays },
     { to: "/coaches", label: t.coaches, icon: Users },
     { to: "/news", label: t.news, icon: Newspaper },
