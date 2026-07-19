@@ -30,6 +30,10 @@ function ProfilePage() {
   const { t } = useLang();
   const nav = useNavigate();
   const qc = useQueryClient();
+  const { data: gym } = useQuery({
+    queryKey: ["gym"],
+    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
+  });
 
   const signOut = async () => {
     await qc.cancelQueries();
