@@ -38,19 +38,26 @@ function SignUpPage() {
     e.preventDefault();
     if (password !== confirm) return toast.error("Passwords do not match");
     setLoading(true);
-    const data: Record<string, string> = { name, phone: `${cc}${phone}` };
-    if (ref) data.referral_code = ref;
-    const { error } = await supabase.auth.signUp({
+    const meta: Record<string, string> = { name, phone: `${cc}${phone}` };
+    if (ref) meta.referral_code = ref;
+    const { data, error } = await supabase.auth.signUp({
       email, password,
       options: {
         emailRedirectTo: window.location.origin,
-        data,
+        data: meta,
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
     setLoading(false);
-    toast.success("Account created!");
-    nav({ to: "/onboarding" });
+    if (data.session) {
+      toast.success("Account created!");
+      nav({ to: "/onboarding" });
+    } else {
+      toast.message("Check your email", {
+        description: "Confirm your account before signing in.",
+      });
+      nav({ to: "/auth" });
+    }
   };
 
 
