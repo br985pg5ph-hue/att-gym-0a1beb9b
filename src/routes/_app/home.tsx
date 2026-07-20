@@ -47,9 +47,7 @@ function HomePage() {
     ? { remaining: selectedChild.classes_remaining, attended: selectedChild.classes_attended, streak: selectedChild.streak }
     : { remaining: profile?.classes_remaining ?? 0, attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
 
-  const subtitleText = parentMode && selectedChild
-    ? `${profile?.name || ""} · Viewing ${selectedChild.name}`
-    : profile?.name || "";
+  const subtitleText = profile?.name || "";
 
   const formatWhen = (iso: string) => {
     const d = new Date(iso);
