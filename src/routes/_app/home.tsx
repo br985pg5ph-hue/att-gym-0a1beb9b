@@ -165,6 +165,20 @@ function HomePage() {
           </div>
         </Link>
 
+        {/* Coaches */}
+        <Link to="/coaches" className="card-surface block p-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
+              <Users size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.coaches}</p>
+              <p className="truncate text-sm font-medium">Meet the team</p>
+            </div>
+            <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
+          </div>
+        </Link>
+
       </div>
     </div>
   );
