@@ -46,7 +46,7 @@ export const dict: Record<Lang, Dict> = {
     confirmBooking: "تأكيد الحجز", selectSlot: "اختر موعد",
     all: "الكل", full: "ممتلئ", booked: "محجوز", slotsLeft: "أماكن متبقية",
     wallet: "رصيد المحفظة", topUp: "شحن", changePlan: "تغيير الباقة", addPayment: "إضافة طريقة دفع",
-    myBookings: "حجوزاتي", refer: "أدعُ صديقاً", payments: "الدفع والعضوية", settings: "الإعدادات",
+    myBookings: "حجوزاتي", refer: "أدعُ صديقاً", payments: "الدفع والعضوية", membership: "العضوية", settings: "الإعدادات",
     referralCode: "رمز الإحالة", copy: "نسخ", copied: "✓ تم النسخ", shareMsg: "مشاركة عبر رسالة", shareLink: "مشاركة الرابط",
     howItWorks: "كيف يعمل", freeClass: "حصة مجانية", perReferral: "لكل صديق ينضم",
     theme: "المظهر", language: "اللغة", dark: "داكن", lightMode: "فاتح", english: "English", arabic: "العربية",
