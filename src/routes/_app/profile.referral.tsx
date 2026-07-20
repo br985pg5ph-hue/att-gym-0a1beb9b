@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth, useLang } from "@/lib/providers";
+import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Gift, Copy, ChevronLeft, MessageSquare, Share2 } from "lucide-react";
 
@@ -9,12 +11,24 @@ export const Route = createFileRoute("/_app/profile/referral")({
 });
 
 function ReferralPage() {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const code = profile?.referral_code ?? "";
   const link = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${code}` : "";
+
+  const { data: stats } = useQuery({
+    queryKey: ["referral-stats", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_referral_stats");
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return { joined: Number(row?.joined ?? 0), rewards: Number(row?.rewards ?? 0) };
+    },
+  });
+
 
   const copy = () => {
     navigator.clipboard.writeText(code);
