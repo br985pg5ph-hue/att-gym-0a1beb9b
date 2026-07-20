@@ -9,6 +9,15 @@ export const Route = createFileRoute("/onboarding")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_parent")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.is_parent) {
+      await supabase.from("profiles").update({ onboarded: true }).eq("id", data.user.id);
+      throw redirect({ to: "/profile/children", search: { new: 1, welcome: 1 } as any });
+    }
   },
   component: OnboardingPage,
 });
