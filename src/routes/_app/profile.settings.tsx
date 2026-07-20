@@ -1,10 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
 import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users } from "lucide-react";
 import { toast } from "sonner";
+import { deleteMyAccount } from "@/lib/account.functions";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_app/profile/settings")({
   component: SettingsPage,
@@ -30,11 +36,22 @@ function SettingsPage() {
   };
 
 
+  const deleteAccountFn = useServerFn(deleteMyAccount);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const del = async () => {
-    if (!confirm("Delete your account permanently?")) return;
-    await supabase.auth.signOut();
-    toast.info("Contact support to complete deletion.");
-    nav({ to: "/auth" });
+    setDeleting(true);
+    try {
+      await deleteAccountFn();
+      await supabase.auth.signOut();
+      toast.success("Your account has been deleted.");
+      setConfirmOpen(false);
+      nav({ to: "/auth" });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to delete account");
+      setDeleting(false);
+    }
   };
 
   return (
@@ -95,10 +112,32 @@ function SettingsPage() {
             <FileText size={18} className="text-muted-foreground"/>
             <span className="flex-1 text-sm font-medium">{t.legal}</span>
           </button>
-          <button onClick={del} className="flex w-full items-center gap-3 p-4 text-start text-destructive">
-            <Trash2 size={18}/>
-            <span className="flex-1 text-sm font-medium">{t.deleteAccount}</span>
-          </button>
+          <AlertDialog open={confirmOpen} onOpenChange={(o) => !deleting && setConfirmOpen(o)}>
+            <AlertDialogTrigger asChild>
+              <button className="flex w-full items-center gap-3 p-4 text-start text-destructive">
+                <Trash2 size={18}/>
+                <span className="flex-1 text-sm font-medium">{t.deleteAccount}</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently deletes your account, profile, children, bookings, and transactions. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={deleting}
+                  onClick={(e) => { e.preventDefault(); del(); }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? "Deleting…" : "Delete permanently"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
