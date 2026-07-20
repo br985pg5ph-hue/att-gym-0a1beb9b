@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_app/admin")({
   ssr: false,
@@ -116,7 +116,7 @@ function ClassesAdmin() {
   const { data: classes = [] } = useQuery({
     queryKey: ["admin-classes"],
     queryFn: async () => (await supabase.from("classes")
-      .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, profiles(name))")
+      .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, child_id, profiles(name), children(name))")
       .order("starts_at")).data ?? [],
   });
   const { data: coaches = [] } = useQuery({
@@ -176,7 +176,11 @@ function ClassesAdmin() {
                 <ul className="mt-3 space-y-1">
                   {active.map((b: any) => (
                     <li key={b.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                      <span>{b.profiles?.name ?? "Member"}</span>
+                      <span>
+                        {b.child_id
+                          ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
+                          : (b.profiles?.name ?? "Member")}
+                      </span>
                       <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
                     </li>
                   ))}
@@ -231,19 +235,55 @@ function CoachesAdmin() {
 function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
-    queryFn: async () => (await supabase.from("profiles").select("id, name, membership_status, wallet_balance, classes_remaining, role").order("name")).data ?? [],
+    queryFn: async () => (await supabase.from("profiles")
+      .select("id, name, membership_status, wallet_balance, classes_remaining, role, children(id, name, classes_remaining)")
+      .order("name")).data ?? [],
   });
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   return (
     <div className="space-y-2">
-      {data.map((m: any) => (
-        <div key={m.id} className="card-surface flex items-center justify-between p-4">
-          <div className="min-w-0">
-            <p className="font-display text-lg leading-none">{m.name || "—"}</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
+      {data.map((m: any) => {
+        const kids = m.children ?? [];
+        const hasKids = kids.length > 0;
+        const isOpen = !!expanded[m.id];
+        return (
+          <div key={m.id} className="card-surface p-4">
+            <button
+              type="button"
+              onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
+              className="flex w-full items-center justify-between gap-3 text-left"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-display text-lg leading-none">{m.name || "—"}</p>
+                  {hasKids && (
+                    <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                      {kids.length} {kids.length === 1 ? "child" : "children"}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
+              </div>
+              <p className="shrink-0 font-display text-xl">{Number(m.wallet_balance).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span></p>
+              {hasKids && (
+                <span className="shrink-0 text-muted-foreground">
+                  {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
+                </span>
+              )}
+            </button>
+            {hasKids && isOpen && (
+              <ul className="mt-3 space-y-1">
+                {kids.map((k: any) => (
+                  <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
+                    <span>{k.name}</span>
+                    <span className="text-muted-foreground">{k.classes_remaining ?? 0} classes left</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <p className="shrink-0 font-display text-xl">{Number(m.wallet_balance).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span></p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
