@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User } from "lucide-react";
+import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
