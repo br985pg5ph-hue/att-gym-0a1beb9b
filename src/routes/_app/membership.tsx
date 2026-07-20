@@ -1,16 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
-import { ChevronLeft, Plus, CreditCard, Apple } from "lucide-react";
+import { Plus, CreditCard, Apple } from "lucide-react";
 
-export const Route = createFileRoute("/_app/profile/payments")({
-  component: PaymentsPage,
+export const Route = createFileRoute("/_app/membership")({
+  component: MembershipPage,
 });
 
-function PaymentsPage() {
+function MembershipPage() {
   const { user, profile, refresh } = useAuth();
   const { t } = useLang();
   const qc = useQueryClient();
@@ -32,10 +32,7 @@ function PaymentsPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-2 px-3 pt-4">
-        <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
-      </div>
-      <PageHeader title={t.payments} />
+      <PageHeader title={t.membership} />
       <div className="space-y-4 px-5">
         <div className="card-surface p-6 bg-gradient-to-br from-primary/25 to-transparent">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.wallet}</p>
@@ -45,7 +42,6 @@ function PaymentsPage() {
               <button key={v} disabled={topUp.isPending} onClick={()=>topUp.mutate(v)}
                 className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+{v} JOD</button>
             ))}
-
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, CalendarDays, User, Shield } from "lucide-react";
+import { Home, CalendarDays, User, Shield, CreditCard } from "lucide-react";
 import { useAuth, useLang } from "@/lib/providers";
 
 export function BottomNav() {
@@ -11,6 +11,7 @@ export function BottomNav() {
   const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
     { to: "/home", label: t.home, icon: Home, exact: true },
     { to: "/book", label: t.book, icon: CalendarDays },
+    { to: "/membership", label: t.membership, icon: CreditCard },
     { to: "/profile", label: t.profile, icon: User },
   ];
   if (isStaff) tabs.push({ to: "/admin", label: t.admin, icon: Shield });
