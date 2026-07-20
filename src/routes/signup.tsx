@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { CountrySelect } from "@/components/CountrySelect";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -7,8 +9,13 @@ import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 
+const searchSchema = z.object({
+  ref: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/signup")({
   ssr: false,
+  validateSearch: zodValidator(searchSchema),
   component: SignUpPage,
 });
 
@@ -18,6 +25,7 @@ export const Route = createFileRoute("/signup")({
 function SignUpPage() {
   const nav = useNavigate();
   const { t } = useLang();
+  const { ref } = Route.useSearch();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cc, setCc] = useState("+962");
@@ -30,11 +38,13 @@ function SignUpPage() {
     e.preventDefault();
     if (password !== confirm) return toast.error("Passwords do not match");
     setLoading(true);
+    const data: Record<string, string> = { name, phone: `${cc}${phone}` };
+    if (ref) data.referral_code = ref;
     const { error } = await supabase.auth.signUp({
       email, password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { name, phone: `${cc}${phone}` },
+        data,
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
@@ -49,6 +59,7 @@ function SignUpPage() {
     if (r.error) toast.error("Sign-in failed");
     else if (!r.redirected) nav({ to: "/onboarding" });
   };
+
 
 
   return (
