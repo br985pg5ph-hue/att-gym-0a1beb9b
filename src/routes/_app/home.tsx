@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
-import { Logo } from "@/components/Logo";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { Flame, Trophy, ChevronRight, Ticket, Newspaper } from "lucide-react";
+import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -78,7 +77,7 @@ function HomePage() {
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
               ) : (
-                <Logo size={44} />
+                <User size={24} />
               )}
             </Link>
           </div>
