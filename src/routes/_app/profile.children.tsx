@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
@@ -7,6 +7,10 @@ import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/children")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    new: s.new ? 1 : undefined,
+    welcome: s.welcome ? 1 : undefined,
+  }),
   component: ChildrenPage,
 });
 
@@ -20,7 +24,14 @@ const EXPERIENCE = [
 function ChildrenPage() {
   const { user, profile, refresh } = useAuth();
   const { children, refreshChildren, setSelectedChildId } = useChildren();
+  const search = useSearch({ from: "/_app/profile/children" });
+  const nav = useNavigate();
   const [editing, setEditing] = useState<string | "new" | null>(null);
+
+  useEffect(() => {
+    if (search.new) setEditing("new");
+  }, [search.new]);
+
 
   return (
     <div>
@@ -29,7 +40,11 @@ function ChildrenPage() {
           <ChevronLeft size={20} className="flip-rtl" />
         </Link>
       </div>
-      <PageHeader title="My Children" subtitle={`${children.length} ${children.length === 1 ? "child" : "children"}`} />
+      <PageHeader
+        title={search.welcome ? "Add your child" : "My Children"}
+        subtitle={search.welcome ? "Set up their profile to tailor their experience" : `${children.length} ${children.length === 1 ? "child" : "children"}`}
+      />
+
 
       <div className="space-y-3 px-5">
         {children.map((c) => (
@@ -84,6 +99,7 @@ function ChildrenPage() {
               await refresh();
             }
             setEditing(null);
+            if (search.welcome) nav({ to: "/home" });
           }}
         />
       )}
