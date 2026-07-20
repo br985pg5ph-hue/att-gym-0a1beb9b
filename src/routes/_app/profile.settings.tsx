@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
-import { useLang, useTheme } from "@/lib/providers";
-import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog } from "lucide-react";
+import { useAuth, useLang, useTheme } from "@/lib/providers";
+import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/settings")({
@@ -13,8 +13,22 @@ export const Route = createFileRoute("/_app/profile/settings")({
 function SettingsPage() {
   const { t, lang, setLang } = useLang();
   const { theme, setTheme } = useTheme();
+  const { profile, user, refresh } = useAuth();
   const nav = useNavigate();
   const [notif, setNotif] = useState(true);
+  const [savingParent, setSavingParent] = useState(false);
+  const parentMode = !!profile?.is_parent;
+
+  const toggleParent = async () => {
+    if (!user) return;
+    setSavingParent(true);
+    const { error } = await supabase.from("profiles").update({ is_parent: !parentMode }).eq("id", user.id);
+    setSavingParent(false);
+    if (error) return toast.error(error.message);
+    await refresh();
+    toast.success(!parentMode ? "Parent Mode enabled" : "Parent Mode disabled");
+  };
+
 
   const del = async () => {
     if (!confirm("Delete your account permanently?")) return;
@@ -63,7 +77,18 @@ function SettingsPage() {
               <span className={`block h-5 w-5 rounded-pill bg-white transition ${notif ? "translate-x-5" : ""}`}/>
             </button>
           </div>
+          <div className="flex items-center gap-3 p-4">
+            <Users size={18} className="text-muted-foreground"/>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Parent Mode</p>
+              <p className="text-[11px] text-muted-foreground">Sign up and manage kids' classes</p>
+            </div>
+            <button onClick={toggleParent} disabled={savingParent} className={`h-6 w-11 rounded-pill p-0.5 transition ${parentMode ? "bg-primary":"bg-muted"} disabled:opacity-60`}>
+              <span className={`block h-5 w-5 rounded-pill bg-white transition ${parentMode ? "translate-x-5" : ""}`}/>
+            </button>
+          </div>
         </div>
+
 
         <div className="card-surface divide-y hairline overflow-hidden">
           <button className="flex w-full items-center gap-3 p-4 text-start">
