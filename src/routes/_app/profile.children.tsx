@@ -40,7 +40,11 @@ function ChildrenPage() {
           <ChevronLeft size={20} className="flip-rtl" />
         </Link>
       </div>
-      <PageHeader title="My Children" subtitle={`${children.length} ${children.length === 1 ? "child" : "children"}`} />
+      <PageHeader
+        title={search.welcome ? "Add your child" : "My Children"}
+        subtitle={search.welcome ? "Set up their profile to tailor their experience" : `${children.length} ${children.length === 1 ? "child" : "children"}`}
+      />
+
 
       <div className="space-y-3 px-5">
         {children.map((c) => (
