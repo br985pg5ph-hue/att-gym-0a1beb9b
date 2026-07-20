@@ -281,7 +281,7 @@ function SignUpPage() {
   const { t } = useLang();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [cc, setCc] = useState("+961");
+  const [cc, setCc] = useState("+962");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
