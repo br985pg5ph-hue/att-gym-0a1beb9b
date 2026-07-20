@@ -5,7 +5,8 @@ import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
 import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
 import { toast } from "sonner";
-import { CountrySelect, COUNTRY_CODES } from "./profile.edit";
+import { CountrySelect } from "@/components/CountrySelect";
+import { COUNTRIES as COUNTRY_CODES } from "@/lib/countries";
 
 function splitPhone(raw: string): { cc: string; rest: string } {
   if (!raw) return { cc: "+962", rest: "" };
