@@ -112,10 +112,32 @@ function SettingsPage() {
             <FileText size={18} className="text-muted-foreground"/>
             <span className="flex-1 text-sm font-medium">{t.legal}</span>
           </button>
-          <button onClick={del} className="flex w-full items-center gap-3 p-4 text-start text-destructive">
-            <Trash2 size={18}/>
-            <span className="flex-1 text-sm font-medium">{t.deleteAccount}</span>
-          </button>
+          <AlertDialog open={confirmOpen} onOpenChange={(o) => !deleting && setConfirmOpen(o)}>
+            <AlertDialogTrigger asChild>
+              <button className="flex w-full items-center gap-3 p-4 text-start text-destructive">
+                <Trash2 size={18}/>
+                <span className="flex-1 text-sm font-medium">{t.deleteAccount}</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently deletes your account, profile, children, bookings, and transactions. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={deleting}
+                  onClick={(e) => { e.preventDefault(); del(); }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? "Deleting…" : "Delete permanently"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
