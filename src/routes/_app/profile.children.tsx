@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
@@ -7,6 +7,10 @@ import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/children")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    new: s.new ? 1 : undefined,
+    welcome: s.welcome ? 1 : undefined,
+  }),
   component: ChildrenPage,
 });
 
@@ -20,7 +24,14 @@ const EXPERIENCE = [
 function ChildrenPage() {
   const { user, profile, refresh } = useAuth();
   const { children, refreshChildren, setSelectedChildId } = useChildren();
+  const search = useSearch({ from: "/_app/profile/children" });
+  const nav = useNavigate();
   const [editing, setEditing] = useState<string | "new" | null>(null);
+
+  useEffect(() => {
+    if (search.new) setEditing("new");
+  }, [search.new]);
+
 
   return (
     <div>
