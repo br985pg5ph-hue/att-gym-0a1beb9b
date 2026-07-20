@@ -93,11 +93,15 @@ function BookPage() {
       .filter(Boolean).map((c: any) => c.starts_at.slice(0, 10))
   );
 
-  const effectiveFilter = bookingForChild ? "kids" : filter;
+  const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
   const remaining = bookingForChild ? (bookingForChild.classes_remaining ?? 0) : (profile?.classes_remaining ?? 0);
   const noCredits = remaining <= 0;
 
-  const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (effectiveFilter === "all" || c.type === effectiveFilter));
+  const daySlots = classes.filter((c: any) => {
+    if (c.starts_at.slice(0, 10) !== selectedDate) return false;
+    if (!bookingForChild && c.type === "kids") return false;
+    return effectiveFilter === "all" || c.type === effectiveFilter;
+  });
 
   const book = useMutation({
     mutationFn: async (classId: string) => {
@@ -191,7 +195,7 @@ function BookPage() {
 
         {!bookingForChild && (
           <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-            {TYPES.map((tp) => (
+            {TYPES.filter((tp) => tp.key !== "kids").map((tp) => (
               <button key={tp.key} onClick={() => setFilter(tp.key)}
                 className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
                   filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
