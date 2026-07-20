@@ -58,18 +58,18 @@ function AdminPage() {
         {tab === "members" && <MembersAdmin />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
-        <ul className="mx-auto flex max-w-3xl items-center justify-around px-2">
+        <ul className="grid grid-cols-4 items-center px-2">
           {tabs.map(x => {
             const active = tab === x.key;
             const Icon = x.icon;
             return (
-              <li key={x.key} className="flex-1">
+              <li key={x.key}>
                 <button
                   onClick={()=>setTab(x.key)}
-                  className={`flex w-full flex-col items-center gap-1 rounded-pill px-2 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
+                  className={`flex w-full flex-col items-center justify-center gap-1 rounded-pill px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
                 >
                   <Icon size={22} strokeWidth={active ? 2.4 : 1.8} />
-                  <span className="truncate">{x.label}</span>
+                  <span className="text-center leading-none">{x.label}</span>
                 </button>
               </li>
             );
