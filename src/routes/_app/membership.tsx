@@ -1,33 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
-import { toast } from "sonner";
-import { Plus, CreditCard, Apple } from "lucide-react";
 
 export const Route = createFileRoute("/_app/membership")({
   component: MembershipPage,
 });
 
 function MembershipPage() {
-  const { user, profile, refresh } = useAuth();
+  const { user, profile } = useAuth();
   const { t } = useLang();
-  const qc = useQueryClient();
 
   const { data: txns = [] } = useQuery({
     queryKey: ["txns", user?.id],
     enabled: !!user,
-    queryFn: async () => (await supabase.from("transactions").select("*").eq("member_id", user!.id).order("created_at", { ascending: false })).data ?? [],
-  });
-
-  const topUp = useMutation({
-    mutationFn: async (amount: number) => {
-      const { error } = await supabase.from("transactions").insert({ member_id: user!.id, amount, type: "credit", description: `Wallet top-up +${amount} JOD` });
-      if (error) throw error;
-    },
-    onSuccess: async () => { toast.success("Wallet topped up"); await refresh(); qc.invalidateQueries({ queryKey: ["txns"] }); },
-    onError: (e: any) => toast.error(e.message),
+    queryFn: async () =>
+      (await supabase
+        .from("transactions")
+        .select("id, classes, type, description, payment_method, created_at, child_id, children(name)")
+        .eq("member_id", user!.id)
+        .order("created_at", { ascending: false })).data ?? [],
   });
 
   return (
@@ -35,49 +28,43 @@ function MembershipPage() {
       <PageHeader title={t.membership} />
       <div className="space-y-4 px-5">
         <div className="card-surface p-6 bg-gradient-to-br from-primary/25 to-transparent">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.wallet}</p>
-          <p className="font-display mt-1 text-5xl">{Number(profile?.wallet_balance ?? 0).toFixed(2)} <span className="text-2xl text-muted-foreground">JOD</span></p>
-          <div className="mt-4 flex gap-2">
-            {[10, 25, 50].map(v => (
-              <button key={v} disabled={topUp.isPending} onClick={()=>topUp.mutate(v)}
-                className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">+{v} JOD</button>
-            ))}
-          </div>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Classes Remaining</p>
+          <p className="font-display mt-1 text-6xl leading-none">
+            {profile?.classes_remaining ?? 0}
+            <span className="ml-2 text-xl text-muted-foreground">classes left</span>
+          </p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Pay at the gym (cash or card) and staff will top up your classes here.
+          </p>
         </div>
 
         <div className="card-surface p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">Current Plan</p>
-              <p className="font-display mt-1 text-2xl">Unlimited</p>
-            </div>
-            <button className="rounded-pill border hairline px-4 py-2 text-xs font-semibold">{t.changePlan}</button>
-          </div>
-        </div>
-
-        <div className="card-surface p-5">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Payment methods</p>
-          <div className="mt-3 space-y-2">
-            <div className="flex items-center gap-3 rounded-xl border hairline p-3"><CreditCard size={18}/><span className="text-sm">•••• 4242</span></div>
-            <div className="flex items-center gap-3 rounded-xl border hairline p-3"><Apple size={18}/><span className="text-sm">Apple Pay</span></div>
-          </div>
-          <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-pill border border-dashed hairline py-3 text-xs font-semibold text-muted-foreground">
-            <Plus size={14}/> {t.addPayment}
-          </button>
-        </div>
-
-        <div className="card-surface p-5">
-          <p className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">History</p>
+          <p className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">Class credit history</p>
           <div className="divide-y hairline">
-            {txns.length === 0 && <p className="py-4 text-sm text-muted-foreground">No transactions yet</p>}
+            {txns.length === 0 && <p className="py-4 text-sm text-muted-foreground">No class credits yet</p>}
             {txns.map((tx: any) => (
-              <div key={tx.id} className="flex items-center justify-between py-3">
+              <div key={tx.id} className="flex items-start justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm">{tx.description}</p>
-                  <p className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString()}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-sm">
+                      {tx.description || (tx.type === "credit" ? "Classes added" : "Classes adjusted")}
+                    </p>
+                    {tx.payment_method && (
+                      <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        {tx.payment_method}
+                      </span>
+                    )}
+                    {tx.child_id && tx.children?.name && (
+                      <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                        For {tx.children.name}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString()}</p>
                 </div>
                 <p className={`shrink-0 font-display text-lg ${tx.type === "credit" ? "text-emerald-400" : "text-destructive"}`}>
-                  {tx.type === "credit" ? "+" : "-"}{Number(tx.amount).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span>
+                  {tx.type === "credit" ? "+" : "-"}{tx.classes}
+                  <span className="ml-1 text-xs text-muted-foreground">classes</span>
                 </p>
               </div>
             ))}
