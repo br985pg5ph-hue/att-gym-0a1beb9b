@@ -114,19 +114,14 @@ function BookPage() {
     onError: (e: any) => toast.error(e.message ?? "Booking failed"),
   });
 
-  // Month grid
-  const today = new Date();
-  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
-  const y = viewedMonth.getFullYear();
-  const m = viewedMonth.getMonth();
+  // Month grid derived values
   const first = new Date(y, m, 1);
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const startPad = first.getDay();
   const cells: Array<Date | null> = [];
   for (let i = 0; i < startPad; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
-  const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+
   const changeMonth = (delta: number) => {
     const next = new Date(y, m + delta, 1);
     setViewedMonth(next);
