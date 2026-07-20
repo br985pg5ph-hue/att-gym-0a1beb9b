@@ -307,7 +307,8 @@ function SignUpPage() {
     }
     setLoading(false);
     toast.success("Account created!");
-    nav({ to: isParent ? "/profile/children" : "/onboarding" });
+    if (isParent) nav({ to: "/profile/children", search: { new: 1, welcome: 1 } as any });
+    else nav({ to: "/onboarding" });
   };
 
   const oauth = async (provider: "google" | "apple") => {
