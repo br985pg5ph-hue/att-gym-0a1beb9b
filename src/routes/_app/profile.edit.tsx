@@ -7,21 +7,26 @@ import { useAuth, useLang } from "@/lib/providers";
 import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-async function fileToAvatarDataUrl(file: File, size = 256): Promise<string> {
+async function fileToAvatarBlob(file: File, size = 256): Promise<Blob> {
   const bmp = await createImageBitmap(file);
-  const scale = Math.min(size / bmp.width, size / bmp.height, 1);
-  const w = Math.round(bmp.width * scale);
-  const h = Math.round(bmp.height * scale);
-  const side = Math.min(w, h);
+  const side = Math.min(bmp.width, bmp.height);
   const canvas = document.createElement("canvas");
-  canvas.width = side; canvas.height = side;
+  canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(bmp, (w - side) / 2 / scale * -1 + 0, 0, w, h);
-  // recentre crop
-  ctx.clearRect(0, 0, side, side);
-  ctx.drawImage(bmp, (bmp.width - Math.min(bmp.width, bmp.height)) / 2, (bmp.height - Math.min(bmp.width, bmp.height)) / 2, Math.min(bmp.width, bmp.height), Math.min(bmp.width, bmp.height), 0, 0, side, side);
-  return canvas.toDataURL("image/jpeg", 0.85);
+  ctx.drawImage(
+    bmp,
+    (bmp.width - side) / 2, (bmp.height - side) / 2, side, side,
+    0, 0, size, size,
+  );
+  return await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Encode failed"))), "image/jpeg", 0.85)
+  );
 }
+
+// Signed URLs are used because the bucket is private. Store the path so we can
+// refresh URLs and delete the file cleanly.
+const AVATAR_SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 5; // 5 years
+
 
 import { COUNTRIES } from "@/lib/countries";
 import { CountrySelect } from "@/components/CountrySelect";
@@ -52,8 +57,20 @@ function EditProfilePage() {
     if (!file.type.startsWith("image/")) return toast.error("Please choose an image");
     try {
       setAvatarSaving(true);
-      const dataUrl = await fileToAvatarDataUrl(file);
-      const { error } = await supabase.from("profiles").update({ avatar_url: dataUrl }).eq("id", user.id);
+      const blob = await fileToAvatarBlob(file);
+      const path = `${user.id}/avatar.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, blob, { upsert: true, contentType: "image/jpeg", cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, AVATAR_SIGNED_URL_TTL);
+      if (signErr) throw signErr;
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: signed.signedUrl })
+        .eq("id", user.id);
       if (error) throw error;
       await refresh();
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -68,13 +85,20 @@ function EditProfilePage() {
   const handleAvatarRemove = async () => {
     if (!user) return;
     setAvatarSaving(true);
-    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
-    setAvatarSaving(false);
-    if (error) return toast.error(error.message);
-    await refresh();
-    qc.invalidateQueries({ queryKey: ["profile"] });
-    toast.success("Photo removed");
+    try {
+      await supabase.storage.from("avatars").remove([`${user.id}/avatar.jpg`]);
+      const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+      if (error) throw error;
+      await refresh();
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Photo removed");
+    } catch (err: any) {
+      toast.error(err.message ?? "Remove failed");
+    } finally {
+      setAvatarSaving(false);
+    }
   };
+
 
   useEffect(() => {
     if (profile) {
