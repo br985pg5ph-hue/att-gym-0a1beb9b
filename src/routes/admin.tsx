@@ -25,11 +25,11 @@ function AdminPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("announcements");
-  const tabs: Array<{ key: Tab; label: string }> = [
-    { key: "announcements", label: t.manageAnnouncements },
-    { key: "classes", label: t.manageClasses },
-    { key: "coaches", label: t.manageCoaches },
-    { key: "members", label: t.membersList },
+  const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
+    { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
+    { key: "classes", label: t.manageClasses, icon: CalendarDays },
+    { key: "coaches", label: t.manageCoaches, icon: UserCog },
+    { key: "members", label: t.membersList, icon: Users },
   ];
   const signOut = async () => {
     await qc.cancelQueries();
