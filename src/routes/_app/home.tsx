@@ -23,6 +23,11 @@ function HomePage() {
     queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
   });
 
+  const { data: latestNews } = useQuery({
+    queryKey: ["latest-news"],
+    queryFn: async () => (await supabase.from("announcements").select("*").order("created_at", { ascending: false }).limit(1)).data?.[0] ?? null,
+  });
+
   const { data: nextBooking } = useQuery({
     queryKey: ["next-booking", user?.id, scope === "child" ? selectedChild?.id : "self"],
     enabled: !!user,
