@@ -269,6 +269,7 @@ function MembersAdmin() {
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
       .select("id, name, membership_status, classes_remaining, role, children(id, name, classes_remaining)")
+      .eq("role", "member")
       .order("name")).data ?? [],
   });
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
