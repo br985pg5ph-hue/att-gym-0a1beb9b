@@ -94,6 +94,9 @@ function BookPage() {
   );
 
   const effectiveFilter = bookingForChild ? "kids" : filter;
+  const remaining = bookingForChild ? (bookingForChild.classes_remaining ?? 0) : (profile?.classes_remaining ?? 0);
+  const noCredits = remaining <= 0;
+
   const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (effectiveFilter === "all" || c.type === effectiveFilter));
 
   const book = useMutation({
@@ -205,6 +208,14 @@ function BookPage() {
         )}
 
 
+        {remaining <= 0 && (
+          <div className="mt-3 rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-xs font-medium text-destructive">
+            {bookingForChild
+              ? `${bookingForChild.name} has no classes remaining`
+              : "No classes remaining — visit the gym to add more"}
+          </div>
+        )}
+
         <div className="mt-2 space-y-2">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
           {daySlots.map((c: any) => {
@@ -212,7 +223,7 @@ function BookPage() {
             const full = cnt >= c.capacity;
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
-            const disabled = full || booked;
+            const disabled = full || booked || noCredits;
             return (
               <button key={c.id} onClick={() => !disabled && setPickedId(picked ? null : c.id)}
                 className={`card-surface flex w-full items-center justify-between p-4 text-start transition ${
@@ -238,11 +249,11 @@ function BookPage() {
 
       <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
         <button
-          disabled={!pickedId || book.isPending}
+          disabled={noCredits || !pickedId || book.isPending}
           onClick={() => pickedId && book.mutate(pickedId)}
-          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed"
+          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {book.isPending ? "…" : pickedId ? t.confirmBooking : t.selectSlot}
+          {book.isPending ? "…" : noCredits ? "No classes left" : pickedId ? t.confirmBooking : t.selectSlot}
         </button>
       </div>
     </div>
