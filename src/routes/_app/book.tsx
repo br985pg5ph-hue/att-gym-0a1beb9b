@@ -249,11 +249,11 @@ function BookPage() {
 
       <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
         <button
-          disabled={!pickedId || book.isPending}
+          disabled={noCredits || !pickedId || book.isPending}
           onClick={() => pickedId && book.mutate(pickedId)}
-          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed"
+          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {book.isPending ? "…" : pickedId ? t.confirmBooking : t.selectSlot}
+          {book.isPending ? "…" : noCredits ? "No classes left" : pickedId ? t.confirmBooking : t.selectSlot}
         </button>
       </div>
     </div>
