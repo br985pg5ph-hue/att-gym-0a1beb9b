@@ -127,6 +127,26 @@ function BookPage() {
 
       <div className="px-5">
         <div className="card-surface p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              onClick={() => changeMonth(-1)}
+              disabled={isCurrentMonth}
+              aria-label="Previous month"
+              className="rounded-pill hairline border p-1.5 disabled:invisible"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <p className="font-display text-sm tracking-wide">
+              {first.toLocaleString([], { month: "long", year: "numeric" })}
+            </p>
+            <button
+              onClick={() => changeMonth(1)}
+              aria-label="Next month"
+              className="rounded-pill hairline border p-1.5"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
           <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
             {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
           </div>
