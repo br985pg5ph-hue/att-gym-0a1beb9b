@@ -213,7 +213,17 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
             <input value={emName ?? ""} onChange={(e) => setEmName(e.target.value)} className="input" />
           </Field>
           <Field label="Emergency contact phone">
-            <input value={emPhone ?? ""} onChange={(e) => setEmPhone(e.target.value)} className="input" type="tel" />
+            <div className="flex items-stretch gap-2">
+              <CountrySelect value={emCc} onChange={setEmCc} />
+              <input
+                value={emPhone ?? ""}
+                onChange={(e) => setEmPhone(e.target.value)}
+                className="input flex-1"
+                type="tel"
+                inputMode="tel"
+                placeholder="7xxxxxxx"
+              />
+            </div>
           </Field>
         </div>
 
