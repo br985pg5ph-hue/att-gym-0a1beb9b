@@ -45,8 +45,9 @@ function HomePage() {
     },
   });
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
+  const jordanTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" }));
+  const hour = jordanTime.getHours();
+  const greeting = hour >= 5 && hour < 12 ? t.goodMorning : hour >= 12 && hour < 18 ? t.goodEvening : t.goodNight;
 
   const stats = scope === "child" && selectedChild
     ? { remaining: selectedChild.classes_remaining, attended: selectedChild.classes_attended, streak: selectedChild.streak }
