@@ -116,7 +116,7 @@ function ClassesAdmin() {
   const { data: classes = [] } = useQuery({
     queryKey: ["admin-classes"],
     queryFn: async () => (await supabase.from("classes")
-      .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, profiles(name))")
+      .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, child_id, profiles(name), children(name))")
       .order("starts_at")).data ?? [],
   });
   const { data: coaches = [] } = useQuery({
