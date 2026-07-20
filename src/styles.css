@@ -110,14 +110,17 @@
 @utility input {
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-hairline);
+  border: 1px solid color-mix(in oklab, var(--color-muted-foreground) 40%, transparent);
   background-color: var(--color-card);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.input:focus { border-color: var(--color-primary); }
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-primary) 20%, transparent);
+}
 
 
 [dir="rtl"] .flip-rtl { transform: scaleX(-1); }
