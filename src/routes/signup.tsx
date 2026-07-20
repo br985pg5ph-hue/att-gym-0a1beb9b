@@ -286,14 +286,12 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isParent, setIsParent] = useState(false);
-
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) return toast.error("Passwords do not match");
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email, password,
       options: {
         emailRedirectTo: window.location.origin,
@@ -301,15 +299,11 @@ function SignUpPage() {
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
-    // Flag account as parent so the app switches into Parent Mode.
-    if (isParent && data.user) {
-      await supabase.from("profiles").update({ is_parent: true, onboarded: true }).eq("id", data.user.id);
-    }
     setLoading(false);
     toast.success("Account created!");
-    if (isParent) nav({ to: "/profile/children", search: { new: 1, welcome: 1 } as any });
-    else nav({ to: "/onboarding" });
+    nav({ to: "/onboarding" });
   };
+
 
   const oauth = async (provider: "google" | "apple") => {
     const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
@@ -325,17 +319,8 @@ function SignUpPage() {
         <h1 className="font-display mt-3 text-3xl">{t.createAccount}</h1>
       </div>
 
-      {/* Signing up as: self vs parent-of-kids. Parent flow skips personal onboarding and goes to add a child. */}
-      <div className="mb-4 grid grid-cols-2 gap-2 rounded-2xl border hairline bg-card p-1">
-        <button type="button" onClick={() => setIsParent(false)}
-          className={`rounded-pill py-2 text-xs font-semibold transition ${!isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-          I'm training
-        </button>
-        <button type="button" onClick={() => setIsParent(true)}
-          className={`rounded-pill py-2 text-xs font-semibold transition ${isParent ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-          I'm signing up my kid(s)
-        </button>
-      </div>
+
+
 
       <form onSubmit={submit} className="space-y-3">
         <input required placeholder={t.name} value={name} onChange={(e)=>setName(e.target.value)}
