@@ -96,14 +96,25 @@ function BookPage() {
 
   // Month grid
   const today = new Date();
-  const y = today.getFullYear();
-  const m = today.getMonth();
+  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
+  const y = viewedMonth.getFullYear();
+  const m = viewedMonth.getMonth();
   const first = new Date(y, m, 1);
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const startPad = first.getDay();
   const cells: Array<Date | null> = [];
   for (let i = 0; i < startPad; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
+  const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+  const changeMonth = (delta: number) => {
+    const next = new Date(y, m + delta, 1);
+    setViewedMonth(next);
+    const sel = new Date(selectedDate);
+    if (sel.getFullYear() !== next.getFullYear() || sel.getMonth() !== next.getMonth()) {
+      setSelectedDate(fmtDay(next));
+    }
+  };
 
   return (
     <div>
