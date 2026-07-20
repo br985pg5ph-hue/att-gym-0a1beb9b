@@ -118,11 +118,11 @@ function BookPage() {
 
   return (
     <div>
-      <PageHeader
-        title={t.book}
-        subtitle={bookingForChild ? `Booking for ${bookingForChild.name}` : first.toLocaleString([], { month: "long", year: "numeric" })}
-        right={<ChildSwitcher />}
-      />
+        <PageHeader
+          title={t.book}
+          subtitle={bookingForChild ? `Booking for ${bookingForChild.name}` : undefined}
+          right={<ChildSwitcher />}
+        />
 
 
       <div className="px-5">
