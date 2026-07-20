@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { MapPin, Flame, Trophy, ChevronRight, Ticket } from "lucide-react";
+import { MapPin, Flame, Trophy, ChevronRight, Ticket, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
