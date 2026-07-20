@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StaffLoginRouteImport } from './routes/staff-login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -31,6 +32,11 @@ import { Route as AppProfileEditRouteImport } from './routes/_app/profile.edit'
 import { Route as AppProfileChildrenRouteImport } from './routes/_app/profile.children'
 import { Route as AppProfileBookingsRouteImport } from './routes/_app/profile.bookings'
 
+const StaffLoginRoute = StaffLoginRouteImport.update({
+  id: '/staff-login',
+  path: '/staff-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/staff-login': typeof StaffLoginRoute
   '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/staff-login': typeof StaffLoginRoute
   '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/staff-login': typeof StaffLoginRoute
   '/_app/admin': typeof AppAdminRoute
   '/_app/book': typeof AppBookRoute
   '/_app/coaches': typeof AppCoachesRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/staff-login'
     | '/admin'
     | '/book'
     | '/coaches'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/staff-login'
     | '/admin'
     | '/book'
     | '/coaches'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/staff-login'
     | '/_app/admin'
     | '/_app/book'
     | '/_app/coaches'
@@ -280,10 +292,18 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  StaffLoginRoute: typeof StaffLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/staff-login': {
+      id: '/staff-login'
+      path: '/staff-login'
+      fullPath: '/staff-login'
+      preLoaderRoute: typeof StaffLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -488,6 +508,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  StaffLoginRoute: StaffLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
