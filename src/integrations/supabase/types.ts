@@ -270,6 +270,8 @@ export type Database = {
           onboarded: boolean
           phone: string | null
           referral_code: string
+          referral_reward_granted: boolean
+          referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
           training_frequency: string | null
@@ -291,6 +293,8 @@ export type Database = {
           onboarded?: boolean
           phone?: string | null
           referral_code?: string
+          referral_reward_granted?: boolean
+          referred_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
           training_frequency?: string | null
@@ -312,11 +316,21 @@ export type Database = {
           onboarded?: boolean
           phone?: string | null
           referral_code?: string
+          referral_reward_granted?: boolean
+          referred_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
           training_frequency?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -328,6 +342,7 @@ export type Database = {
           id: string
           member_id: string
           payment_method: Database["public"]["Enums"]["payment_method"] | null
+          source: string
           type: Database["public"]["Enums"]["txn_type"]
         }
         Insert: {
@@ -339,6 +354,7 @@ export type Database = {
           id?: string
           member_id: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          source?: string
           type: Database["public"]["Enums"]["txn_type"]
         }
         Update: {
@@ -350,6 +366,7 @@ export type Database = {
           id?: string
           member_id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          source?: string
           type?: Database["public"]["Enums"]["txn_type"]
         }
         Relationships: [
@@ -367,6 +384,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_referral_stats: {
+        Args: never
+        Returns: {
+          joined: number
+          rewards: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
