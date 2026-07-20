@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, Gift, CreditCard, Settings, LogOut, ChevronRight, User, Phone, Users } from "lucide-react";
+import { CalendarCheck, Gift, CreditCard, Settings, LogOut, ChevronRight, User, Phone, Users, Pencil } from "lucide-react";
 import { useChildren } from "@/lib/providers";
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -62,10 +62,16 @@ function ProfilePage() {
       <PageHeader title={t.profile} />
       <div className="space-y-4 px-5">
         <div className="card-surface flex items-center gap-4 p-5">
-          <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
-            {profile?.avatar_url ? <img src={profile.avatar_url} className="h-full w-full object-cover" alt="" /> : <User size={28} />}
-          </div>
+          <Link to="/profile/edit" aria-label="Edit profile photo" className="relative shrink-0">
+            <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+              {profile?.avatar_url ? <img src={profile.avatar_url} className="h-full w-full object-cover" alt="" /> : <User size={28} />}
+            </div>
+            <span className="absolute -bottom-0.5 -end-0.5 grid h-6 w-6 place-items-center rounded-pill bg-primary text-primary-foreground ring-2 ring-background">
+              <Pencil size={12} />
+            </span>
+          </Link>
           <div className="min-w-0">
+
             <h2 className="font-display truncate text-2xl leading-none">{profile?.name || "—"}</h2>
             <span className="mt-1 inline-block rounded-pill bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
               {t.membershipActive}
