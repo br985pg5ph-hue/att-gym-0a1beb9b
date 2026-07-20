@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { MapPin, Flame, Trophy, ChevronRight, Ticket, Newspaper } from "lucide-react";
+import { Flame, Trophy, ChevronRight, Ticket, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -165,26 +165,6 @@ function HomePage() {
           </div>
         </Link>
 
-        {/* Location teaser */}
-        <Link to="/location" className="card-surface block overflow-hidden">
-          {gym && (
-            <iframe
-              title="Gym location map"
-              src={`https://www.google.com/maps?q=${gym.lat},${gym.lng}&z=16&output=embed`}
-              className="pointer-events-none h-40 w-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          )}
-          <div className="flex items-center gap-3 p-4">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary"><MapPin size={20} /></div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.ourLocation}</p>
-              <p className="truncate text-sm font-medium">{gym?.address || "—"}</p>
-            </div>
-            <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
-          </div>
-        </Link>
       </div>
     </div>
   );
