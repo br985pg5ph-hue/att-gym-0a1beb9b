@@ -18,6 +18,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppNewsRouteImport } from './routes/_app/news'
+import { Route as AppMembershipRouteImport } from './routes/_app/membership'
 import { Route as AppLocationRouteImport } from './routes/_app/location'
 import { Route as AppHomeRouteImport } from './routes/_app/home'
 import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
@@ -73,6 +74,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
 const AppNewsRoute = AppNewsRouteImport.update({
   id: '/news',
   path: '/news',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMembershipRoute = AppMembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLocationRoute = AppLocationRouteImport.update({
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
   '/location': typeof AppLocationRoute
+  '/membership': typeof AppMembershipRoute
   '/news': typeof AppNewsRoute
   '/profile': typeof AppProfileRouteWithChildren
   '/profile/bookings': typeof AppProfileBookingsRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
   '/location': typeof AppLocationRoute
+  '/membership': typeof AppMembershipRoute
   '/news': typeof AppNewsRoute
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/children': typeof AppProfileChildrenRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_app/coaches': typeof AppCoachesRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/location': typeof AppLocationRoute
+  '/_app/membership': typeof AppMembershipRoute
   '/_app/news': typeof AppNewsRoute
   '/_app/profile': typeof AppProfileRouteWithChildren
   '/_app/profile/bookings': typeof AppProfileBookingsRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/coaches'
     | '/home'
     | '/location'
+    | '/membership'
     | '/news'
     | '/profile'
     | '/profile/bookings'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/coaches'
     | '/home'
     | '/location'
+    | '/membership'
     | '/news'
     | '/profile/bookings'
     | '/profile/children'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/_app/coaches'
     | '/_app/home'
     | '/_app/location'
+    | '/_app/membership'
     | '/_app/news'
     | '/_app/profile'
     | '/_app/profile/bookings'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/news'
       fullPath: '/news'
       preLoaderRoute: typeof AppNewsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/membership': {
+      id: '/_app/membership'
+      path: '/membership'
+      fullPath: '/membership'
+      preLoaderRoute: typeof AppMembershipRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/location': {
@@ -464,6 +483,7 @@ interface AppRouteChildren {
   AppCoachesRoute: typeof AppCoachesRoute
   AppHomeRoute: typeof AppHomeRoute
   AppLocationRoute: typeof AppLocationRoute
+  AppMembershipRoute: typeof AppMembershipRoute
   AppNewsRoute: typeof AppNewsRoute
   AppProfileRoute: typeof AppProfileRouteWithChildren
 }
@@ -474,6 +494,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCoachesRoute: AppCoachesRoute,
   AppHomeRoute: AppHomeRoute,
   AppLocationRoute: AppLocationRoute,
+  AppMembershipRoute: AppMembershipRoute,
   AppNewsRoute: AppNewsRoute,
   AppProfileRoute: AppProfileRouteWithChildren,
 }
