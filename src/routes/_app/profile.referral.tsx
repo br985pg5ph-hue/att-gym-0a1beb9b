@@ -88,14 +88,15 @@ function ReferralPage() {
           </ol>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {["Invited", "Joined", "Rewards"].map((l, i) => (
-            <div key={l} className="card-surface p-4 text-center">
-              <p className="font-display text-2xl">{[0,0,0][i]}</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{l}</p>
+        <div className="grid grid-cols-2 gap-2">
+          {[{ l: "Joined", v: stats?.joined ?? 0 }, { l: "Rewards", v: stats?.rewards ?? 0 }].map((s) => (
+            <div key={s.l} className="card-surface p-4 text-center">
+              <p className="font-display text-2xl">{s.v}</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{s.l}</p>
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );
