@@ -1,10 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
 import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users } from "lucide-react";
 import { toast } from "sonner";
+import { deleteMyAccount } from "@/lib/account.functions";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_app/profile/settings")({
   component: SettingsPage,
