@@ -27,7 +27,6 @@ import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppProfileIndexRouteImport } from './routes/_app/profile.index'
 import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
 import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
-import { Route as AppProfilePaymentsRouteImport } from './routes/_app/profile.payments'
 import { Route as AppProfileEditRouteImport } from './routes/_app/profile.edit'
 import { Route as AppProfileChildrenRouteImport } from './routes/_app/profile.children'
 import { Route as AppProfileBookingsRouteImport } from './routes/_app/profile.bookings'
@@ -121,11 +120,6 @@ const AppProfileReferralRoute = AppProfileReferralRouteImport.update({
   path: '/referral',
   getParentRoute: () => AppProfileRoute,
 } as any)
-const AppProfilePaymentsRoute = AppProfilePaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => AppProfileRoute,
-} as any)
 const AppProfileEditRoute = AppProfileEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -160,7 +154,6 @@ export interface FileRoutesByFullPath {
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/children': typeof AppProfileChildrenRoute
   '/profile/edit': typeof AppProfileEditRoute
-  '/profile/payments': typeof AppProfilePaymentsRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
   '/profile/': typeof AppProfileIndexRoute
@@ -182,7 +175,6 @@ export interface FileRoutesByTo {
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/children': typeof AppProfileChildrenRoute
   '/profile/edit': typeof AppProfileEditRoute
-  '/profile/payments': typeof AppProfilePaymentsRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
   '/profile': typeof AppProfileIndexRoute
@@ -207,7 +199,6 @@ export interface FileRoutesById {
   '/_app/profile/bookings': typeof AppProfileBookingsRoute
   '/_app/profile/children': typeof AppProfileChildrenRoute
   '/_app/profile/edit': typeof AppProfileEditRoute
-  '/_app/profile/payments': typeof AppProfilePaymentsRoute
   '/_app/profile/referral': typeof AppProfileReferralRoute
   '/_app/profile/settings': typeof AppProfileSettingsRoute
   '/_app/profile/': typeof AppProfileIndexRoute
@@ -232,7 +223,6 @@ export interface FileRouteTypes {
     | '/profile/bookings'
     | '/profile/children'
     | '/profile/edit'
-    | '/profile/payments'
     | '/profile/referral'
     | '/profile/settings'
     | '/profile/'
@@ -254,7 +244,6 @@ export interface FileRouteTypes {
     | '/profile/bookings'
     | '/profile/children'
     | '/profile/edit'
-    | '/profile/payments'
     | '/profile/referral'
     | '/profile/settings'
     | '/profile'
@@ -278,7 +267,6 @@ export interface FileRouteTypes {
     | '/_app/profile/bookings'
     | '/_app/profile/children'
     | '/_app/profile/edit'
-    | '/_app/profile/payments'
     | '/_app/profile/referral'
     | '/_app/profile/settings'
     | '/_app/profile/'
@@ -422,13 +410,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileReferralRouteImport
       parentRoute: typeof AppProfileRoute
     }
-    '/_app/profile/payments': {
-      id: '/_app/profile/payments'
-      path: '/payments'
-      fullPath: '/profile/payments'
-      preLoaderRoute: typeof AppProfilePaymentsRouteImport
-      parentRoute: typeof AppProfileRoute
-    }
     '/_app/profile/edit': {
       id: '/_app/profile/edit'
       path: '/edit'
@@ -457,7 +438,6 @@ interface AppProfileRouteChildren {
   AppProfileBookingsRoute: typeof AppProfileBookingsRoute
   AppProfileChildrenRoute: typeof AppProfileChildrenRoute
   AppProfileEditRoute: typeof AppProfileEditRoute
-  AppProfilePaymentsRoute: typeof AppProfilePaymentsRoute
   AppProfileReferralRoute: typeof AppProfileReferralRoute
   AppProfileSettingsRoute: typeof AppProfileSettingsRoute
   AppProfileIndexRoute: typeof AppProfileIndexRoute
@@ -467,7 +447,6 @@ const AppProfileRouteChildren: AppProfileRouteChildren = {
   AppProfileBookingsRoute: AppProfileBookingsRoute,
   AppProfileChildrenRoute: AppProfileChildrenRoute,
   AppProfileEditRoute: AppProfileEditRoute,
-  AppProfilePaymentsRoute: AppProfilePaymentsRoute,
   AppProfileReferralRoute: AppProfileReferralRoute,
   AppProfileSettingsRoute: AppProfileSettingsRoute,
   AppProfileIndexRoute: AppProfileIndexRoute,

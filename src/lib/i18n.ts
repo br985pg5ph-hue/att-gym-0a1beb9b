@@ -19,7 +19,7 @@ export const dict: Record<Lang, Dict> = {
     confirmBooking: "Confirm Booking", selectSlot: "Select a slot",
     all: "All", full: "Full", booked: "Booked", slotsLeft: "spots left",
     wallet: "Wallet Balance", topUp: "Top Up", changePlan: "Change Plan", addPayment: "Add Payment Method",
-    myBookings: "My Bookings", refer: "Refer a Friend", payments: "Payment & Membership", settings: "Settings",
+    myBookings: "My Bookings", refer: "Refer a Friend", payments: "Payment & Membership", membership: "Membership", settings: "Settings",
     referralCode: "Your referral code", copy: "Copy", copied: "✓ Copied", shareMsg: "Share via Message", shareLink: "Share Link",
     howItWorks: "How It Works", freeClass: "1 Free Class", perReferral: "For every friend who joins",
     theme: "Theme", language: "Language", dark: "Dark", lightMode: "Light", english: "English", arabic: "العربية",
