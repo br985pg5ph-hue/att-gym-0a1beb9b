@@ -36,11 +36,22 @@ function SettingsPage() {
   };
 
 
+  const deleteAccountFn = useServerFn(deleteMyAccount);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const del = async () => {
-    if (!confirm("Delete your account permanently?")) return;
-    await supabase.auth.signOut();
-    toast.info("Contact support to complete deletion.");
-    nav({ to: "/auth" });
+    setDeleting(true);
+    try {
+      await deleteAccountFn();
+      await supabase.auth.signOut();
+      toast.success("Your account has been deleted.");
+      setConfirmOpen(false);
+      nav({ to: "/auth" });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to delete account");
+      setDeleting(false);
+    }
   };
 
   return (
