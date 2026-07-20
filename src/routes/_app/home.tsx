@@ -135,7 +135,7 @@ function HomePage() {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest">{t.classesAttended}</span></div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
           </div>
           <div className="card-surface p-4">
