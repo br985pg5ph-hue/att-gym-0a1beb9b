@@ -54,6 +54,6 @@ export const dict: Record<Lang, Dict> = {
     manageAnnouncements: "إدارة الإعلانات", manageClasses: "إدارة الحصص", manageCoaches: "إدارة المدربين", membersList: "الأعضاء",
     save: "حفظ", edit: "تعديل", delete: "حذف", add: "إضافة", title: "العنوان", body: "المحتوى", tag: "الوسم",
     specialty: "التخصص", bio: "نبذة", photoUrl: "رابط الصورة", type: "النوع", coach: "المدرب", capacity: "السعة", startsAt: "يبدأ في",
-    membershipActive: "عضو نشط", hours: "ساعات العمل", connectWithUs: "تواصل معنا",
+    membershipActive: "عضو نشط", membershipInactive: "عضو غير نشط", hours: "ساعات العمل", connectWithUs: "تواصل معنا",
   },
 };
