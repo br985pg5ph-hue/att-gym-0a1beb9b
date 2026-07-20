@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
@@ -95,26 +96,57 @@ function BookPage() {
 
   // Month grid
   const today = new Date();
-  const y = today.getFullYear();
-  const m = today.getMonth();
+  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
+  const y = viewedMonth.getFullYear();
+  const m = viewedMonth.getMonth();
   const first = new Date(y, m, 1);
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const startPad = first.getDay();
   const cells: Array<Date | null> = [];
   for (let i = 0; i < startPad; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
+  const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+  const changeMonth = (delta: number) => {
+    const next = new Date(y, m + delta, 1);
+    setViewedMonth(next);
+    const sel = new Date(selectedDate);
+    if (sel.getFullYear() !== next.getFullYear() || sel.getMonth() !== next.getMonth()) {
+      setSelectedDate(fmtDay(next));
+    }
+  };
 
   return (
     <div>
-      <PageHeader
-        title={t.book}
-        subtitle={bookingForChild ? `Booking for ${bookingForChild.name}` : first.toLocaleString([], { month: "long", year: "numeric" })}
-        right={<ChildSwitcher />}
-      />
+        <PageHeader
+          title={t.book}
+          subtitle={bookingForChild ? `Booking for ${bookingForChild.name}` : undefined}
+          right={<ChildSwitcher />}
+        />
 
 
       <div className="px-5">
         <div className="card-surface p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              onClick={() => changeMonth(-1)}
+              disabled={isCurrentMonth}
+              aria-label="Previous month"
+              className="rounded-pill hairline border p-1.5 disabled:invisible"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <p className="font-display text-sm tracking-wide">
+              {first.toLocaleString([], { month: "long", year: "numeric" })}
+            </p>
+            <button
+              onClick={() => changeMonth(1)}
+              aria-label="Next month"
+              className="rounded-pill hairline border p-1.5"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
           <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
             {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
           </div>
