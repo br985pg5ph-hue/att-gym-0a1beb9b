@@ -5,6 +5,17 @@ import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
 import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
 import { toast } from "sonner";
+import { CountrySelect, COUNTRY_CODES } from "./profile.edit";
+
+function splitPhone(raw: string): { cc: string; rest: string } {
+  if (!raw) return { cc: "+962", rest: "" };
+  const match = COUNTRY_CODES
+    .slice()
+    .sort((a, b) => b.code.length - a.code.length)
+    .find((c) => raw.startsWith(c.code));
+  if (match) return { cc: match.code, rest: raw.slice(match.code.length).trim() };
+  return { cc: "+962", rest: raw };
+}
 
 export const Route = createFileRoute("/_app/profile/children")({
   validateSearch: (s: Record<string, unknown>) => ({
