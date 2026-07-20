@@ -147,7 +147,7 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
       experience_level: experience || null,
       injuries_notes: injuries.trim() || null,
       emergency_contact_name: emName.trim() || null,
-      emergency_contact_phone: emPhone.trim() || null,
+      emergency_contact_phone: emPhone.trim() ? `${emCc} ${emPhone.trim()}` : null,
     };
     const { error } = child
       ? await supabase.from("children").update(payload).eq("id", child.id)
