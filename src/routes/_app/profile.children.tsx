@@ -5,6 +5,17 @@ import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
 import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
 import { toast } from "sonner";
+import { CountrySelect, COUNTRY_CODES } from "./profile.edit";
+
+function splitPhone(raw: string): { cc: string; rest: string } {
+  if (!raw) return { cc: "+962", rest: "" };
+  const match = COUNTRY_CODES
+    .slice()
+    .sort((a, b) => b.code.length - a.code.length)
+    .find((c) => raw.startsWith(c.code));
+  if (match) return { cc: match.code, rest: raw.slice(match.code.length).trim() };
+  return { cc: "+962", rest: raw };
+}
 
 export const Route = createFileRoute("/_app/profile/children")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -119,7 +130,9 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
   const [experience, setExperience] = useState(child?.experience_level ?? "");
   const [injuries, setInjuries] = useState(child?.injuries_notes ?? "");
   const [emName, setEmName] = useState(child?.emergency_contact_name ?? "");
-  const [emPhone, setEmPhone] = useState(child?.emergency_contact_phone ?? "");
+  const initialPhone = splitPhone(child?.emergency_contact_phone ?? "");
+  const [emCc, setEmCc] = useState(initialPhone.cc);
+  const [emPhone, setEmPhone] = useState(initialPhone.rest);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -134,7 +147,7 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
       experience_level: experience || null,
       injuries_notes: injuries.trim() || null,
       emergency_contact_name: emName.trim() || null,
-      emergency_contact_phone: emPhone.trim() || null,
+      emergency_contact_phone: emPhone.trim() ? `${emCc} ${emPhone.trim()}` : null,
     };
     const { error } = child
       ? await supabase.from("children").update(payload).eq("id", child.id)
@@ -200,7 +213,17 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
             <input value={emName ?? ""} onChange={(e) => setEmName(e.target.value)} className="input" />
           </Field>
           <Field label="Emergency contact phone">
-            <input value={emPhone ?? ""} onChange={(e) => setEmPhone(e.target.value)} className="input" type="tel" />
+            <div className="flex items-stretch gap-2">
+              <CountrySelect value={emCc} onChange={setEmCc} />
+              <input
+                value={emPhone ?? ""}
+                onChange={(e) => setEmPhone(e.target.value)}
+                className="input flex-1"
+                type="tel"
+                inputMode="tel"
+                placeholder="7xxxxxxx"
+              />
+            </div>
           </Field>
         </div>
 

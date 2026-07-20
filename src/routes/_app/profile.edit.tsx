@@ -240,7 +240,8 @@ const COUNTRIES: { code: string; name: string; iso: string }[] = [
   { code: "+998", name: "Uzbekistan", iso: "uz" },
 ];
 
-function CountrySelect({ value, onChange }: { value: string; onChange: (code: string) => void }) {
+export const COUNTRY_CODES = COUNTRIES;
+export function CountrySelect({ value, onChange }: { value: string; onChange: (code: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const selected = COUNTRIES.find((c) => c.code === value) || COUNTRIES[0];
