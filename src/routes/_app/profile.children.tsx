@@ -130,7 +130,9 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
   const [experience, setExperience] = useState(child?.experience_level ?? "");
   const [injuries, setInjuries] = useState(child?.injuries_notes ?? "");
   const [emName, setEmName] = useState(child?.emergency_contact_name ?? "");
-  const [emPhone, setEmPhone] = useState(child?.emergency_contact_phone ?? "");
+  const initialPhone = splitPhone(child?.emergency_contact_phone ?? "");
+  const [emCc, setEmCc] = useState(initialPhone.cc);
+  const [emPhone, setEmPhone] = useState(initialPhone.rest);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
