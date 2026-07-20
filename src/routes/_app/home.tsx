@@ -77,7 +77,7 @@ function HomePage() {
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
               ) : (
-                <Logo size={44} />
+                <User size={24} />
               )}
             </Link>
           </div>
