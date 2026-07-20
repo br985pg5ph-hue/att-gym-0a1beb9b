@@ -57,8 +57,20 @@ function EditProfilePage() {
     if (!file.type.startsWith("image/")) return toast.error("Please choose an image");
     try {
       setAvatarSaving(true);
-      const dataUrl = await fileToAvatarDataUrl(file);
-      const { error } = await supabase.from("profiles").update({ avatar_url: dataUrl }).eq("id", user.id);
+      const blob = await fileToAvatarBlob(file);
+      const path = `${user.id}/avatar.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, blob, { upsert: true, contentType: "image/jpeg", cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, AVATAR_SIGNED_URL_TTL);
+      if (signErr) throw signErr;
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: signed.signedUrl })
+        .eq("id", user.id);
       if (error) throw error;
       await refresh();
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -73,13 +85,20 @@ function EditProfilePage() {
   const handleAvatarRemove = async () => {
     if (!user) return;
     setAvatarSaving(true);
-    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
-    setAvatarSaving(false);
-    if (error) return toast.error(error.message);
-    await refresh();
-    qc.invalidateQueries({ queryKey: ["profile"] });
-    toast.success("Photo removed");
+    try {
+      await supabase.storage.from("avatars").remove([`${user.id}/avatar.jpg`]);
+      const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+      if (error) throw error;
+      await refresh();
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Photo removed");
+    } catch (err: any) {
+      toast.error(err.message ?? "Remove failed");
+    } finally {
+      setAvatarSaving(false);
+    }
   };
+
 
   useEffect(() => {
     if (profile) {
