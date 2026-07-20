@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
-import { useLang, useTheme } from "@/lib/providers";
-import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog } from "lucide-react";
+import { useAuth, useLang, useTheme } from "@/lib/providers";
+import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile/settings")({
@@ -13,8 +13,22 @@ export const Route = createFileRoute("/_app/profile/settings")({
 function SettingsPage() {
   const { t, lang, setLang } = useLang();
   const { theme, setTheme } = useTheme();
+  const { profile, user, refresh } = useAuth();
   const nav = useNavigate();
   const [notif, setNotif] = useState(true);
+  const [savingParent, setSavingParent] = useState(false);
+  const parentMode = !!profile?.is_parent;
+
+  const toggleParent = async () => {
+    if (!user) return;
+    setSavingParent(true);
+    const { error } = await supabase.from("profiles").update({ is_parent: !parentMode }).eq("id", user.id);
+    setSavingParent(false);
+    if (error) return toast.error(error.message);
+    await refresh();
+    toast.success(!parentMode ? "Parent Mode enabled" : "Parent Mode disabled");
+  };
+
 
   const del = async () => {
     if (!confirm("Delete your account permanently?")) return;
