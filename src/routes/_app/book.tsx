@@ -223,7 +223,7 @@ function BookPage() {
             const full = cnt >= c.capacity;
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
-            const disabled = full || booked;
+            const disabled = full || booked || noCredits;
             return (
               <button key={c.id} onClick={() => !disabled && setPickedId(picked ? null : c.id)}
                 className={`card-surface flex w-full items-center justify-between p-4 text-start transition ${
