@@ -51,7 +51,6 @@ function ProfilePage() {
       ? [{ icon: Users, label: `My Children${kids.length ? ` (${kids.length})` : ""}`, to: "/profile/children" as const }]
       : []),
     { icon: Gift, label: t.refer, to: "/profile/referral" },
-    { icon: CreditCard, label: t.payments, to: "/profile/payments" },
     { icon: Settings, label: t.settings, to: "/profile/settings" },
   ] as const;
 
