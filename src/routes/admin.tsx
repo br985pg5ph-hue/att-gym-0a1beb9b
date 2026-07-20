@@ -51,20 +51,26 @@ function AdminPage() {
           <LogOut size={14} /> {t.signOut}
         </button>
       </header>
-      <main className="mx-auto max-w-3xl px-5 py-5 pb-[max(env(safe-area-inset-bottom),24px)]">
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-3">
-          {tabs.map(x => (
-            <button key={x.key} onClick={()=>setTab(x.key)}
-              className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium ${tab===x.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"}`}>
-              {x.label}
-            </button>
-          ))}
-        </div>
+      <main className="mx-auto max-w-3xl px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]">
         {tab === "announcements" && <AnnouncementsAdmin />}
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
       </main>
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
+        <ul className="mx-auto flex max-w-3xl items-center justify-around gap-1 px-2">
+          {tabs.map(x => (
+            <li key={x.key} className="flex-1">
+              <button
+                onClick={()=>setTab(x.key)}
+                className={`w-full truncate rounded-pill px-2 py-1.5 text-[11px] font-semibold transition-colors ${tab===x.key ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                {x.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }
