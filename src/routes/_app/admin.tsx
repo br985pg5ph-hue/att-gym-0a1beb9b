@@ -176,7 +176,11 @@ function ClassesAdmin() {
                 <ul className="mt-3 space-y-1">
                   {active.map((b: any) => (
                     <li key={b.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                      <span>{b.profiles?.name ?? "Member"}</span>
+                      <span>
+                        {b.child_id
+                          ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
+                          : (b.profiles?.name ?? "Member")}
+                      </span>
                       <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
                     </li>
                   ))}
