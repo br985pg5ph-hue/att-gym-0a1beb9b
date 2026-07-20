@@ -12,6 +12,7 @@ function ReferralPage() {
   const { profile } = useAuth();
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const code = profile?.referral_code ?? "";
   const link = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${code}` : "";
 
@@ -21,8 +22,16 @@ function ReferralPage() {
     setTimeout(() => setCopied(false), 1800);
   };
   const share = async () => {
-    if (navigator.share) await navigator.share({ title: "Join ATT Academy", text: `Use my code ${code}`, url: link }).catch(()=>{});
-    else copy();
+    const shareData = { title: "Join ATT Academy", text: `Join me at ATT Academy! Use my code ${code}`, url: link };
+    try {
+      if (typeof navigator !== "undefined" && (navigator as any).share && (!(navigator as any).canShare || (navigator as any).canShare(shareData))) {
+        await (navigator as any).share(shareData);
+        return;
+      }
+    } catch { /* user cancelled or share failed — fall through to copy */ }
+    try { await navigator.clipboard.writeText(link); } catch { /* ignore */ }
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 1800);
   };
   const sms = () => { window.location.href = `sms:?body=${encodeURIComponent(`Join me at ATT Academy! Use my code ${code} — ${link}`)}`; };
 
@@ -51,7 +60,9 @@ function ReferralPage() {
 
         <div className="grid grid-cols-2 gap-2">
           <button onClick={sms} className="card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium"><MessageSquare size={14}/> {t.shareMsg}</button>
-          <button onClick={share} className="card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium"><Share2 size={14}/> {t.shareLink}</button>
+          <button onClick={share} className={`card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium transition ${linkCopied ? "bg-emerald-500 text-white" : ""}`}>
+            <Share2 size={14}/> {linkCopied ? "✓ Link copied" : t.shareLink}
+          </button>
         </div>
 
         <div className="card-surface p-5">
