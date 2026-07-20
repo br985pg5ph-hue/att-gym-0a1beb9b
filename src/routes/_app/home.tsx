@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { Logo } from "@/components/Logo";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { MapPin, Flame, Trophy, ChevronRight, Ticket } from "lucide-react";
+import { MapPin, Flame, Trophy, ChevronRight, Ticket, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -21,6 +21,11 @@ function HomePage() {
   const { data: gym } = useQuery({
     queryKey: ["gym"],
     queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
+  });
+
+  const { data: latestNews } = useQuery({
+    queryKey: ["latest-news"],
+    queryFn: async () => (await supabase.from("announcements").select("*").order("created_at", { ascending: false }).limit(1)).data?.[0] ?? null,
   });
 
   const { data: nextBooking } = useQuery({
@@ -140,6 +145,25 @@ function HomePage() {
         </div>
 
 
+
+        {/* Latest news */}
+        <Link to="/news" className="card-surface block p-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
+              <Newspaper size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.latestNews ?? "Latest News"}</p>
+              <p className="truncate text-sm font-medium">
+                {latestNews?.title ?? "No announcements yet"}
+              </p>
+              {latestNews?.body && (
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{latestNews.body}</p>
+              )}
+            </div>
+            <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
+          </div>
+        </Link>
 
         {/* Location teaser */}
         <Link to="/location" className="card-surface block overflow-hidden">
