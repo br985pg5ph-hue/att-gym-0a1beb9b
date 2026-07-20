@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ForgotRouteImport } from './routes/forgot'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
@@ -24,7 +25,6 @@ import { Route as AppLocationRouteImport } from './routes/_app/location'
 import { Route as AppHomeRouteImport } from './routes/_app/home'
 import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
 import { Route as AppBookRouteImport } from './routes/_app/book'
-import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppProfileIndexRouteImport } from './routes/_app/profile.index'
 import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
 import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
@@ -60,6 +60,11 @@ const ForgotRoute = ForgotRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -106,11 +111,6 @@ const AppBookRoute = AppBookRouteImport.update({
   path: '/book',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminRoute = AppAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppProfileIndexRoute = AppProfileIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -144,13 +144,13 @@ const AppProfileBookingsRoute = AppProfileBookingsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/staff-login': typeof StaffLoginRoute
-  '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
@@ -167,13 +167,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/staff-login': typeof StaffLoginRoute
-  '/admin': typeof AppAdminRoute
   '/book': typeof AppBookRoute
   '/coaches': typeof AppCoachesRoute
   '/home': typeof AppHomeRoute
@@ -191,13 +191,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/staff-login': typeof StaffLoginRoute
-  '/_app/admin': typeof AppAdminRoute
   '/_app/book': typeof AppBookRoute
   '/_app/coaches': typeof AppCoachesRoute
   '/_app/home': typeof AppHomeRoute
@@ -216,13 +216,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/forgot'
     | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/staff-login'
-    | '/admin'
     | '/book'
     | '/coaches'
     | '/home'
@@ -239,13 +239,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/auth'
     | '/forgot'
     | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/staff-login'
-    | '/admin'
     | '/book'
     | '/coaches'
     | '/home'
@@ -262,13 +262,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/admin'
     | '/auth'
     | '/forgot'
     | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/staff-login'
-    | '/_app/admin'
     | '/_app/book'
     | '/_app/coaches'
     | '/_app/home'
@@ -287,6 +287,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ForgotRoute: typeof ForgotRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -337,6 +338,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -400,13 +408,6 @@ declare module '@tanstack/react-router' {
       path: '/book'
       fullPath: '/book'
       preLoaderRoute: typeof AppBookRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/admin': {
-      id: '/_app/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile/': {
@@ -477,7 +478,6 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAdminRoute: typeof AppAdminRoute
   AppBookRoute: typeof AppBookRoute
   AppCoachesRoute: typeof AppCoachesRoute
   AppHomeRoute: typeof AppHomeRoute
@@ -488,7 +488,6 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdminRoute: AppAdminRoute,
   AppBookRoute: AppBookRoute,
   AppCoachesRoute: AppCoachesRoute,
   AppHomeRoute: AppHomeRoute,
@@ -503,6 +502,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ForgotRoute: ForgotRoute,
   OnboardingRoute: OnboardingRoute,

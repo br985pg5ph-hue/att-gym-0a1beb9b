@@ -7,7 +7,7 @@ import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
 import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/_app/admin")({
+export const Route = createFileRoute("/admin")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
