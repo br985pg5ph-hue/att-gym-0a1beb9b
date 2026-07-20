@@ -199,7 +199,6 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
           </button>
         </div>
       </div>
-      <style>{`.input{width:100%;border-radius:12px;background:hsl(var(--card));border:1px solid hsl(var(--border));padding:12px 14px;font-size:14px;outline:none} .input:focus{border-color:hsl(var(--primary))}`}</style>
     </div>
   );
 }
