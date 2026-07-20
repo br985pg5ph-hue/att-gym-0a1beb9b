@@ -161,14 +161,28 @@ function ClassesAdmin() {
     onSuccess: () => { setTitle(""); setStartsAt(""); toast.success("Class added"); qc.invalidateQueries({ queryKey: ["admin-classes"] }); qc.invalidateQueries({ queryKey: ["classes"] }); },
     onError: (e: any) => toast.error(e.message),
   });
-  const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("classes").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
+  const cancelClass = useMutation({
+    mutationFn: async (id: string) => {
+      // Cancel all upcoming bookings first so credits refund via trigger
+      const { error: bErr } = await supabase.from("bookings").update({ status: "cancelled" }).eq("class_id", id).eq("status", "upcoming");
+      if (bErr) throw bErr;
+      const { error } = await supabase.from("classes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Class cancelled");
+      qc.invalidateQueries({ queryKey: ["admin-classes"] });
+      qc.invalidateQueries({ queryKey: ["classes"] });
+    },
+    onError: (e: any) => toast.error(e.message),
   });
   const removeAttendee = useMutation({
     mutationFn: async (bid: string) => { await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bid); },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
   });
+
+  const now = Date.now();
+  const upcomingClasses = classes.filter((c: any) => new Date(c.starts_at).getTime() >= now - 60*60*1000);
 
   return (
     <div className="space-y-4">
@@ -190,17 +204,35 @@ function ClassesAdmin() {
         <button onClick={()=>create.mutate()} disabled={!title || !startsAt}
           className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> Add class</button>
       </div>
+      {upcomingClasses.length === 0 && (
+        <p className="text-center text-xs text-muted-foreground py-4">No upcoming classes</p>
+      )}
       <div className="space-y-2">
-        {classes.map((c: any) => {
+        {upcomingClasses.map((c: any) => {
           const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
+          const booked = active.length;
+          const left = Math.max(0, c.capacity - booked);
+          const full = left === 0;
           return (
             <div key={c.id} className="card-surface p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{c.title}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{new Date(c.starts_at).toLocaleString()} • {c.coaches?.name || "—"} • {active.length}/{c.capacity}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{new Date(c.starts_at).toLocaleString()} • {c.coaches?.name || "—"}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
+                    <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                      {full ? "Full" : `${left} left`}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">of {c.capacity}</span>
+                  </div>
                 </div>
-                <button onClick={()=>del.mutate(c.id)} className="text-destructive"><Trash2 size={16}/></button>
+                <button
+                  onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
+                  className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
+                >
+                  Cancel
+                </button>
               </div>
               {active.length > 0 && (
                 <ul className="mt-3 space-y-1">
@@ -223,6 +255,7 @@ function ClassesAdmin() {
     </div>
   );
 }
+
 
 function CoachesAdmin() {
   const qc = useQueryClient();
