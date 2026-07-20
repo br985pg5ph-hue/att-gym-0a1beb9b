@@ -99,6 +99,7 @@ function ChildrenPage() {
               await refresh();
             }
             setEditing(null);
+            if (search.welcome) nav({ to: "/home" });
           }}
         />
       )}
