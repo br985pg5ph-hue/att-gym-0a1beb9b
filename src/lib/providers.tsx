@@ -13,7 +13,7 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict 
 // ---------- AUTH ----------
 type Profile = {
   id: string; name: string; phone: string | null; avatar_url: string | null;
-  role: "member" | "staff"; membership_status: string; wallet_balance: number;
+  role: "member" | "staff"; membership_status: string;
   referral_code: string; streak: number; classes_attended: number; classes_remaining: number; interests: string[];
   is_parent: boolean;
 };
