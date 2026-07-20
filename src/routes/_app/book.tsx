@@ -34,12 +34,26 @@ function BookPage() {
   const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
+  // Month grid (declared here so month-scoped queries can use it)
+  const today = new Date();
+  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
+  const y = viewedMonth.getFullYear();
+  const m = viewedMonth.getMonth();
+
+  const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+  const monthStartIso = isCurrentMonth
+    ? new Date(Date.now() - 24 * 3600 * 1000).toISOString()
+    : new Date(y, m, 1).toISOString();
+  const nextMonthStartIso = new Date(y, m + 1, 1).toISOString();
+
   const { data: classes = [] } = useQuery({
-    queryKey: ["classes"],
+    queryKey: ["classes", y, m],
     queryFn: async () => {
       const { data } = await supabase.from("classes")
         .select("id, type, title, starts_at, duration_min, capacity, coaches(name)")
-        .gte("starts_at", new Date(Date.now() - 24*3600*1000).toISOString())
+        .gte("starts_at", monthStartIso)
+        .lt("starts_at", nextMonthStartIso)
         .order("starts_at");
       return data ?? [];
     },
@@ -56,15 +70,21 @@ function BookPage() {
     },
   });
 
+  const classIds = classes.map((c: any) => c.id);
   const { data: counts = {} } = useQuery({
-    queryKey: ["class-counts"],
+    queryKey: ["class-counts", y, m, classIds.length],
+    enabled: classIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("bookings").select("class_id, status").eq("status", "upcoming");
+      const { data } = await supabase.from("bookings")
+        .select("class_id, status")
+        .eq("status", "upcoming")
+        .in("class_id", classIds);
       const map: Record<string, number> = {};
       (data ?? []).forEach((b: any) => { map[b.class_id] = (map[b.class_id] ?? 0) + 1; });
       return map;
     },
   });
+
 
   const bookedClassIds = new Set(myBookings.filter((b: any) => b.status === "upcoming").map((b: any) => b.class_id));
   const daysWithBookings = new Set(
