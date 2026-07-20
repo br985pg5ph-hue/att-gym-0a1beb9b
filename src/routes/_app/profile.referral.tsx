@@ -60,7 +60,9 @@ function ReferralPage() {
 
         <div className="grid grid-cols-2 gap-2">
           <button onClick={sms} className="card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium"><MessageSquare size={14}/> {t.shareMsg}</button>
-          <button onClick={share} className="card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium"><Share2 size={14}/> {t.shareLink}</button>
+          <button onClick={share} className={`card-surface flex items-center justify-center gap-2 p-4 text-xs font-medium transition ${linkCopied ? "bg-emerald-500 text-white" : ""}`}>
+            <Share2 size={14}/> {linkCopied ? "✓ Link copied" : t.shareLink}
+          </button>
         </div>
 
         <div className="card-surface p-5">
