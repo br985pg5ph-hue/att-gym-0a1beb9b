@@ -205,6 +205,14 @@ function BookPage() {
         )}
 
 
+        {remaining <= 0 && (
+          <div className="mt-3 rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-xs font-medium text-destructive">
+            {bookingForChild
+              ? `${bookingForChild.name} has no classes remaining`
+              : "No classes remaining — visit the gym to add more"}
+          </div>
+        )}
+
         <div className="mt-2 space-y-2">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
           {daySlots.map((c: any) => {
