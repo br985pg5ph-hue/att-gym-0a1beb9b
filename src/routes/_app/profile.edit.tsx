@@ -360,7 +360,7 @@ function EditProfilePage() {
       const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null }).eq("id", user.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Profile updated"); qc.invalidateQueries({ queryKey: ["profile"] }); },
+    onSuccess: async () => { toast.success("Profile updated"); await refresh(); qc.invalidateQueries({ queryKey: ["profile"] }); },
     onError: (e: any) => toast.error(e.message),
   });
 
