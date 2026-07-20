@@ -233,19 +233,49 @@ function CoachesAdmin() {
 }
 
 function MembersAdmin() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, membership_status, wallet_balance, classes_remaining, role, children(id, name, classes_remaining)")
+      .select("id, name, membership_status, classes_remaining, role, children(id, name, classes_remaining)")
       .order("name")).data ?? [],
   });
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [addFor, setAddFor] = useState<string | null>(null);
+  const [childId, setChildId] = useState<string>("");
+  const [classes, setClasses] = useState<number>(10);
+  const [method, setMethod] = useState<"cash" | "card">("cash");
+  const [note, setNote] = useState("");
+
+  const addCredit = useMutation({
+    mutationFn: async (memberId: string) => {
+      const { error } = await supabase.from("transactions").insert({
+        member_id: memberId,
+        child_id: childId || null,
+        classes,
+        type: "credit",
+        payment_method: method,
+        description: note || null,
+        created_by: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Classes added");
+      setAddFor(null); setChildId(""); setClasses(10); setMethod("cash"); setNote("");
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-2">
       {data.map((m: any) => {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
+        const isAdding = addFor === m.id;
         return (
           <div key={m.id} className="card-surface p-4">
             <button
@@ -264,7 +294,6 @@ function MembersAdmin() {
                 </div>
                 <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
               </div>
-              <p className="shrink-0 font-display text-xl">{Number(m.wallet_balance).toFixed(2)} <span className="text-xs text-muted-foreground">JOD</span></p>
               {hasKids && (
                 <span className="shrink-0 text-muted-foreground">
                   {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
@@ -281,9 +310,68 @@ function MembersAdmin() {
                 ))}
               </ul>
             )}
+            <div className="mt-3">
+              {!isAdding ? (
+                <button
+                  onClick={() => { setAddFor(m.id); setChildId(""); }}
+                  className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground"
+                >
+                  <Plus size={12} className="inline"/> Add classes
+                </button>
+              ) : (
+                <div className="space-y-2 rounded-xl border hairline p-3">
+                  {hasKids && (
+                    <select
+                      value={childId}
+                      onChange={(e)=>setChildId(e.target.value)}
+                      className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
+                    >
+                      <option value="">Credit to {m.name || "member"}</option>
+                      {kids.map((k: any) => <option key={k.id} value={k.id}>Credit to {k.name}</option>)}
+                    </select>
+                  )}
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number" min={1} value={classes}
+                      onChange={(e)=>setClasses(Math.max(1, Number(e.target.value)))}
+                      className="rounded-xl border hairline bg-card px-3 py-2 text-sm"
+                      placeholder="# classes"
+                    />
+                    <select
+                      value={method} onChange={(e)=>setMethod(e.target.value as "cash"|"card")}
+                      className="rounded-xl border hairline bg-card px-3 py-2 text-sm"
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="card">Card</option>
+                    </select>
+                  </div>
+                  <input
+                    placeholder="Note (optional)"
+                    value={note} onChange={(e)=>setNote(e.target.value)}
+                    className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={()=>addCredit.mutate(m.id)}
+                      disabled={addCredit.isPending || classes < 1}
+                      className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+                    >
+                      Add {classes} {classes === 1 ? "class" : "classes"}
+                    </button>
+                    <button
+                      onClick={()=>setAddFor(null)}
+                      className="rounded-pill border hairline px-3 py-2 text-xs font-semibold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
       })}
     </div>
   );
 }
+

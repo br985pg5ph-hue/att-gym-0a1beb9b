@@ -273,7 +273,6 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           streak: number
           training_frequency: string | null
-          wallet_balance: number
         }
         Insert: {
           avatar_url?: string | null
@@ -295,7 +294,6 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
           training_frequency?: string | null
-          wallet_balance?: number
         }
         Update: {
           avatar_url?: string | null
@@ -317,36 +315,52 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
           training_frequency?: string | null
-          wallet_balance?: number
         }
         Relationships: []
       }
       transactions: {
         Row: {
-          amount: number
+          child_id: string | null
+          classes: number
           created_at: string
-          description: string
+          created_by: string | null
+          description: string | null
           id: string
           member_id: string
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
           type: Database["public"]["Enums"]["txn_type"]
         }
         Insert: {
-          amount: number
+          child_id?: string | null
+          classes: number
           created_at?: string
-          description?: string
+          created_by?: string | null
+          description?: string | null
           id?: string
           member_id: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           type: Database["public"]["Enums"]["txn_type"]
         }
         Update: {
-          amount?: number
+          child_id?: string | null
+          classes?: number
           created_at?: string
-          description?: string
+          created_by?: string | null
+          description?: string | null
           id?: string
           member_id?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           type?: Database["public"]["Enums"]["txn_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -365,6 +379,7 @@ export type Database = {
       app_role: "member" | "staff"
       booking_status: "upcoming" | "completed" | "cancelled"
       class_type: "pt" | "women_only" | "mixed" | "kids"
+      payment_method: "cash" | "card"
       txn_type: "credit" | "debit"
     }
     CompositeTypes: {
@@ -496,6 +511,7 @@ export const Constants = {
       app_role: ["member", "staff"],
       booking_status: ["upcoming", "completed", "cancelled"],
       class_type: ["pt", "women_only", "mixed", "kids"],
+      payment_method: ["cash", "card"],
       txn_type: ["credit", "debit"],
     },
   },
