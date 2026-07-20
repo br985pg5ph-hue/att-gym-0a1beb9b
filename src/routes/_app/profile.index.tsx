@@ -72,9 +72,16 @@ function ProfilePage() {
           <div className="min-w-0">
 
             <h2 className="font-display truncate text-2xl leading-none">{profile?.name || "—"}</h2>
-            <span className="mt-1 inline-block rounded-pill bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
-              {t.membershipActive}
-            </span>
+            {profile?.membership_status === "inactive" ? (
+              <span className="mt-1 inline-block rounded-pill bg-muted px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                {t.membershipInactive}
+              </span>
+            ) : (
+              <span className="mt-1 inline-block rounded-pill bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                {t.membershipActive}
+              </span>
+            )}
+
           </div>
         </div>
 
