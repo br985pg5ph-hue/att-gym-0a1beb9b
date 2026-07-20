@@ -27,7 +27,7 @@ export const dict: Record<Lang, Dict> = {
     manageAnnouncements: "Manage Announcements", manageClasses: "Manage Classes", manageCoaches: "Manage Coaches", membersList: "Members",
     save: "Save", edit: "Edit", delete: "Delete", add: "Add", title: "Title", body: "Body", tag: "Tag",
     specialty: "Specialty", bio: "Bio", photoUrl: "Photo URL", type: "Type", coach: "Coach", capacity: "Capacity", startsAt: "Starts at",
-    membershipActive: "Active Member", hours: "Hours", connectWithUs: "Connect with us",
+    membershipActive: "Active Member", membershipInactive: "Inactive Member", hours: "Hours", connectWithUs: "Connect with us",
   },
   ar: {
     appName: "أكاديمية ATT",
