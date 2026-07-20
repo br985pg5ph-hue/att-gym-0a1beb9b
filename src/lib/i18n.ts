@@ -14,7 +14,7 @@ export const dict: Record<Lang, Dict> = {
     goodMorning: "Good morning", goodAfternoon: "Good afternoon", goodEvening: "Good evening",
     nextClass: "Your next class", noUpcoming: "No upcoming classes — book one below",
     timeToGym: "Time to gym", getDirections: "Get Directions", callGym: "Call Gym", ourLocation: "Our Location",
-    classesAttended: "Classes attended", currentStreak: "Current streak", days: "days", classesLeft: "Classes left",
+    classesAttended: "Classes attended", currentStreak: "CURRENT\nSTREAK", days: "days", classesLeft: "Classes left",
     upcoming: "Upcoming", past: "Past", cancel: "Cancel", cancelled: "Cancelled", completed: "Completed",
     confirmBooking: "Confirm Booking", selectSlot: "Select a slot",
     all: "All", full: "Full", booked: "Booked", slotsLeft: "spots left",
