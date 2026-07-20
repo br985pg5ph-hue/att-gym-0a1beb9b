@@ -77,7 +77,18 @@ function SettingsPage() {
               <span className={`block h-5 w-5 rounded-pill bg-white transition ${notif ? "translate-x-5" : ""}`}/>
             </button>
           </div>
+          <div className="flex items-center gap-3 p-4">
+            <Users size={18} className="text-muted-foreground"/>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Parent Mode</p>
+              <p className="text-[11px] text-muted-foreground">Sign up and manage kids' classes</p>
+            </div>
+            <button onClick={toggleParent} disabled={savingParent} className={`h-6 w-11 rounded-pill p-0.5 transition ${parentMode ? "bg-primary":"bg-muted"} disabled:opacity-60`}>
+              <span className={`block h-5 w-5 rounded-pill bg-white transition ${parentMode ? "translate-x-5" : ""}`}/>
+            </button>
+          </div>
         </div>
+
 
         <div className="card-surface divide-y hairline overflow-hidden">
           <button className="flex w-full items-center gap-3 p-4 text-start">
