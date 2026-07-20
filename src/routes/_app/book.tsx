@@ -93,11 +93,15 @@ function BookPage() {
       .filter(Boolean).map((c: any) => c.starts_at.slice(0, 10))
   );
 
-  const effectiveFilter = bookingForChild ? "kids" : filter;
+  const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
   const remaining = bookingForChild ? (bookingForChild.classes_remaining ?? 0) : (profile?.classes_remaining ?? 0);
   const noCredits = remaining <= 0;
 
-  const daySlots = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate && (effectiveFilter === "all" || c.type === effectiveFilter));
+  const daySlots = classes.filter((c: any) => {
+    if (c.starts_at.slice(0, 10) !== selectedDate) return false;
+    if (!bookingForChild && c.type === "kids") return false;
+    return effectiveFilter === "all" || c.type === effectiveFilter;
+  });
 
   const book = useMutation({
     mutationFn: async (classId: string) => {
