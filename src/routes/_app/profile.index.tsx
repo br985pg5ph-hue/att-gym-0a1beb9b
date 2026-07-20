@@ -140,6 +140,5 @@ function ProfilePage() {
         </Link>
       </div>
     </div>
-    </div>
   );
 }
