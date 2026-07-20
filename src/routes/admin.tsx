@@ -1,11 +1,11 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader } from "@/components/AppShell";
+import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -22,6 +22,8 @@ type Tab = "announcements" | "classes" | "coaches" | "members";
 
 function AdminPage() {
   const { t } = useLang();
+  const nav = useNavigate();
+  const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("announcements");
   const tabs: Array<{ key: Tab; label: string }> = [
     { key: "announcements", label: t.manageAnnouncements },
@@ -29,10 +31,27 @@ function AdminPage() {
     { key: "coaches", label: t.manageCoaches },
     { key: "members", label: t.membersList },
   ];
+  const signOut = async () => {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    nav({ to: "/auth", replace: true });
+  };
   return (
-    <div>
-      <PageHeader title={t.admin} />
-      <div className="px-5">
+    <div className="min-h-screen bg-background">
+      <header className="flex items-center justify-between gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
+        <div className="flex min-w-0 items-center gap-3">
+          <Logo size={36} />
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">ATT Academy</p>
+            <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
+          </div>
+        </div>
+        <button onClick={signOut} className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive">
+          <LogOut size={14} /> {t.signOut}
+        </button>
+      </header>
+      <main className="mx-auto max-w-3xl px-5 py-5 pb-[max(env(safe-area-inset-bottom),24px)]">
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-3">
           {tabs.map(x => (
             <button key={x.key} onClick={()=>setTab(x.key)}
@@ -45,7 +64,7 @@ function AdminPage() {
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
-      </div>
+      </main>
     </div>
   );
 }
