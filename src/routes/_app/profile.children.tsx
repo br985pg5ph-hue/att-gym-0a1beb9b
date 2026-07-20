@@ -47,13 +47,21 @@ function ChildrenPage() {
   return (
     <div>
       <div className="flex items-center gap-2 px-3 pt-4">
-        <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted">
-          <ChevronLeft size={20} className="flip-rtl" />
-        </Link>
+        {!search.welcome && (
+          <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted">
+            <ChevronLeft size={20} className="flip-rtl" />
+          </Link>
+        )}
       </div>
       <PageHeader
-        title={search.welcome ? "Add your child" : "My Children"}
-        subtitle={search.welcome ? "Set up their profile to tailor their experience" : `${children.length} ${children.length === 1 ? "child" : "children"}`}
+        title={search.welcome ? (children.length === 0 ? "Add your child" : "Any more kids?") : "My Children"}
+        subtitle={
+          search.welcome
+            ? children.length === 0
+              ? "Set up their profile to tailor their experience"
+              : `${children.length} added — add another or continue`
+            : `${children.length} ${children.length === 1 ? "child" : "children"}`
+        }
       />
 
 
@@ -88,10 +96,19 @@ function ChildrenPage() {
           onClick={() => setEditing("new")}
           className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed hairline bg-card/50 py-5 text-sm font-semibold text-primary"
         >
-          <Plus size={16} /> Add child
+          <Plus size={16} /> Add {children.length === 0 ? "child" : "another child"}
         </button>
 
-        {!profile?.is_parent && children.length === 0 && (
+        {search.welcome && children.length > 0 && (
+          <button
+            onClick={() => nav({ to: "/home" })}
+            className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground"
+          >
+            Continue to app
+          </button>
+        )}
+
+        {!profile?.is_parent && children.length === 0 && !search.welcome && (
           <p className="pt-2 text-center text-xs text-muted-foreground">
             Adding a child will switch your account into Parent Mode.
           </p>
@@ -110,7 +127,7 @@ function ChildrenPage() {
               await refresh();
             }
             setEditing(null);
-            if (search.welcome) nav({ to: "/home" });
+            // In welcome flow, stay on this page so the parent can add more kids or tap Continue.
           }}
         />
       )}
