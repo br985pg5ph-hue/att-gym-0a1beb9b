@@ -195,7 +195,7 @@ function BookPage() {
 
         {!bookingForChild && (
           <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-            {TYPES.map((tp) => (
+            {TYPES.filter((tp) => tp.key !== "kids").map((tp) => (
               <button key={tp.key} onClick={() => setFilter(tp.key)}
                 className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
                   filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
