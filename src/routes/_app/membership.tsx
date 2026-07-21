@@ -91,7 +91,7 @@ function MembershipPage() {
                         {isGroup ? "Group" : "PT"}
                       </span>
                     </div>
-                    <p className="mt-1 text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString()}</p>
+                    <p className="mt-1 text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                   <p className={`shrink-0 font-display text-lg ${tx.type === "credit" ? "text-emerald-400" : "text-destructive"}`}>
                     {tx.type === "credit" ? "+" : "-"}{amount}
