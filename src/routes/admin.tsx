@@ -195,27 +195,36 @@ function ClassesAdmin() {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!title || !startsAt) throw new Error("Title and start time are required");
+      const start = fromAmmanDateInput(startsAt);
+      if (isNaN(start.getTime())) throw new Error("Invalid start time");
+
       if (recurring) {
         if (!endDate) throw new Error("Pick an end date");
-        const start = new Date(startsAt);
-        const end = new Date(endDate + "T23:59:59");
-        if (end < start) throw new Error("End date must be after start date");
+        if (!frequency) throw new Error("Pick a frequency");
+        const end = fromAmmanDateInput(endDate + "T23:59:59");
+        if (end < start) throw new Error("End date must be on or after the start date");
+        const maxEnd = addAmmanDays(start, 90);
+        if (end > maxEnd) throw new Error("Recurring series cannot exceed 90 days");
+
         const stepDays = frequency === "daily" ? 1 : 7;
         const rows: any[] = [];
-        const cur = new Date(start);
+        let cur = start;
         while (cur <= end && rows.length < 200) {
           rows.push({ type, coach_id: coachId || null, title, starts_at: cur.toISOString(), capacity });
-          cur.setDate(cur.getDate() + stepDays);
+          cur = addAmmanDays(cur, stepDays);
         }
+        if (rows.length === 0) throw new Error("No classes generated for the selected range");
         const { error } = await supabase.from("classes").insert(rows);
         if (error) throw error;
         return rows.length;
       }
-      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: startsAt, capacity });
+
+      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: start.toISOString(), capacity });
       if (error) throw error;
       return 1;
     },
-    onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); invalidateAll(); },
+    onSuccess: (n) => { setTitle(""); setStartsAt(toAmmanDateInput(ammanNow())); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
   const cancelClass = useMutation({
