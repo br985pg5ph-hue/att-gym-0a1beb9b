@@ -214,7 +214,7 @@ function BookPage() {
               const key = fmtDay(d);
               const hasBooking = daysWithBookings.has(key);
               const active = key === selectedDate;
-              const isToday = key === fmtDay(new Date());
+              const isToday = key === todayKey;
               return (
                 <button key={i} onClick={() => setSelectedDate(key)}
                   className={`relative aspect-square rounded-lg text-sm transition ${
