@@ -21,7 +21,21 @@ const TYPES = [
   { key: "kids", labelKey: "kids" as const },
 ];
 
-function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
+const AMMAN_TZ = "Asia/Amman";
+function fmtDay(d: Date) {
+  // Format YYYY-MM-DD in Amman local time, regardless of the device's timezone.
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: AMMAN_TZ, year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(d);
+  const y = parts.find((p) => p.type === "year")!.value;
+  const m = parts.find((p) => p.type === "month")!.value;
+  const day = parts.find((p) => p.type === "day")!.value;
+  return `${y}-${m}-${day}`;
+}
+function ammanNow(): Date {
+  // A Date whose local getters (year/month/date) reflect Amman wall-clock time.
+  return new Date(new Date().toLocaleString("en-US", { timeZone: AMMAN_TZ }));
+}
 
 function BookPage() {
   const { t } = useLang();
@@ -34,8 +48,9 @@ function BookPage() {
   const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
-  // Month grid (declared here so month-scoped queries can use it)
-  const today = new Date();
+  // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
+  const today = ammanNow();
+  const todayKey = fmtDay(new Date());
   const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
   const y = viewedMonth.getFullYear();
@@ -199,7 +214,7 @@ function BookPage() {
               const key = fmtDay(d);
               const hasBooking = daysWithBookings.has(key);
               const active = key === selectedDate;
-              const isToday = key === fmtDay(new Date());
+              const isToday = key === todayKey;
               return (
                 <button key={i} onClick={() => setSelectedDate(key)}
                   className={`relative aspect-square rounded-lg text-sm transition ${
