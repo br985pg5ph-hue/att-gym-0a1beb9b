@@ -11,9 +11,10 @@ export const Route = createFileRoute("/_app/profile/bookings")({
 });
 
 function BookingsPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth();
   const { t } = useLang();
-  const { children: kids } = useChildren();
+  const { children: kids, refreshChildren } = useChildren();
+
   const parentMode = !!profile?.is_parent;
   const qc = useQueryClient();
 
