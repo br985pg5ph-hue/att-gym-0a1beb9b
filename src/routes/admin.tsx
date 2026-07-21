@@ -502,7 +502,8 @@ function MembersAdmin() {
   const filtered = q
     ? (data as any[]).filter((m) =>
         (m.name ?? "").toLowerCase().includes(q) ||
-        (m.member_code ?? "").toLowerCase().includes(q)
+        (m.member_code ?? "").toLowerCase().includes(q) ||
+        (m.children ?? []).some((k: any) => (k.name ?? "").toLowerCase().includes(q))
       )
     : (data as any[]);
 
