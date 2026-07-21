@@ -188,6 +188,17 @@ function MemberDetailPage() {
           )}
         </section>
 
+        {/* Book a class */}
+        <section className="card-surface flex items-center justify-between p-4">
+          <div>
+            <p className="font-display text-lg leading-none">Book a class</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Book on behalf of {member?.name || "member"}{kids.length > 0 ? " or a child" : ""}</p>
+          </div>
+          <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground inline-flex items-center gap-1">
+            <CalendarPlus size={12}/> Book
+          </button>
+        </section>
+
         {/* Upcoming bookings */}
         <section>
           <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Upcoming bookings ({upcoming.length})</p>
