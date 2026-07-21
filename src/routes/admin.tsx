@@ -557,7 +557,17 @@ function MembersAdmin() {
 
   return (
     <div className="space-y-2">
-      {data.map((m: any) => {
+      <input
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by name or member code (e.g. ATT-00001)"
+        className="w-full rounded-pill border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
+      />
+      {filtered.length === 0 && (
+        <p className="py-6 text-center text-xs text-muted-foreground">No members found.</p>
+      )}
+      {filtered.map((m: any) => {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
@@ -572,6 +582,9 @@ function MembersAdmin() {
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                  {m.member_code && (
+                    <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">{m.member_code}</p>
+                  )}
                   <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
                     {m.role} • {m.membership_status}
                   </p>
