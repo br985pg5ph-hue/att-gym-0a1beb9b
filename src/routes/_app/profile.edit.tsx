@@ -123,7 +123,7 @@ function EditProfilePage() {
     mutationFn: async () => {
       if (!user) throw new Error("Not signed in");
       if (!name.trim()) throw new Error("Name is required");
-      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null }).eq("id", user.id);
+      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null, date_of_birth: dob || null } as any).eq("id", user.id);
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Profile updated"); await refresh(); qc.invalidateQueries({ queryKey: ["profile"] }); },
