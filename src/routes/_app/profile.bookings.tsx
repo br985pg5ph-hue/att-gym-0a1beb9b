@@ -33,7 +33,7 @@ function BookingsPage() {
       const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Cancelled"); qc.invalidateQueries({ queryKey: ["all-bookings"] }); qc.invalidateQueries({ queryKey: ["my-bookings"] }); qc.invalidateQueries({ queryKey: ["class-counts"] }); qc.invalidateQueries({ queryKey: ["next-booking"] }); },
+    onSuccess: () => { toast.success("Cancelled"); qc.invalidateQueries({ queryKey: ["all-bookings"] }); qc.invalidateQueries({ queryKey: ["my-bookings"] }); qc.invalidateQueries({ queryKey: ["class-counts"] }); qc.invalidateQueries({ queryKey: ["next-booking"] }); qc.invalidateQueries({ queryKey: ["txns"] }); refresh(); refreshChildren(); },
   });
 
   const now = Date.now();
