@@ -238,9 +238,16 @@ function BookPage() {
           </div>
         )}
         {bookingForChild && (
-          <p className="mt-3 rounded-pill bg-primary/10 px-3 py-2 text-center text-[11px] font-medium text-primary">
-            Showing Kids classes only
-          </p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {TYPES.filter((tp) => tp.key === "all" || tp.key === "kids" || tp.key === "pt").map((tp) => (
+              <button key={tp.key} onClick={() => setFilter(tp.key)}
+                className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
+                  filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+                }`}>
+                {t[tp.labelKey]}
+              </button>
+            ))}
+          </div>
         )}
 
 
@@ -248,9 +255,10 @@ function BookPage() {
           const warnings: string[] = [];
           if (bookingForChild) {
             if (!groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
+            if (ptRemainingChild <= 0) warnings.push(`${bookingForChild.name} has no PT sessions — visit the gym to add more`);
           } else {
             if (!groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
-            if (ptRemaining <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
+            if (ptRemainingSelf <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
           }
           if (warnings.length === 0) return null;
           return (
