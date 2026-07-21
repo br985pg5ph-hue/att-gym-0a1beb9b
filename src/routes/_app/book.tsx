@@ -96,6 +96,7 @@ function BookPage() {
       .map((b: any) => classes.find((c: any) => c.id === b.class_id))
       .filter(Boolean).map((c: any) => c.starts_at.slice(0, 10))
   );
+  const daysWithClasses = new Set(classes.map((c: any) => c.starts_at.slice(0, 10)));
 
   const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
   const ptRemaining = profile?.pt_sessions_remaining ?? 0;
