@@ -66,11 +66,6 @@ function AuthPage() {
       <p className="mt-8 text-center text-xs text-muted-foreground">
         {t.dontHaveAccount} <Link to="/signup" className="font-semibold text-primary">{t.signUp}</Link>
       </p>
-      <p className="mt-3 text-center">
-        <Link to="/staff-login" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
-          Staff Sign In
-        </Link>
-      </p>
     </div>
   );
 }
