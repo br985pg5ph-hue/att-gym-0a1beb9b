@@ -48,9 +48,19 @@ function HomePage() {
   const hour = jordanTime.getHours();
   const greeting = hour >= 5 && hour < 12 ? t.goodMorning : hour >= 12 && hour < 18 ? t.goodEvening : t.goodNight;
 
+  const groupUntil = scope === "child" && selectedChild
+    ? selectedChild.group_subscription_until
+    : profile?.group_subscription_until ?? null;
+  const groupActive = !!groupUntil && new Date(groupUntil).getTime() > Date.now();
+  const groupHolderName = scope === "child" && selectedChild ? selectedChild.name : (profile?.name ?? "");
+  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
   const stats = scope === "child" && selectedChild
-    ? { remaining: 0, attended: selectedChild.classes_attended, streak: selectedChild.streak }
-    : { remaining: profile?.pt_sessions_remaining ?? 0, attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
+    ? { attended: selectedChild.classes_attended, streak: selectedChild.streak }
+    : { attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
+
+  const groupDateLabel = groupUntil
+    ? new Date(groupUntil).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })
+    : null;
 
   const subtitleText = profile?.name || "";
 
