@@ -233,13 +233,25 @@ function BookPage() {
         )}
 
 
-        {remaining <= 0 && (
-          <div className="mt-3 rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-xs font-medium text-destructive">
-            {bookingForChild
-              ? `${bookingForChild.name} has no classes remaining`
-              : "No classes remaining — visit the gym to add more"}
-          </div>
-        )}
+        {(() => {
+          const warnings: string[] = [];
+          if (bookingForChild) {
+            if (!groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
+          } else {
+            if (!groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
+            if (ptRemaining <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
+          }
+          if (warnings.length === 0) return null;
+          return (
+            <div className="mt-3 space-y-2">
+              {warnings.map((w, i) => (
+                <div key={i} className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-xs font-medium text-destructive">
+                  {w}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
 
         <div className="mt-2 space-y-2">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
@@ -248,7 +260,8 @@ function BookPage() {
             const full = cnt >= c.capacity;
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
-            const disabled = full || booked || noCredits;
+            const eligible = isEligible(c.type);
+            const disabled = full || booked || !eligible;
             return (
               <button key={c.id} onClick={() => !disabled && setPickedId(picked ? null : c.id)}
                 className={`card-surface flex w-full items-center justify-between p-4 text-start transition ${
@@ -260,6 +273,9 @@ function BookPage() {
                     {new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     {c.coaches?.name && ` • ${c.coaches.name}`}
                   </p>
+                  {!eligible && !booked && !full && (
+                    <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type)}</p>
+                  )}
                 </div>
                 <span className={`shrink-0 rounded-pill px-3 py-1 text-[10px] font-semibold uppercase ${
                   booked ? "bg-silver/20 text-silver" : full ? "bg-destructive/20 text-destructive" : "bg-primary/15 text-primary"
@@ -273,13 +289,26 @@ function BookPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
-        <button
-          disabled={noCredits || !pickedId || book.isPending}
-          onClick={() => pickedId && book.mutate(pickedId)}
-          className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {book.isPending ? "…" : noCredits ? "No classes left" : pickedId ? t.confirmBooking : t.selectSlot}
-        </button>
+        {(() => {
+          const pickedIneligible = pickedClass && !isEligible(pickedClass.type);
+          const disabled = !pickedId || pickedIneligible || book.isPending;
+          const label = book.isPending
+            ? "…"
+            : !pickedId
+              ? t.selectSlot
+              : pickedIneligible
+                ? eligibilityMessage(pickedClass.type)
+                : t.confirmBooking;
+          return (
+            <button
+              disabled={disabled}
+              onClick={() => pickedId && !pickedIneligible && book.mutate(pickedId)}
+              className="w-full rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {label}
+            </button>
+          );
+        })()}
       </div>
     </div>
   );
