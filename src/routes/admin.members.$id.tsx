@@ -57,6 +57,7 @@ function MemberDetailPage() {
   const [adjClasses, setAdjClasses] = useState(1);
   const [adjType, setAdjType] = useState<"credit" | "debit">("debit");
   const [adjNote, setAdjNote] = useState("");
+  const [bookOpen, setBookOpen] = useState(false);
 
   const adjust = useMutation({
     mutationFn: async () => {
