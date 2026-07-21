@@ -54,6 +54,7 @@ function BookPage() {
         .select("id, type, title, starts_at, duration_min, capacity, coaches(name)")
         .gte("starts_at", monthStartIso)
         .lt("starts_at", nextMonthStartIso)
+        .is("cancelled_at", null)
         .order("starts_at");
       return data ?? [];
     },
