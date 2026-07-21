@@ -163,13 +163,26 @@ function MemberDetailPage() {
                 </select>
               )}
               <input type="number" min={1} value={adjClasses} onChange={(e)=>setAdjClasses(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# classes"/>
-              <input placeholder="Note (optional)" value={adjNote} onChange={(e)=>setAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-              <div className="flex gap-2">
-                <button onClick={()=>adjust.mutate()} disabled={adjust.isPending} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${adjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                  {adjType==="credit" ? "Add" : "Remove"} {adjClasses} {adjClasses===1 ? "class" : "classes"}
-                </button>
-                <button onClick={()=>setAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
-              </div>
+              {(() => {
+                const available = adjChildId
+                  ? (kids.find((k: any) => k.id === adjChildId)?.classes_remaining ?? 0)
+                  : (member?.classes_remaining ?? 0);
+                const overDraw = adjType === "debit" && adjClasses > available;
+                return (
+                  <>
+                    {adjType === "debit" && (
+                      <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
+                    )}
+                    <input placeholder="Note (optional)" value={adjNote} onChange={(e)=>setAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                    <div className="flex gap-2">
+                      <button onClick={()=>adjust.mutate()} disabled={adjust.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${adjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                        {adjType==="credit" ? "Add" : "Remove"} {adjClasses} {adjClasses===1 ? "class" : "classes"}
+                      </button>
+                      <button onClick={()=>setAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           )}
         </section>
