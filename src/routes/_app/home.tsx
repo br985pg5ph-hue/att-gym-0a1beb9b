@@ -126,24 +126,41 @@ function HomePage() {
 
 
 
-        {/* Classes remaining */}
-        <div className="card-surface p-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Ticket size={16} />
-                <span className="text-[10px] uppercase tracking-widest">{t.classesLeft}</span>
+        {/* Group membership status */}
+        <div className={`card-surface p-5 ${groupActive ? "bg-gradient-to-br from-primary/20 to-transparent" : ""}`}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className={`flex items-center gap-2 ${groupActive ? "text-primary" : "text-muted-foreground"}`}>
+                {groupActive ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
+                <span className="text-[10px] uppercase tracking-widest">Group Membership</span>
               </div>
-              <p className="font-display mt-1 text-4xl">{stats.remaining}</p>
+              {groupActive ? (
+                <>
+                  <p className="font-display mt-1 text-2xl leading-tight">
+                    {scope === "child" ? `${groupHolderName} — Active` : "Active"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Until {groupDateLabel}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-display mt-1 text-2xl leading-tight text-muted-foreground">
+                    {groupUntil ? "Expired" : "Not active"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Renew at the gym to book group classes</p>
+                </>
+              )}
             </div>
-            <Link to="/book" className="shrink-0 rounded-pill bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground">
-              {t.book}
-            </Link>
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
+          {scope !== "child" && (
+            <div className="card-surface p-4">
+              <div className="flex items-center gap-2 text-muted-foreground"><Ticket size={16} /><span className="text-[10px] uppercase tracking-widest">PT Sessions</span></div>
+              <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
+            </div>
+          )}
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
@@ -153,6 +170,7 @@ function HomePage() {
             <p className="font-display mt-1 text-3xl">{stats.streak} <span className="text-sm text-muted-foreground">{t.days}</span></p>
           </div>
         </div>
+
 
 
 
