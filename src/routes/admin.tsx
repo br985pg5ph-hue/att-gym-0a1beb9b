@@ -147,11 +147,13 @@ function ClassesAdmin() {
   const [startsAt, setStartsAt] = useState("");
   const [capacity, setCapacity] = useState(15);
 
+  const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { data: classes = [] } = useQuery({
-    queryKey: ["admin-classes"],
+    queryKey: ["admin-classes", cutoff],
     queryFn: async () => {
       const { data: cls } = await supabase.from("classes")
         .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
+        .gte("starts_at", cutoff)
         .order("starts_at");
       const list = cls ?? [];
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
