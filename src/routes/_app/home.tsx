@@ -139,7 +139,7 @@ function HomePage() {
               {groupActive ? (
                 <>
                   <p className="font-display mt-1 text-2xl leading-tight">
-                    {scope === "child" ? `${groupHolderName} — Active` : "Active"}
+                    {scope === "child" ? `${groupHolderName} - Active` : "Active"}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">Until {groupDateLabel}</p>
                 </>
