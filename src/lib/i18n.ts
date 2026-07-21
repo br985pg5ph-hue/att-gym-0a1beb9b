@@ -8,7 +8,7 @@ export const dict: Record<Lang, Dict> = {
     home: "Home", book: "Booking", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin",
     signIn: "Sign In", signUp: "Sign Up", signOut: "Sign Out", email: "Email", password: "Password", forgotPassword: "Forgot password?",
     createAccount: "Create Account", name: "Full name", phone: "Phone", confirmPassword: "Confirm password",
-    interests: "Interests", pt: "Personal Training", womenOnly: "Women Only", mixed: "Mixed", kids: "Kids", yoga: "Yoga", gymnastics: "Gymnastics",
+    interests: "Interests", pt: "Personal Training", womenOnly: "Women Only", mixed: "Mixed", kids: "Kids Class", yoga: "Yoga", gymnastics: "Gymnastics",
     continueWithGoogle: "Continue with Google", continueWithApple: "Continue with Apple", or: "or",
     dontHaveAccount: "Don't have an account?", haveAccount: "Already have an account?",
     goodMorning: "Good morning", goodAfternoon: "Good afternoon", goodEvening: "Good evening", goodNight: "Good night",
