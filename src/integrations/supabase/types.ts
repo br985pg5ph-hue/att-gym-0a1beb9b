@@ -147,6 +147,7 @@ export type Database = {
       }
       classes: {
         Row: {
+          cancelled_at: string | null
           capacity: number
           coach_id: string | null
           created_at: string
@@ -157,6 +158,7 @@ export type Database = {
           type: Database["public"]["Enums"]["class_type"]
         }
         Insert: {
+          cancelled_at?: string | null
           capacity?: number
           coach_id?: string | null
           created_at?: string
@@ -167,6 +169,7 @@ export type Database = {
           type: Database["public"]["Enums"]["class_type"]
         }
         Update: {
+          cancelled_at?: string | null
           capacity?: number
           coach_id?: string | null
           created_at?: string

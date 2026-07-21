@@ -154,6 +154,7 @@ function ClassesAdmin() {
       const { data: cls } = await supabase.from("classes")
         .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
         .gte("starts_at", cutoff)
+        .is("cancelled_at", null)
         .order("starts_at");
       const list = cls ?? [];
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
@@ -185,7 +186,7 @@ function ClassesAdmin() {
       // Cancel all upcoming bookings first so credits refund via trigger
       const { error: bErr } = await supabase.from("bookings").update({ status: "cancelled" }).eq("class_id", id).eq("status", "upcoming");
       if (bErr) throw bErr;
-      const { error } = await supabase.from("classes").delete().eq("id", id);
+      const { error } = await supabase.from("classes").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
