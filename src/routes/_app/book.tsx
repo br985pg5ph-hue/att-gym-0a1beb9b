@@ -21,7 +21,21 @@ const TYPES = [
   { key: "kids", labelKey: "kids" as const },
 ];
 
-function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
+const AMMAN_TZ = "Asia/Amman";
+function fmtDay(d: Date) {
+  // Format YYYY-MM-DD in Amman local time, regardless of the device's timezone.
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: AMMAN_TZ, year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(d);
+  const y = parts.find((p) => p.type === "year")!.value;
+  const m = parts.find((p) => p.type === "month")!.value;
+  const day = parts.find((p) => p.type === "day")!.value;
+  return `${y}-${m}-${day}`;
+}
+function ammanNow(): Date {
+  // A Date whose local getters (year/month/date) reflect Amman wall-clock time.
+  return new Date(new Date().toLocaleString("en-US", { timeZone: AMMAN_TZ }));
+}
 
 function BookPage() {
   const { t } = useLang();
