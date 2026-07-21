@@ -154,6 +154,7 @@ function ClassesAdmin() {
       const { data: cls } = await supabase.from("classes")
         .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
         .gte("starts_at", cutoff)
+        .is("cancelled_at", null)
         .order("starts_at");
       const list = cls ?? [];
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
