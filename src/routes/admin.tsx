@@ -1,11 +1,12 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight } from "lucide-react";
+
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -355,28 +356,38 @@ function MembersAdmin() {
         const isAdding = addFor === m.id;
         return (
           <div key={m.id} className="card-surface p-4">
-            <button
-              type="button"
-              onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
-              className="flex w-full items-center justify-between gap-3 text-left"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-display text-lg leading-none">{m.name || "—"}</p>
-                  {hasKids && (
-                    <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                      {kids.length} {kids.length === 1 ? "child" : "children"}
-                    </span>
-                  )}
+            <div className="flex w-full items-start justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
+                className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-display text-lg leading-none">{m.name || "—"}</p>
+                    {hasKids && (
+                      <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                        {kids.length} {kids.length === 1 ? "child" : "children"}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
                 </div>
-                <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
-              </div>
-              {hasKids && (
-                <span className="shrink-0 text-muted-foreground">
-                  {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
-                </span>
-              )}
-            </button>
+                {hasKids && (
+                  <span className="shrink-0 text-muted-foreground">
+                    {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
+                  </span>
+                )}
+              </button>
+              <Link
+                to="/admin/members/$id"
+                params={{ id: m.id }}
+                className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary"
+              >
+                View <ChevronsRight size={12} className="inline"/>
+              </Link>
+            </div>
+
             {hasKids && isOpen && (
               <ul className="mt-3 space-y-1">
                 {kids.map((k: any) => (
