@@ -165,10 +165,6 @@ function HomePage() {
             <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
           </div>
-          <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Flame size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.currentStreak}</span></div>
-            <p className="font-display mt-1 text-3xl">{stats.streak} <span className="text-sm text-muted-foreground">{t.days}</span></p>
-          </div>
         </div>
 
 
