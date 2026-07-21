@@ -146,61 +146,38 @@ function ClassesAdmin() {
   const [title, setTitle] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [capacity, setCapacity] = useState(15);
+  const [recurring, setRecurring] = useState(false);
+  const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
+  const [endDate, setEndDate] = useState("");
 
   const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: classes = [] } = useQuery({
-    queryKey: ["admin-classes", cutoff],
-    queryFn: async () => {
-      const { data: cls } = await supabase.from("classes")
-        .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
-        .gte("starts_at", cutoff)
-        .is("cancelled_at", null)
-        .order("starts_at");
-      const list = cls ?? [];
-      const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
-      let nameMap: Record<string, string> = {};
-      if (memberIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, name").in("id", memberIds);
-        nameMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.name]));
-      }
-      return list.map((c: any) => ({
-        ...c,
-        bookings: (c.bookings ?? []).map((b: any) => ({ ...b, profiles: { name: nameMap[b.member_id] ?? "Member" } })),
-      }));
-    },
-  });
-  const { data: coaches = [] } = useQuery({
-    queryKey: ["coaches"], queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [],
-  });
-
+...
   const create = useMutation({
     mutationFn: async () => {
+      if (recurring) {
+        if (!endDate) throw new Error("Pick an end date");
+        const start = new Date(startsAt);
+        const end = new Date(endDate + "T23:59:59");
+        if (end < start) throw new Error("End date must be after start date");
+        const stepDays = frequency === "daily" ? 1 : 7;
+        const rows: any[] = [];
+        const cur = new Date(start);
+        while (cur <= end && rows.length < 200) {
+          rows.push({ type, coach_id: coachId || null, title, starts_at: cur.toISOString(), capacity });
+          cur.setDate(cur.getDate() + stepDays);
+        }
+        const { error } = await supabase.from("classes").insert(rows);
+        if (error) throw error;
+        return rows.length;
+      }
       const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: startsAt, capacity });
       if (error) throw error;
+      return 1;
     },
-    onSuccess: () => { setTitle(""); setStartsAt(""); toast.success("Class added"); qc.invalidateQueries({ queryKey: ["admin-classes"] }); qc.invalidateQueries({ queryKey: ["classes"] }); },
+    onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); qc.invalidateQueries({ queryKey: ["admin-classes"] }); qc.invalidateQueries({ queryKey: ["classes"] }); },
     onError: (e: any) => toast.error(e.message),
   });
-  const cancelClass = useMutation({
-    mutationFn: async (id: string) => {
-      // Cancel all upcoming bookings first so credits refund via trigger
-      const { error: bErr } = await supabase.from("bookings").update({ status: "cancelled" }).eq("class_id", id).eq("status", "upcoming");
-      if (bErr) throw bErr;
-      const { error } = await supabase.from("classes").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Class cancelled");
-      qc.invalidateQueries({ queryKey: ["admin-classes"] });
-      qc.invalidateQueries({ queryKey: ["classes"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-  const removeAttendee = useMutation({
-    mutationFn: async (bid: string) => { await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bid); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
-  });
-
+...
   return (
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
@@ -218,8 +195,21 @@ function ClassesAdmin() {
           <input type="datetime-local" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
           <input type="number" placeholder="Capacity" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
         </div>
-        <button onClick={()=>create.mutate()} disabled={!title || !startsAt}
-          className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> Add class</button>
+        <label className="flex items-center gap-2 px-1 pt-1 text-xs font-medium">
+          <input type="checkbox" checked={recurring} onChange={(e)=>setRecurring(e.target.checked)} className="h-4 w-4 accent-primary"/>
+          Recurring class
+        </label>
+        {recurring && (
+          <div className="grid grid-cols-2 gap-2">
+            <select value={frequency} onChange={(e)=>setFrequency(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+              <option value="weekly">Weekly</option>
+              <option value="daily">Daily</option>
+            </select>
+            <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} placeholder="End date" className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+          </div>
+        )}
+        <button onClick={()=>create.mutate()} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
+          className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
       </div>
       {classes.length === 0 && (
         <p className="text-center text-xs text-muted-foreground py-4">No upcoming classes</p>
