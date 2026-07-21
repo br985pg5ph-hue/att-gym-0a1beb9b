@@ -18,6 +18,8 @@ const TYPES = [
   { key: "pt", labelKey: "pt" as const },
   { key: "women_only", labelKey: "womenOnly" as const },
   { key: "mixed", labelKey: "mixed" as const },
+  { key: "yoga", labelKey: "yoga" as const },
+  { key: "gymnastics", labelKey: "gymnastics" as const },
   { key: "kids", labelKey: "kids" as const },
 ];
 
@@ -117,7 +119,7 @@ function BookPage() {
   const isEligible = (type: string) => {
     if (type === "kids") return groupActiveChild;
     if (type === "pt") return !bookingForChild && ptRemaining > 0;
-    // mixed / women_only
+    // mixed / women_only / yoga / gymnastics
     return !bookingForChild && groupActiveSelf;
   };
 
