@@ -31,7 +31,7 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until)")
+        .select("id, name, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until, pt_sessions_remaining)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
@@ -60,6 +60,7 @@ function MemberDetailPage() {
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
   const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
   const [ptAdjNote, setPtAdjNote] = useState("");
+  const [ptAdjChildId, setPtAdjChildId] = useState("");
 
   const [grpAdjustOpen, setGrpAdjustOpen] = useState(false);
   const [grpAdjChildId, setGrpAdjChildId] = useState("");
@@ -73,7 +74,7 @@ function MemberDetailPage() {
     mutationFn: async () => {
       const { error } = await supabase.from("transactions").insert({
         member_id: id,
-        child_id: null,
+        child_id: ptAdjChildId || null,
         service: "pt",
         classes: ptAdjSessions,
         type: ptAdjType,
@@ -86,7 +87,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit");
+      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId("");
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
@@ -175,7 +176,7 @@ function MemberDetailPage() {
               {kids.map((k: any) => (
                 <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-sm">
                   <span>{k.name}</span>
-                  <span className="text-xs text-muted-foreground">{formatGroupStatus(k.group_subscription_until)}</span>
+                  <span className="text-xs text-muted-foreground">{k.pt_sessions_remaining ?? 0} PT • {formatGroupStatus(k.group_subscription_until)}</span>
                 </li>
               ))}
             </ul>
@@ -197,8 +198,15 @@ function MemberDetailPage() {
                 <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
               </div>
               <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
+              {kids.length > 0 && (
+                <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                  <option value="">Apply to {member?.name || "member"}</option>
+                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                </select>
+              )}
               {(() => {
-                const available = member?.pt_sessions_remaining ?? 0;
+                const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
+                const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
                 const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
                 return (
                   <>
@@ -387,10 +395,7 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
   });
 
   const selectedChild = kids.find((k) => k.id === childId);
-  void selectedChild;
-  const targetBalance = childId ? 0 : memberBalance;
-
-  const noCredits = targetBalance <= 0;
+  const childPT = selectedChild?.pt_sessions_remaining ?? 0;
 
   const bookedClassIds = new Set(
     existingUpcoming
@@ -429,24 +434,28 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
 
         <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="mb-3 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
 
-        <div className="mb-3 flex items-center justify-between text-[11px]">
-          <span className="text-muted-foreground">{childId ? selectedChild?.name : memberName}</span>
-          <span className={noCredits ? "font-semibold text-destructive" : "text-muted-foreground"}>
-            {noCredits ? "No classes remaining" : `${targetBalance} classes left`}
-          </span>
+        <div className="mb-3 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{childId ? selectedChild?.name : memberName}</span>
+          <span>{childId ? `${childPT} PT left` : `${memberBalance} PT left`}</span>
         </div>
 
         <div className="space-y-2">
           {isLoading && <p className="py-6 text-center text-xs text-muted-foreground">Loading…</p>}
           {!isLoading && dayClasses.length === 0 && <p className="py-6 text-center text-xs text-muted-foreground">No classes this day</p>}
           {dayClasses
-            .filter((c: any) => (childId ? true : c.type !== "kids"))
+            .filter((c: any) => {
+              // Adults: hide kids classes. Children: only kids or pt classes.
+              if (childId) return c.type === "kids" || c.type === "pt";
+              return c.type !== "kids";
+            })
             .map((c: any) => {
               const activeCount = (c.bookings ?? []).filter((b: any) => b.status === "upcoming").length;
               const left = Math.max(0, (c.capacity ?? 0) - activeCount);
               const full = left === 0;
               const alreadyBooked = bookedClassIds.has(c.id);
-              const disabled = noCredits || full || alreadyBooked || pendingId === c.id;
+              const isPT = c.type === "pt";
+              const noCreditsForThis = isPT && (childId ? childPT <= 0 : memberBalance <= 0);
+              const disabled = noCreditsForThis || full || alreadyBooked || pendingId === c.id;
               return (
                 <div key={c.id} className="card-surface flex items-center justify-between gap-3 p-3">
                   <div className="min-w-0">

@@ -484,7 +484,7 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until)")
+      .select("id, name, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until, pt_sessions_remaining)")
       .eq("role", "member")
       .order("name")).data ?? [],
   });
@@ -528,7 +528,7 @@ function MembersAdmin() {
     mutationFn: async (memberId: string) => {
       const { error } = await supabase.from("transactions").insert({
         member_id: memberId,
-        child_id: null,
+        child_id: childId || null,
         service: "pt",
         type: "credit",
         classes: sessions,
@@ -595,7 +595,7 @@ function MembersAdmin() {
                 {kids.map((k: any) => (
                   <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
                     <span>{k.name}</span>
-                    <span className="text-muted-foreground">{formatGroupStatus(k.group_subscription_until)}</span>
+                    <span className="text-muted-foreground">{k.pt_sessions_remaining ?? 0} PT • {formatGroupStatus(k.group_subscription_until)}</span>
                   </li>
                 ))}
               </ul>
@@ -629,7 +629,7 @@ function MembersAdmin() {
                     >PT sessions</button>
                   </div>
 
-                  {addKind === "group" && hasKids && (
+                  {hasKids && (
                     <select
                       value={childId}
                       onChange={(e)=>setChildId(e.target.value)}

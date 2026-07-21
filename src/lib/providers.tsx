@@ -25,6 +25,7 @@ export type Child = {
   experience_level: string | null; injuries_notes: string | null;
   emergency_contact_name: string | null; emergency_contact_phone: string | null;
   group_subscription_until: string | null; streak: number; classes_attended: number; avatar_url: string | null;
+  pt_sessions_remaining: number;
 };
 
 

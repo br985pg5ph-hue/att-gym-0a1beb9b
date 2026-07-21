@@ -33,7 +33,7 @@ function BookPage() {
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
-  const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
+  const [filter, setFilter] = useState<string>("all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
   // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
@@ -98,27 +98,31 @@ function BookPage() {
   );
   const daysWithClasses = new Set(classes.map((c: any) => c.starts_at.slice(0, 10)));
 
-  const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
-  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
+  // Adult sees all; child sees only kids + pt
+  const effectiveFilter = bookingForChild ? (filter === "pt" ? "pt" : filter === "kids" ? "kids" : "all") : (filter === "kids" ? "all" : filter);
+  const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
+  const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
   const groupActiveSelf = !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
   const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
 
   const isEligible = (type: string) => {
     if (type === "kids") return groupActiveChild;
-    if (type === "pt") return !bookingForChild && ptRemaining > 0;
-    // mixed / women_only / yoga / gymnastics
+    if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
+    // mixed / women_only / yoga / gymnastics — adult group only
     return !bookingForChild && groupActiveSelf;
   };
 
   const eligibilityMessage = (type: string): string => {
     if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
-    if (type === "pt") return "No PT sessions remaining";
+    if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions remaining` : "No PT sessions remaining";
     return "Your group membership isn't active";
   };
 
   const daySlots = classes.filter((c: any) => {
     if (c.starts_at.slice(0, 10) !== selectedDate) return false;
+    // Adults never see kids classes; children only see kids or pt
     if (!bookingForChild && c.type === "kids") return false;
+    if (bookingForChild && c.type !== "kids" && c.type !== "pt") return false;
     return effectiveFilter === "all" || c.type === effectiveFilter;
   });
 
@@ -234,9 +238,16 @@ function BookPage() {
           </div>
         )}
         {bookingForChild && (
-          <p className="mt-3 rounded-pill bg-primary/10 px-3 py-2 text-center text-[11px] font-medium text-primary">
-            Showing Kids classes only
-          </p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {TYPES.filter((tp) => tp.key === "all" || tp.key === "kids" || tp.key === "pt").map((tp) => (
+              <button key={tp.key} onClick={() => setFilter(tp.key)}
+                className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
+                  filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+                }`}>
+                {t[tp.labelKey]}
+              </button>
+            ))}
+          </div>
         )}
 
 
@@ -244,9 +255,10 @@ function BookPage() {
           const warnings: string[] = [];
           if (bookingForChild) {
             if (!groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
+            if (ptRemainingChild <= 0) warnings.push(`${bookingForChild.name} has no PT sessions — visit the gym to add more`);
           } else {
             if (!groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
-            if (ptRemaining <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
+            if (ptRemainingSelf <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
           }
           if (warnings.length === 0) return null;
           return (

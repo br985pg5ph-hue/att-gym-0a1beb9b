@@ -53,7 +53,9 @@ function HomePage() {
     : profile?.group_subscription_until ?? null;
   const groupActive = !!groupUntil && new Date(groupUntil).getTime() > Date.now();
   const groupHolderName = scope === "child" && selectedChild ? selectedChild.name : (profile?.name ?? "");
-  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
+  const ptRemaining = scope === "child" && selectedChild
+    ? (selectedChild as any).pt_sessions_remaining ?? 0
+    : profile?.pt_sessions_remaining ?? 0;
   const stats = scope === "child" && selectedChild
     ? { attended: selectedChild.classes_attended, streak: selectedChild.streak }
     : { attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
@@ -155,12 +157,10 @@ function HomePage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
-          {scope !== "child" && (
-            <div className="card-surface p-4">
-              <div className="flex items-center gap-2 text-muted-foreground"><Ticket size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{"PRIVATE\nSESSIONS"}</span></div>
-              <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
-            </div>
-          )}
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground"><Ticket size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{"PRIVATE\nSESSIONS"}</span></div>
+            <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
+          </div>
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
