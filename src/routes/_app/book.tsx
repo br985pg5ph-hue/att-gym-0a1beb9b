@@ -199,7 +199,7 @@ function BookPage() {
           <div className="mt-2 grid grid-cols-7 gap-1">
             {cells.map((d, i) => {
               if (!d) return <div key={i} />;
-              const key = fmtDay(d);
+              const key = toAmmanDateKey(d);
               const hasBooking = daysWithBookings.has(key);
               const active = key === selectedDate;
               const isToday = key === todayKey;
