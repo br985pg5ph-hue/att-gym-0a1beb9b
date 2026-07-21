@@ -95,14 +95,30 @@ function BookPage() {
   );
 
   const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
-  const remaining = bookingForChild ? (0) : (profile?.pt_sessions_remaining ?? 0);
-  const noCredits = remaining <= 0;
+  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
+  const groupActiveSelf = !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
+  const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
+
+  const isEligible = (type: string) => {
+    if (type === "kids") return groupActiveChild;
+    if (type === "pt") return !bookingForChild && ptRemaining > 0;
+    // mixed / women_only
+    return !bookingForChild && groupActiveSelf;
+  };
+
+  const eligibilityMessage = (type: string): string => {
+    if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
+    if (type === "pt") return "No PT sessions remaining";
+    return "Your group membership isn't active";
+  };
 
   const daySlots = classes.filter((c: any) => {
     if (c.starts_at.slice(0, 10) !== selectedDate) return false;
     if (!bookingForChild && c.type === "kids") return false;
     return effectiveFilter === "all" || c.type === effectiveFilter;
   });
+
+  const pickedClass = pickedId ? (daySlots.find((c: any) => c.id === pickedId) as any) : null;
 
   const book = useMutation({
     mutationFn: async (classId: string) => {
