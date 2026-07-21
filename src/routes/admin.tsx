@@ -139,9 +139,12 @@ function AnnouncementsAdmin() {
   );
 }
 
+type ClassView = "upcoming" | "past" | "cancelled";
+type ClassType = "pt"|"women_only"|"mixed"|"kids"|"yoga"|"gymnastics";
+
 function ClassesAdmin() {
   const qc = useQueryClient();
-  const [type, setType] = useState<"pt"|"women_only"|"mixed"|"kids"|"yoga"|"gymnastics">("mixed");
+  const [type, setType] = useState<ClassType>("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
   const [startsAt, setStartsAt] = useState("");
@@ -149,16 +152,20 @@ function ClassesAdmin() {
   const [recurring, setRecurring] = useState(false);
   const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
   const [endDate, setEndDate] = useState("");
+  const [view, setView] = useState<ClassView>("upcoming");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: ClassType }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
 
-  const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: classes = [] } = useQuery({
-    queryKey: ["admin-classes", cutoff],
+  const nowIso = new Date().toISOString();
+  const { data: classes = [], isLoading } = useQuery({
+    queryKey: ["admin-classes", view],
     queryFn: async () => {
-      const { data: cls } = await supabase.from("classes")
-        .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
-        .gte("starts_at", cutoff)
-        .is("cancelled_at", null)
-        .order("starts_at");
+      let q = supabase.from("classes")
+        .select("id, type, title, starts_at, capacity, coach_id, cancelled_at, coaches(name), bookings(id, status, member_id, child_id, children(name))");
+      if (view === "upcoming") q = q.gte("starts_at", nowIso).is("cancelled_at", null).order("starts_at", { ascending: true });
+      else if (view === "past") q = q.lt("starts_at", nowIso).is("cancelled_at", null).order("starts_at", { ascending: false });
+      else q = q.not("cancelled_at", "is", null).order("cancelled_at", { ascending: false });
+      const { data: cls } = await q;
       const list = cls ?? [];
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
       let nameMap: Record<string, string> = {};
@@ -175,6 +182,16 @@ function ClassesAdmin() {
   const { data: coaches = [] } = useQuery({
     queryKey: ["coaches"], queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [],
   });
+
+  const invalidateAll = () => {
+    qc.invalidateQueries({ queryKey: ["admin-classes"] });
+    qc.invalidateQueries({ queryKey: ["classes"] });
+    qc.invalidateQueries({ queryKey: ["home"] });
+    qc.invalidateQueries({ queryKey: ["book"] });
+    qc.invalidateQueries({ queryKey: ["upcoming"] });
+    qc.invalidateQueries({ queryKey: ["profile-bookings"] });
+  };
+
   const create = useMutation({
     mutationFn: async () => {
       if (recurring) {
@@ -197,7 +214,7 @@ function ClassesAdmin() {
       if (error) throw error;
       return 1;
     },
-    onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); qc.invalidateQueries({ queryKey: ["admin-classes"] }); qc.invalidateQueries({ queryKey: ["classes"] }); },
+    onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
   const cancelClass = useMutation({
@@ -207,17 +224,53 @@ function ClassesAdmin() {
       const { error } = await supabase.from("classes").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("Class cancelled");
-      qc.invalidateQueries({ queryKey: ["admin-classes"] });
-      qc.invalidateQueries({ queryKey: ["classes"] });
+    onSuccess: () => { toast.success("Class cancelled"); invalidateAll(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const restoreClass = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("classes").update({ cancelled_at: null }).eq("id", id);
+      if (error) throw error;
     },
+    onSuccess: () => { toast.success("Class restored"); invalidateAll(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const deleteClass = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("classes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Class deleted"); invalidateAll(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const updateClass = useMutation({
+    mutationFn: async () => {
+      if (!editId) return;
+      const { error } = await supabase.from("classes").update({
+        title: editForm.title,
+        starts_at: new Date(editForm.starts_at).toISOString(),
+        capacity: editForm.capacity,
+        coach_id: editForm.coach_id || null,
+        type: editForm.type,
+      }).eq("id", editId);
+      if (error) throw error;
+    },
+    onSuccess: () => { setEditId(null); toast.success("Class updated"); invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
   const removeAttendee = useMutation({
-    mutationFn: async (bid: string) => { await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bid); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
+    mutationFn: async (bid: string) => { const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bid); if (error) throw error; },
+    onSuccess: () => { toast.success("Booking cancelled — credit refunded"); invalidateAll(); },
+    onError: (e: any) => toast.error(e.message),
   });
+
+  const openEdit = (c: any) => {
+    const d = new Date(c.starts_at);
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    setEditForm({ title: c.title ?? "", starts_at: local, capacity: c.capacity, coach_id: c.coach_id ?? "", type: c.type });
+    setEditId(c.id);
+  };
+
   return (
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
@@ -251,8 +304,19 @@ function ClassesAdmin() {
         <button onClick={()=>create.mutate()} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
           className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
       </div>
-      {classes.length === 0 && (
-        <p className="text-center text-xs text-muted-foreground py-4">No upcoming classes</p>
+
+      <div className="flex gap-2">
+        {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
+          <button key={v} onClick={()=>setView(v)}
+            className={`flex-1 rounded-pill px-3 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${view===v ? "bg-primary text-primary-foreground" : "border hairline bg-card text-muted-foreground"}`}>
+            {v}
+          </button>
+        ))}
+      </div>
+
+      {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
+      {!isLoading && classes.length === 0 && (
+        <p className="text-center text-xs text-muted-foreground py-4">No {view} classes</p>
       )}
       <div className="space-y-2">
         {classes.map((c: any) => {
@@ -260,26 +324,50 @@ function ClassesAdmin() {
           const booked = active.length;
           const left = Math.max(0, c.capacity - booked);
           const full = left === 0;
+          const isCancelled = !!c.cancelled_at;
           return (
             <div key={c.id} className="card-surface p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{c.title}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{new Date(c.starts_at).toLocaleString()} • {c.coaches?.name || "—"}</p>
-                  <div className="mt-2 flex items-center gap-2">
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {new Date(c.starts_at).toLocaleString()} • {c.coaches?.name || "—"} • <span className="uppercase">{c.type}</span>
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
-                    <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
-                      {full ? "Full" : `${left} left`}
-                    </span>
+                    {!isCancelled && (
+                      <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                        {full ? "Full" : `${left} left`}
+                      </span>
+                    )}
+                    {isCancelled && (
+                      <span className="rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive">Cancelled</span>
+                    )}
                     <span className="text-[10px] text-muted-foreground">of {c.capacity}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
-                  className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
-                >
-                  Cancel
-                </button>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  {view === "upcoming" && (
+                    <>
+                      <button onClick={()=>openEdit(c)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold">Edit</button>
+                      <button
+                        onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
+                        className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  )}
+                  {view === "cancelled" && (
+                    <>
+                      <button onClick={()=>restoreClass.mutate(c.id)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary">Restore</button>
+                      <button onClick={()=>{ if (confirm("Delete this class permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
+                    </>
+                  )}
+                  {view === "past" && (
+                    <button onClick={()=>{ if (confirm("Delete this past class record permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
+                  )}
+                </div>
               </div>
               {active.length > 0 && (
                 <ul className="mt-3 space-y-1">
@@ -290,7 +378,9 @@ function ClassesAdmin() {
                           ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
                           : (b.profiles?.name ?? "Member")}
                       </span>
-                      <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
+                      {view === "upcoming" && (
+                        <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -299,9 +389,37 @@ function ClassesAdmin() {
           );
         })}
       </div>
+
+      {editId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" onClick={()=>setEditId(null)}>
+          <div className="w-full max-w-md space-y-3 rounded-2xl bg-card p-4 shadow-xl" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-xl">Edit class</h3>
+              <button onClick={()=>setEditId(null)} className="text-xs text-muted-foreground">Close</button>
+            </div>
+            <input value={editForm.title} onChange={(e)=>setEditForm(f=>({...f, title: e.target.value}))} placeholder="Title" className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            <div className="grid grid-cols-2 gap-2">
+              <select value={editForm.type} onChange={(e)=>setEditForm(f=>({...f, type: e.target.value as ClassType}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
+              </select>
+              <select value={editForm.coach_id} onChange={(e)=>setEditForm(f=>({...f, coach_id: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="">Coach…</option>
+                {coaches.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <input type="datetime-local" value={editForm.starts_at} onChange={(e)=>setEditForm(f=>({...f, starts_at: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+              <input type="number" value={editForm.capacity} onChange={(e)=>setEditForm(f=>({...f, capacity: Number(e.target.value)}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            </div>
+            <button onClick={()=>updateClass.mutate()} disabled={updateClass.isPending || !editForm.title || !editForm.starts_at}
+              className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60">Save changes</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 function CoachesAdmin() {
