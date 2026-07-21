@@ -141,7 +141,7 @@ function AnnouncementsAdmin() {
 
 function ClassesAdmin() {
   const qc = useQueryClient();
-  const [type, setType] = useState<"pt"|"women_only"|"mixed"|"kids">("mixed");
+  const [type, setType] = useState<"pt"|"women_only"|"mixed"|"kids"|"yoga"|"gymnastics">("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
   const [startsAt, setStartsAt] = useState("");
@@ -206,7 +206,7 @@ function ClassesAdmin() {
       <div className="card-surface space-y-2 p-4">
         <div className="grid grid-cols-2 gap-2">
           <select value={type} onChange={(e)=>setType(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-            <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="pt">PT</option><option value="kids">Kids</option>
+            <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
           </select>
           <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
             <option value="">Coach…</option>
