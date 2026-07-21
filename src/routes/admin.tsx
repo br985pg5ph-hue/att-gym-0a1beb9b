@@ -629,7 +629,7 @@ function MembersAdmin() {
                     >PT sessions</button>
                   </div>
 
-                  {addKind === "group" && hasKids && (
+                  {hasKids && (
                     <select
                       value={childId}
                       onChange={(e)=>setChildId(e.target.value)}
