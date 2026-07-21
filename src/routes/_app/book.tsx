@@ -118,7 +118,11 @@ function BookPage() {
       qc.invalidateQueries({ queryKey: ["all-bookings"] });
       qc.invalidateQueries({ queryKey: ["class-counts"] });
       qc.invalidateQueries({ queryKey: ["next-booking"] });
+      qc.invalidateQueries({ queryKey: ["txns"] });
+      refresh();
+      refreshChildren();
     },
+
     onError: (e: any) => toast.error(e.message ?? "Booking failed"),
   });
 
