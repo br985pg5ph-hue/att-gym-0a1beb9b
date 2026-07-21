@@ -275,6 +275,7 @@ export type Database = {
           injuries: string | null
           interests: string[]
           is_parent: boolean
+          member_code: string
           membership_status: string
           name: string
           onboarded: boolean
@@ -300,6 +301,7 @@ export type Database = {
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
+          member_code: string
           membership_status?: string
           name?: string
           onboarded?: boolean
@@ -325,6 +327,7 @@ export type Database = {
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
+          member_code?: string
           membership_status?: string
           name?: string
           onboarded?: boolean
