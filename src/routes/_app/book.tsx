@@ -32,7 +32,7 @@ function BookPage() {
   const parentMode = !!profile?.is_parent;
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState(fmtDay(new Date()));
+  const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
   const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
