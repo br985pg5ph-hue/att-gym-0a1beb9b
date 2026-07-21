@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Mail, Phone, CalendarPlus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
@@ -57,6 +57,7 @@ function MemberDetailPage() {
   const [adjClasses, setAdjClasses] = useState(1);
   const [adjType, setAdjType] = useState<"credit" | "debit">("debit");
   const [adjNote, setAdjNote] = useState("");
+  const [bookOpen, setBookOpen] = useState(false);
 
   const adjust = useMutation({
     mutationFn: async () => {
@@ -187,6 +188,17 @@ function MemberDetailPage() {
           )}
         </section>
 
+        {/* Book a class */}
+        <section className="card-surface flex items-center justify-between p-4">
+          <div>
+            <p className="font-display text-lg leading-none">Book a class</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Book on behalf of {member?.name || "member"}{kids.length > 0 ? " or a child" : ""}</p>
+          </div>
+          <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground inline-flex items-center gap-1">
+            <CalendarPlus size={12}/> Book
+          </button>
+        </section>
+
         {/* Upcoming bookings */}
         <section>
           <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Upcoming bookings ({upcoming.length})</p>
@@ -245,6 +257,141 @@ function MemberDetailPage() {
           </div>
         </section>
       </main>
+
+      {bookOpen && member && (
+        <BookClassModal
+          memberId={id}
+          memberName={member.name || "Member"}
+          memberBalance={member.classes_remaining ?? 0}
+          kids={kids}
+          existingUpcoming={upcoming}
+          onClose={()=>setBookOpen(false)}
+          onBooked={()=>{
+            setBookOpen(false);
+            toast.success("Class booked");
+            qc.invalidateQueries({ queryKey: ["admin-member", id] });
+            qc.invalidateQueries({ queryKey: ["admin-member-bookings", id] });
+            qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
+            qc.invalidateQueries({ queryKey: ["admin-members"] });
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpcoming, onClose, onBooked }: {
+  memberId: string;
+  memberName: string;
+  memberBalance: number;
+  kids: any[];
+  existingUpcoming: any[];
+  onClose: () => void;
+  onBooked: () => void;
+}) {
+  const [childId, setChildId] = useState("");
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [pendingId, setPendingId] = useState<string | null>(null);
+
+  const dayStart = new Date(`${date}T00:00:00`).toISOString();
+  const dayEnd = new Date(new Date(`${date}T00:00:00`).getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+  const { data: dayClasses = [], isLoading } = useQuery({
+    queryKey: ["admin-book-day", date],
+    queryFn: async () => (await supabase.from("classes")
+      .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status)")
+      .gte("starts_at", dayStart)
+      .lt("starts_at", dayEnd)
+      .is("cancelled_at", null)
+      .order("starts_at")).data ?? [],
+  });
+
+  const selectedChild = kids.find((k) => k.id === childId);
+  const targetBalance = childId ? (selectedChild?.classes_remaining ?? 0) : memberBalance;
+  const noCredits = targetBalance <= 0;
+
+  const bookedClassIds = new Set(
+    existingUpcoming
+      .filter((b: any) => (childId ? b.child_id === childId : !b.child_id))
+      .map((b: any) => b.classes?.id)
+      .filter(Boolean)
+  );
+
+  const book = async (classId: string) => {
+    setPendingId(classId);
+    const { error } = await supabase.from("bookings").insert({
+      member_id: memberId,
+      class_id: classId,
+      child_id: childId || null,
+      status: "upcoming",
+    });
+    setPendingId(null);
+    if (error) return toast.error(error.message);
+    onBooked();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div onClick={(e)=>e.stopPropagation()} className="max-h-[90vh] w-full max-w-md overflow-auto rounded-t-3xl border-t hairline bg-background p-6 pb-10">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-2xl">Book a class</h2>
+          <button onClick={onClose} className="text-sm text-muted-foreground">Close</button>
+        </div>
+
+        {kids.length > 0 && (
+          <select value={childId} onChange={(e)=>setChildId(e.target.value)} className="mb-3 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+            <option value="">Book for {memberName}</option>
+            {kids.map((k: any) => <option key={k.id} value={k.id}>Book for {k.name}</option>)}
+          </select>
+        )}
+
+        <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="mb-3 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+
+        <div className="mb-3 flex items-center justify-between text-[11px]">
+          <span className="text-muted-foreground">{childId ? selectedChild?.name : memberName}</span>
+          <span className={noCredits ? "font-semibold text-destructive" : "text-muted-foreground"}>
+            {noCredits ? "No classes remaining" : `${targetBalance} classes left`}
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {isLoading && <p className="py-6 text-center text-xs text-muted-foreground">Loading…</p>}
+          {!isLoading && dayClasses.length === 0 && <p className="py-6 text-center text-xs text-muted-foreground">No classes this day</p>}
+          {dayClasses
+            .filter((c: any) => (childId ? true : c.type !== "kids"))
+            .map((c: any) => {
+              const activeCount = (c.bookings ?? []).filter((b: any) => b.status === "upcoming").length;
+              const left = Math.max(0, (c.capacity ?? 0) - activeCount);
+              const full = left === 0;
+              const alreadyBooked = bookedClassIds.has(c.id);
+              const disabled = noCredits || full || alreadyBooked || pendingId === c.id;
+              return (
+                <div key={c.id} className="card-surface flex items-center justify-between gap-3 p-3">
+                  <div className="min-w-0">
+                    <p className="font-display text-base leading-none truncate">{c.title}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {c.coaches?.name ? ` · ${c.coaches.name}` : ""}
+                      {c.type === "kids" ? " · Kids" : ""}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`text-[10px] uppercase tracking-widest ${full ? "text-destructive" : "text-muted-foreground"}`}>
+                      {full ? "Full" : `${left} left`}
+                    </span>
+                    <button
+                      onClick={()=>book(c.id)}
+                      disabled={disabled}
+                      className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+                    >
+                      {alreadyBooked ? "Booked" : pendingId === c.id ? "…" : "Book"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      </div>
     </div>
   );
 }
