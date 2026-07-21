@@ -395,10 +395,7 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
   });
 
   const selectedChild = kids.find((k) => k.id === childId);
-  void selectedChild;
-  const targetBalance = childId ? 0 : memberBalance;
-
-  const noCredits = targetBalance <= 0;
+  const childPT = selectedChild?.pt_sessions_remaining ?? 0;
 
   const bookedClassIds = new Set(
     existingUpcoming
@@ -437,24 +434,28 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
 
         <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="mb-3 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
 
-        <div className="mb-3 flex items-center justify-between text-[11px]">
-          <span className="text-muted-foreground">{childId ? selectedChild?.name : memberName}</span>
-          <span className={noCredits ? "font-semibold text-destructive" : "text-muted-foreground"}>
-            {noCredits ? "No classes remaining" : `${targetBalance} classes left`}
-          </span>
+        <div className="mb-3 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{childId ? selectedChild?.name : memberName}</span>
+          <span>{childId ? `${childPT} PT left` : `${memberBalance} PT left`}</span>
         </div>
 
         <div className="space-y-2">
           {isLoading && <p className="py-6 text-center text-xs text-muted-foreground">Loading…</p>}
           {!isLoading && dayClasses.length === 0 && <p className="py-6 text-center text-xs text-muted-foreground">No classes this day</p>}
           {dayClasses
-            .filter((c: any) => (childId ? true : c.type !== "kids"))
+            .filter((c: any) => {
+              // Adults: hide kids classes. Children: only kids or pt classes.
+              if (childId) return c.type === "kids" || c.type === "pt";
+              return c.type !== "kids";
+            })
             .map((c: any) => {
               const activeCount = (c.bookings ?? []).filter((b: any) => b.status === "upcoming").length;
               const left = Math.max(0, (c.capacity ?? 0) - activeCount);
               const full = left === 0;
               const alreadyBooked = bookedClassIds.has(c.id);
-              const disabled = noCredits || full || alreadyBooked || pendingId === c.id;
+              const isPT = c.type === "pt";
+              const noCreditsForThis = isPT && (childId ? childPT <= 0 : memberBalance <= 0);
+              const disabled = noCreditsForThis || full || alreadyBooked || pendingId === c.id;
               return (
                 <div key={c.id} className="card-surface flex items-center justify-between gap-3 p-3">
                   <div className="min-w-0">
