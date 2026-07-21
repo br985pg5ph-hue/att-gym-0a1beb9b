@@ -18,7 +18,7 @@ function LocationPage() {
 
   if (!gym) return <PageHeader title={t.ourLocation} />;
 
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${gym.lat},${gym.lng}`;
+  const mapsUrl = gym.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${gym.lat},${gym.lng}`;
 
   return (
     <div>
