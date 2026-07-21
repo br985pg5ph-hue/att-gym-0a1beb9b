@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +26,9 @@ function AdminPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("announcements");
+  const pathname = useRouterState({ select: s => s.location.pathname });
+  const isChild = pathname !== "/admin" && pathname !== "/admin/";
+  if (isChild) return <Outlet />;
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
