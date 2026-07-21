@@ -311,21 +311,29 @@ function MemberDetailPage() {
           <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Class transactions</p>
           <div className="space-y-1">
             {txns.length === 0 && <p className="text-xs text-muted-foreground">No transactions yet</p>}
-            {txns.map((t: any) => (
-              <div key={t.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
-                <div className="min-w-0">
-                  <p className="truncate">
-                    <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
-                      {t.type === "credit" ? "+" : "−"}{t.classes}
-                    </span>{" "}
-                    <span className="text-muted-foreground">{t.source || t.type}</span>
-                    {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
-                  </p>
-                  {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+            {txns.map((t: any) => {
+              const isGroup = t.service === "group";
+              const amount = isGroup ? (t.days ?? 0) : (t.classes ?? 0);
+              const unit = isGroup
+                ? (amount === 1 ? "day membership" : "days membership")
+                : (amount === 1 ? "PT session" : "PT sessions");
+              return (
+                <div key={t.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
+                  <div className="min-w-0">
+                    <p className="truncate">
+                      <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
+                        {t.type === "credit" ? "+" : "−"}{amount} {unit}
+                      </span>{" "}
+                      <span className="text-muted-foreground">{t.source || t.type}</span>
+                      {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
+                    </p>
+                    {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+                  </div>
+                  <span className="shrink-0 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
                 </div>
-                <span className="shrink-0 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
-              </div>
-            ))}
+              );
+            })}
+
           </div>
         </section>
       </main>
