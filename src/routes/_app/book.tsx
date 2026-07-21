@@ -48,8 +48,9 @@ function BookPage() {
   const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
-  // Month grid (declared here so month-scoped queries can use it)
-  const today = new Date();
+  // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
+  const today = ammanNow();
+  const todayKey = fmtDay(new Date());
   const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
   const y = viewedMonth.getFullYear();
