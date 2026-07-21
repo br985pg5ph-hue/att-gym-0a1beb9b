@@ -256,9 +256,11 @@ function ClassesAdmin() {
   const updateClass = useMutation({
     mutationFn: async () => {
       if (!editId) return;
+      const startsAtUtc = fromAmmanDateInput(editForm.starts_at);
+      if (isNaN(startsAtUtc.getTime())) throw new Error("Invalid start time");
       const { error } = await supabase.from("classes").update({
         title: editForm.title,
-        starts_at: new Date(editForm.starts_at).toISOString(),
+        starts_at: startsAtUtc.toISOString(),
         capacity: editForm.capacity,
         coach_id: editForm.coach_id || null,
         type: editForm.type,
