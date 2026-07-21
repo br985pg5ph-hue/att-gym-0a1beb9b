@@ -186,7 +186,7 @@ function ClassesAdmin() {
       // Cancel all upcoming bookings first so credits refund via trigger
       const { error: bErr } = await supabase.from("bookings").update({ status: "cancelled" }).eq("class_id", id).eq("status", "upcoming");
       if (bErr) throw bErr;
-      const { error } = await supabase.from("classes").delete().eq("id", id);
+      const { error } = await supabase.from("classes").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
