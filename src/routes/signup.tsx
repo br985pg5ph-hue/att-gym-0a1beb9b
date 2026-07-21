@@ -32,6 +32,7 @@ function SignUpPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [referral, setReferral] = useState(ref || "");
   const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
@@ -39,7 +40,8 @@ function SignUpPage() {
     if (password !== confirm) return toast.error("Passwords do not match");
     setLoading(true);
     const meta: Record<string, string> = { name, phone: `${cc}${phone}` };
-    if (ref) meta.referral_code = ref;
+    const trimmedRef = referral.trim();
+    if (trimmedRef) meta.referral_code = trimmedRef;
     const { data, error } = await supabase.auth.signUp({
       email, password,
       options: {
