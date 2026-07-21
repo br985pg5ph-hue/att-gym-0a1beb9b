@@ -14,7 +14,9 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict 
 type Profile = {
   id: string; name: string; phone: string | null; avatar_url: string | null;
   role: "member" | "staff"; membership_status: string;
-  referral_code: string; streak: number; classes_attended: number; classes_remaining: number; interests: string[];
+  referral_code: string; streak: number; classes_attended: number;
+  pt_sessions_remaining: number; group_subscription_until: string | null;
+  interests: string[];
   is_parent: boolean;
 };
 
@@ -22,8 +24,9 @@ export type Child = {
   id: string; parent_id: string; name: string; date_of_birth: string | null; gender: string | null;
   experience_level: string | null; injuries_notes: string | null;
   emergency_contact_name: string | null; emergency_contact_phone: string | null;
-  classes_remaining: number; streak: number; classes_attended: number; avatar_url: string | null;
+  group_subscription_until: string | null; streak: number; classes_attended: number; avatar_url: string | null;
 };
+
 
 const AuthCtx = createContext<{ user: User | null; profile: Profile | null; loading: boolean; refresh: () => Promise<void> }>({
   user: null, profile: null, loading: true, refresh: async () => {},
