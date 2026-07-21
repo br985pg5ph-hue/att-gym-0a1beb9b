@@ -147,11 +147,13 @@ function ClassesAdmin() {
   const [startsAt, setStartsAt] = useState("");
   const [capacity, setCapacity] = useState(15);
 
+  const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { data: classes = [] } = useQuery({
-    queryKey: ["admin-classes"],
+    queryKey: ["admin-classes", cutoff],
     queryFn: async () => {
       const { data: cls } = await supabase.from("classes")
         .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
+        .gte("starts_at", cutoff)
         .order("starts_at");
       const list = cls ?? [];
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
@@ -198,9 +200,6 @@ function ClassesAdmin() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
   });
 
-  const now = Date.now();
-  const upcomingClasses = classes.filter((c: any) => new Date(c.starts_at).getTime() >= now - 60*60*1000);
-
   return (
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
@@ -221,11 +220,11 @@ function ClassesAdmin() {
         <button onClick={()=>create.mutate()} disabled={!title || !startsAt}
           className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> Add class</button>
       </div>
-      {upcomingClasses.length === 0 && (
+      {classes.length === 0 && (
         <p className="text-center text-xs text-muted-foreground py-4">No upcoming classes</p>
       )}
       <div className="space-y-2">
-        {upcomingClasses.map((c: any) => {
+        {classes.map((c: any) => {
           const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
           const booked = active.length;
           const left = Math.max(0, c.capacity - booked);
