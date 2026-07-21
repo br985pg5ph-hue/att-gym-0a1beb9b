@@ -562,7 +562,7 @@ function MembersAdmin() {
         type="search"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by name or member code (e.g. ATT-00001)"
+        placeholder="Search by name, child name, or member code"
         className="w-full rounded-pill border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
       />
       {filtered.length === 0 && (
