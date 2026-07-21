@@ -502,7 +502,8 @@ function MembersAdmin() {
   const filtered = q
     ? (data as any[]).filter((m) =>
         (m.name ?? "").toLowerCase().includes(q) ||
-        (m.member_code ?? "").toLowerCase().includes(q)
+        (m.member_code ?? "").toLowerCase().includes(q) ||
+        (m.children ?? []).some((k: any) => (k.name ?? "").toLowerCase().includes(q))
       )
     : (data as any[]);
 
@@ -561,7 +562,7 @@ function MembersAdmin() {
         type="search"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by name or member code (e.g. ATT-00001)"
+        placeholder="Search by name, child name, or member code"
         className="w-full rounded-pill border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
       />
       {filtered.length === 0 && (
