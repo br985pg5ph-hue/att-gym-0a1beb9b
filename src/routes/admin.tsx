@@ -528,7 +528,7 @@ function MembersAdmin() {
     mutationFn: async (memberId: string) => {
       const { error } = await supabase.from("transactions").insert({
         member_id: memberId,
-        child_id: null,
+        child_id: childId || null,
         service: "pt",
         type: "credit",
         classes: sessions,
