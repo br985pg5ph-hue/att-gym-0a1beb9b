@@ -12,6 +12,15 @@ export const Route = createFileRoute("/admin/members/$id")({
   component: MemberDetailPage,
 });
 
+function formatGroupStatus(until: string | null | undefined): string {
+  if (!until) return "Group: none";
+  const d = new Date(until);
+  if (isNaN(d.getTime())) return "Group: none";
+  if (d.getTime() <= Date.now()) return "Group: expired";
+  return `Group: active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+
 function MemberDetailPage() {
   const { id } = Route.useParams();
   const nav = useNavigate();
