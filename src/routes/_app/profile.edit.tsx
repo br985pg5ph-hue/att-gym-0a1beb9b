@@ -104,6 +104,7 @@ function EditProfilePage() {
   useEffect(() => {
     if (profile) {
       setName(profile.name || "");
+      setDob((profile as any).date_of_birth || "");
       const full = profile.phone || "";
       const matched = COUNTRIES.slice().sort((a, b) => b.code.length - a.code.length).find((c) => full.startsWith(c.code));
       if (matched) {
