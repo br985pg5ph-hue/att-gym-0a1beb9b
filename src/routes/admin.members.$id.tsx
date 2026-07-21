@@ -41,42 +41,76 @@ function MemberDetailPage() {
   const { data: txns = [] } = useQuery({
     queryKey: ["admin-member-txns", id],
     queryFn: async () => (await supabase.from("transactions")
-      .select("id, classes, type, source, payment_method, description, created_at, child_id, children(name)")
+      .select("id, classes, days, service, type, source, payment_method, description, created_at, child_id, children(name)")
       .eq("member_id", id)
       .order("created_at", { ascending: false })
       .limit(30)).data ?? [],
   });
 
-  const [adjustOpen, setAdjustOpen] = useState(false);
-  const [adjChildId, setAdjChildId] = useState("");
-  const [adjClasses, setAdjClasses] = useState(1);
-  const [adjType, setAdjType] = useState<"credit" | "debit">("debit");
-  const [adjNote, setAdjNote] = useState("");
+  const [ptAdjustOpen, setPtAdjustOpen] = useState(false);
+  const [ptAdjSessions, setPtAdjSessions] = useState(1);
+  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
+  const [ptAdjNote, setPtAdjNote] = useState("");
+
+  const [grpAdjustOpen, setGrpAdjustOpen] = useState(false);
+  const [grpAdjChildId, setGrpAdjChildId] = useState("");
+  const [grpAdjDays, setGrpAdjDays] = useState(30);
+  const [grpAdjType, setGrpAdjType] = useState<"credit" | "debit">("credit");
+  const [grpAdjNote, setGrpAdjNote] = useState("");
+
   const [bookOpen, setBookOpen] = useState(false);
 
-  const adjust = useMutation({
+  const adjustPT = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("transactions").insert({
         member_id: id,
-        child_id: adjChildId || null,
-        classes: adjClasses,
-        type: adjType,
+        child_id: null,
+        service: "pt",
+        classes: ptAdjSessions,
+        type: ptAdjType,
         source: "admin_adjustment",
-        payment_method: adjType === "credit" ? "cash" : null,
-        description: adjNote || (adjType === "debit" ? "Admin removed classes" : "Admin added classes"),
+        payment_method: ptAdjType === "credit" ? "cash" : null,
+        description: ptAdjNote || (ptAdjType === "debit" ? "Admin removed PT sessions" : "Admin added PT sessions"),
         created_by: user!.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Balance updated");
-      setAdjustOpen(false); setAdjChildId(""); setAdjClasses(1); setAdjNote(""); setAdjType("debit");
+      toast.success("PT sessions updated");
+      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit");
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const adjustGroup = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("transactions").insert({
+        member_id: id,
+        child_id: grpAdjChildId || null,
+        service: "group",
+        classes: 0,
+        days: grpAdjDays,
+        type: grpAdjType,
+        source: "admin_adjustment",
+        payment_method: grpAdjType === "credit" ? "cash" : null,
+        description: grpAdjNote || (grpAdjType === "debit" ? "Admin removed membership days" : "Admin added membership days"),
+        created_by: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Group membership updated");
+      setGrpAdjustOpen(false); setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit");
+      qc.invalidateQueries({ queryKey: ["admin-member", id] });
+      qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
 
   const cancelBooking = useMutation({
     mutationFn: async (bid: string) => {
