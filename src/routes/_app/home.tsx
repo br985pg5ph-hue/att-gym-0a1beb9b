@@ -53,7 +53,9 @@ function HomePage() {
     : profile?.group_subscription_until ?? null;
   const groupActive = !!groupUntil && new Date(groupUntil).getTime() > Date.now();
   const groupHolderName = scope === "child" && selectedChild ? selectedChild.name : (profile?.name ?? "");
-  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
+  const ptRemaining = scope === "child" && selectedChild
+    ? (selectedChild as any).pt_sessions_remaining ?? 0
+    : profile?.pt_sessions_remaining ?? 0;
   const stats = scope === "child" && selectedChild
     ? { attended: selectedChild.classes_attended, streak: selectedChild.streak }
     : { attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
