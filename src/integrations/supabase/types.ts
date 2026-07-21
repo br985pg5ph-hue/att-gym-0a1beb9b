@@ -227,6 +227,7 @@ export type Database = {
           instagram_url: string | null
           lat: number
           lng: number
+          maps_url: string | null
           name: string
           phone: string
           whatsapp_number: string | null
@@ -238,6 +239,7 @@ export type Database = {
           instagram_url?: string | null
           lat: number
           lng: number
+          maps_url?: string | null
           name?: string
           phone: string
           whatsapp_number?: string | null
@@ -249,6 +251,7 @@ export type Database = {
           instagram_url?: string | null
           lat?: number
           lng?: number
+          maps_url?: string | null
           name?: string
           phone?: string
           whatsapp_number?: string | null

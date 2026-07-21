@@ -125,7 +125,12 @@ function ProfilePage() {
         </div>
 
         {/* Location */}
-        <Link to="/location" className="card-surface block overflow-hidden">
+        <a
+          href={gymInfo?.maps_url || "/location"}
+          target={gymInfo?.maps_url ? "_blank" : undefined}
+          rel={gymInfo?.maps_url ? "noreferrer" : undefined}
+          className="card-surface block overflow-hidden"
+        >
           {gym && (
             <iframe
               title="Gym location map"
@@ -143,7 +148,7 @@ function ProfilePage() {
             </div>
             <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
           </div>
-        </Link>
+        </a>
       </div>
     </div>
   );
