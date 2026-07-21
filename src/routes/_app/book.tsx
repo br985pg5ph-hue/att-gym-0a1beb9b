@@ -232,10 +232,10 @@ function BookPage() {
         </div>
 
         {!bookingForChild && (
-          <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+          <div className="mt-4 grid grid-cols-3 gap-2">
             {TYPES.filter((tp) => tp.key !== "kids").map((tp) => (
               <button key={tp.key} onClick={() => setFilter(tp.key)}
-                className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition ${
+                className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
                   filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
                 }`}>
                 {t[tp.labelKey]}
