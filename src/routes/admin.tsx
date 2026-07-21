@@ -148,7 +148,7 @@ function ClassesAdmin() {
   const [type, setType] = useState<ClassType>("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
-  const [startsAt, setStartsAt] = useState("");
+  const [startsAt, setStartsAt] = useState(toAmmanDateInput(ammanNow()));
   const [capacity, setCapacity] = useState(15);
   const [recurring, setRecurring] = useState(false);
   const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
