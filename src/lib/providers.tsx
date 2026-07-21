@@ -79,14 +79,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
     const { data } = await supabase.from("children").select("*").eq("parent_id", uid).order("created_at");
     const list = (data ?? []) as Child[];
     setChildList(list);
-    // Auto-select first child if none selected
+    // Preserve current selection if still valid; otherwise default to "Myself" (null).
     setSelectedChildIdState((prev) => {
       if (prev && list.some((c) => c.id === prev)) return prev;
-      const first = list[0]?.id ?? null;
-      if (first) localStorage.setItem("selectedChildId", first);
-      else localStorage.removeItem("selectedChildId");
-      return first;
+      localStorage.removeItem("selectedChildId");
+      return null;
     });
+
   };
 
   const refresh = async () => {

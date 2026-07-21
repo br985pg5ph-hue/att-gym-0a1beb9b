@@ -20,18 +20,7 @@ export function ChildSwitcher() {
 
   if (!profile?.is_parent) return null;
 
-  if (children.length === 0) {
-    return (
-      <Link
-        to="/profile/children"
-        className="inline-flex items-center gap-1.5 rounded-pill bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary"
-      >
-        <Plus size={14} /> Add child
-      </Link>
-    );
-  }
-
-  const label = selectedChild?.name.split(" ")[0] ?? "Select";
+  const label = selectedChild ? selectedChild.name.split(" ")[0] : "Me";
 
   return (
     <div ref={ref} className="relative">
@@ -52,6 +41,16 @@ export function ChildSwitcher() {
       {open && (
         <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border hairline bg-card shadow-lg">
           <div className="max-h-64 overflow-auto">
+            <button
+              onClick={() => { setSelectedChildId(null); setOpen(false); }}
+              className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm hover:bg-muted ${!selectedChild ? "bg-muted" : ""}`}
+            >
+              <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+                {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" /> : <User size={14} />}
+              </span>
+              <span className="min-w-0 flex-1 truncate font-medium">Myself</span>
+              {!selectedChild && <span className="text-[10px] font-semibold text-primary">ACTIVE</span>}
+            </button>
             {children.map((c) => (
               <button
                 key={c.id}
@@ -78,3 +77,4 @@ export function ChildSwitcher() {
     </div>
   );
 }
+
