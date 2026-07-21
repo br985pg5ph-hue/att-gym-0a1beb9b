@@ -26,6 +26,7 @@ import { Route as AppHomeRouteImport } from './routes/_app/home'
 import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
 import { Route as AppBookRouteImport } from './routes/_app/book'
 import { Route as AppProfileIndexRouteImport } from './routes/_app/profile.index'
+import { Route as AdminMembersIdRouteImport } from './routes/admin.members.$id'
 import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
 import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
 import { Route as AppProfileEditRouteImport } from './routes/_app/profile.edit'
@@ -116,6 +117,11 @@ const AppProfileIndexRoute = AppProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppProfileRoute,
 } as any)
+const AdminMembersIdRoute = AdminMembersIdRouteImport.update({
+  id: '/members/$id',
+  path: '/members/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -144,7 +150,7 @@ const AppProfileBookingsRoute = AppProfileBookingsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
@@ -163,11 +169,12 @@ export interface FileRoutesByFullPath {
   '/profile/edit': typeof AppProfileEditRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
+  '/admin/members/$id': typeof AdminMembersIdRoute
   '/profile/': typeof AppProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
@@ -185,13 +192,14 @@ export interface FileRoutesByTo {
   '/profile/edit': typeof AppProfileEditRoute
   '/profile/referral': typeof AppProfileReferralRoute
   '/profile/settings': typeof AppProfileSettingsRoute
+  '/admin/members/$id': typeof AdminMembersIdRoute
   '/profile': typeof AppProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/forgot': typeof ForgotRoute
   '/onboarding': typeof OnboardingRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/_app/profile/edit': typeof AppProfileEditRoute
   '/_app/profile/referral': typeof AppProfileReferralRoute
   '/_app/profile/settings': typeof AppProfileSettingsRoute
+  '/admin/members/$id': typeof AdminMembersIdRoute
   '/_app/profile/': typeof AppProfileIndexRoute
 }
 export interface FileRouteTypes {
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/profile/referral'
     | '/profile/settings'
+    | '/admin/members/$id'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/profile/referral'
     | '/profile/settings'
+    | '/admin/members/$id'
     | '/profile'
   id:
     | '__root__'
@@ -281,13 +292,14 @@ export interface FileRouteTypes {
     | '/_app/profile/edit'
     | '/_app/profile/referral'
     | '/_app/profile/settings'
+    | '/admin/members/$id'
     | '/_app/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ForgotRoute: typeof ForgotRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -417,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileIndexRouteImport
       parentRoute: typeof AppProfileRoute
     }
+    '/admin/members/$id': {
+      id: '/admin/members/$id'
+      path: '/members/$id'
+      fullPath: '/admin/members/$id'
+      preLoaderRoute: typeof AdminMembersIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_app/profile/settings': {
       id: '/_app/profile/settings'
       path: '/settings'
@@ -499,10 +518,20 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminMembersIdRoute: typeof AdminMembersIdRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminMembersIdRoute: AdminMembersIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ForgotRoute: ForgotRoute,
   OnboardingRoute: OnboardingRoute,
