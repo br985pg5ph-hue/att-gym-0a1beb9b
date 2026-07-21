@@ -1,0 +1,1 @@
+ALTER TABLE public.classes ADD COLUMN cancelled_at timestamptz;
