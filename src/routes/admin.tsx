@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
+import { ammanNow, toAmmanDateInput, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { toast } from "sonner";
 import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight } from "lucide-react";
 
@@ -147,7 +148,7 @@ function ClassesAdmin() {
   const [type, setType] = useState<ClassType>("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
-  const [startsAt, setStartsAt] = useState("");
+  const [startsAt, setStartsAt] = useState(toAmmanDateInput(ammanNow()));
   const [capacity, setCapacity] = useState(15);
   const [recurring, setRecurring] = useState(false);
   const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
@@ -194,27 +195,36 @@ function ClassesAdmin() {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!title || !startsAt) throw new Error("Title and start time are required");
+      const start = fromAmmanDateInput(startsAt);
+      if (isNaN(start.getTime())) throw new Error("Invalid start time");
+
       if (recurring) {
         if (!endDate) throw new Error("Pick an end date");
-        const start = new Date(startsAt);
-        const end = new Date(endDate + "T23:59:59");
-        if (end < start) throw new Error("End date must be after start date");
+        if (!frequency) throw new Error("Pick a frequency");
+        const end = fromAmmanDateInput(endDate + "T23:59:59");
+        if (end < start) throw new Error("End date must be on or after the start date");
+        const maxEnd = addAmmanDays(start, 90);
+        if (end > maxEnd) throw new Error("Recurring series cannot exceed 90 days");
+
         const stepDays = frequency === "daily" ? 1 : 7;
         const rows: any[] = [];
-        const cur = new Date(start);
+        let cur = start;
         while (cur <= end && rows.length < 200) {
           rows.push({ type, coach_id: coachId || null, title, starts_at: cur.toISOString(), capacity });
-          cur.setDate(cur.getDate() + stepDays);
+          cur = addAmmanDays(cur, stepDays);
         }
+        if (rows.length === 0) throw new Error("No classes generated for the selected range");
         const { error } = await supabase.from("classes").insert(rows);
         if (error) throw error;
         return rows.length;
       }
-      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: startsAt, capacity });
+
+      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: start.toISOString(), capacity });
       if (error) throw error;
       return 1;
     },
-    onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); invalidateAll(); },
+    onSuccess: (n) => { setTitle(""); setStartsAt(toAmmanDateInput(ammanNow())); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
   const cancelClass = useMutation({
@@ -246,9 +256,11 @@ function ClassesAdmin() {
   const updateClass = useMutation({
     mutationFn: async () => {
       if (!editId) return;
+      const startsAtUtc = fromAmmanDateInput(editForm.starts_at);
+      if (isNaN(startsAtUtc.getTime())) throw new Error("Invalid start time");
       const { error } = await supabase.from("classes").update({
         title: editForm.title,
-        starts_at: new Date(editForm.starts_at).toISOString(),
+        starts_at: startsAtUtc.toISOString(),
         capacity: editForm.capacity,
         coach_id: editForm.coach_id || null,
         type: editForm.type,
@@ -265,9 +277,7 @@ function ClassesAdmin() {
   });
 
   const openEdit = (c: any) => {
-    const d = new Date(c.starts_at);
-    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-    setEditForm({ title: c.title ?? "", starts_at: local, capacity: c.capacity, coach_id: c.coach_id ?? "", type: c.type });
+    setEditForm({ title: c.title ?? "", starts_at: toAmmanDateInput(new Date(c.starts_at)), capacity: c.capacity, coach_id: c.coach_id ?? "", type: c.type });
     setEditId(c.id);
   };
 
@@ -331,7 +341,7 @@ function ClassesAdmin() {
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{c.title}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {new Date(c.starts_at).toLocaleString()} • {c.coaches?.name || "—"} • <span className="uppercase">{c.type}</span>
+                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{c.type}</span>
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>

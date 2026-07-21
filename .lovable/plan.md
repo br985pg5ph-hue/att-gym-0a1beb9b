@@ -1,26 +1,39 @@
-## Add Yoga and Gymnastics to booking
+## Problem
+The admin recurring-class feature uses the device's local timezone when parsing `datetime-local` inputs and generating recurring dates. Because the rest of the app (calendar, booking eligibility, cancellation windows) is anchored to **Asia/Amman**, classes created on a device outside Jordan end up stored at the wrong UTC time. This makes the schedule look unreliable — classes appear on the wrong day or at the wrong hour.
 
-Both are adult-only group classes covered by the existing Group Membership (same "active until" date). They appear as two distinct filters/tags alongside Mixed and Women Only.
+## Plan
 
-### Database
-- Extend the `class_type` enum with two new values: `yoga` and `gymnastics`.
-- Update the two eligibility triggers (`consume_class_credit`, `enforce_kids_class_child`) so `yoga` and `gymnastics` are treated exactly like `mixed` / `women_only`: require an active adult Group Membership, no child bookings, no PT credit consumed.
-- No new columns, no new balance field, no changes to `transactions` or refunds.
+1. **Create a shared Amman-time utility** (`src/lib/time.ts`)
+   - `ammanNow()`: current wall-clock time in Amman.
+   - `toAmmanDateInput(d)`: format a Date as `YYYY-MM-DDTHH:MM` in Amman time for `<input type="datetime-local">`.
+   - `fromAmmanDateInput(iso)`: parse a `datetime-local` string as Amman wall-clock time and return a true UTC `Date`.
+   - `addAmmanDays(d, n)`: add days while staying in Amman wall-clock time (handles DST safely).
+   - `formatAmmanDateTime(d)`: display helper for lists.
 
-### Admin (staff)
-- `admin.tsx` "Create class" form: add Yoga and Gymnastics options to the type dropdown.
-- `admin.members.$id.tsx` "Book on behalf" modal: no logic change needed (it already blocks kids-typed classes from adult bookings); new types will just work.
+2. **Update `src/routes/admin.tsx` class creation form**
+   - Initialize `startsAt` with `toAmmanDateInput(ammanNow())`.
+   - Parse the submitted `startsAt` with `fromAmmanDateInput` before generating or inserting rows.
+   - Use the same helper for the edit modal's `datetime-local` field and display.
 
-### Member booking page (`_app/book.tsx`)
-- Add `yoga` and `gymnastics` to the `TYPES` filter list so they appear as filter chips.
-- Extend the per-slot eligibility function so both types check `groupActiveMember` (same rule as mixed / women_only).
-- Keep kids-only hiding rules unchanged.
+3. **Fix recurring date generation**
+   - Build the recurrence in Amman local time: start at the Amman wall-clock date/time from the input, then add `stepDays` (1 or 7) using `addAmmanDays` until the end date.
+   - Convert each generated occurrence to ISO before inserting.
+   - Cap occurrences at a sensible maximum (e.g., 90 days out or 200 classes, whichever is smaller) and show a clear error if exceeded.
 
-### Copy / i18n (`src/lib/i18n.ts`)
-- Add English + Arabic labels for `yoga` and `gymnastics` used by the filter chips and any type badges.
+4. **Add validation and guardrails**
+   - End date must be on or after the start date.
+   - Frequency + end date required when "Recurring" is checked.
+   - Prevent accidental duplicate recurring series by warning if the date range is empty.
 
-### Out of scope
-- No changes to PT sessions, referral logic, transaction history, or the Group Membership card on Home — a member with an active subscription automatically gets access to the new classes.
+5. **Update class list display**
+   - Show `starts_at` formatted in Amman local time so staff see the same time members see on the booking page.
 
-### Technical notes
-- Postgres does not allow `ALTER TYPE ... ADD VALUE` inside a transaction that also uses the new value. The migration will add the enum values in one statement; the trigger updates (which reference the new labels via `IN (...)`) go in the same migration but after a `COMMIT`-safe boundary using separate statements — standard pattern, handled inside a single migration call.
+6. **Verify**
+   - Create a small weekly recurring series in the admin panel and confirm the stored `starts_at` values match the selected Amman time in the database.
+
+## Out of scope (for this plan)
+- No third-party booking connector — the custom system is being fixed.
+- No changes to the member booking flow, credits, or RLS (those are working).
+
+## Expected result
+Staff can create daily or weekly recurring classes from the admin panel and the generated classes will appear at the correct Amman date/time for members, regardless of the staff member's device timezone.

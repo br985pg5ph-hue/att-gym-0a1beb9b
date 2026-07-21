@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
+import { ammanNow, toAmmanDateKey } from "@/lib/time";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/book")({
@@ -23,21 +24,6 @@ const TYPES = [
   { key: "kids", labelKey: "kids" as const },
 ];
 
-const AMMAN_TZ = "Asia/Amman";
-function fmtDay(d: Date) {
-  // Format YYYY-MM-DD in Amman local time, regardless of the device's timezone.
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: AMMAN_TZ, year: "numeric", month: "2-digit", day: "2-digit",
-  }).formatToParts(d);
-  const y = parts.find((p) => p.type === "year")!.value;
-  const m = parts.find((p) => p.type === "month")!.value;
-  const day = parts.find((p) => p.type === "day")!.value;
-  return `${y}-${m}-${day}`;
-}
-function ammanNow(): Date {
-  // A Date whose local getters (year/month/date) reflect Amman wall-clock time.
-  return new Date(new Date().toLocaleString("en-US", { timeZone: AMMAN_TZ }));
-}
 
 function BookPage() {
   const { t } = useLang();
@@ -46,13 +32,13 @@ function BookPage() {
   const parentMode = !!profile?.is_parent;
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState(fmtDay(new Date()));
+  const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
   const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
   // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
   const today = ammanNow();
-  const todayKey = fmtDay(new Date());
+  const todayKey = toAmmanDateKey(new Date());
   const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
   const y = viewedMonth.getFullYear();
@@ -172,7 +158,7 @@ function BookPage() {
     setViewedMonth(next);
     const sel = new Date(selectedDate);
     if (sel.getFullYear() !== next.getFullYear() || sel.getMonth() !== next.getMonth()) {
-      setSelectedDate(fmtDay(next));
+      setSelectedDate(toAmmanDateKey(next));
     }
   };
 
@@ -213,7 +199,7 @@ function BookPage() {
           <div className="mt-2 grid grid-cols-7 gap-1">
             {cells.map((d, i) => {
               if (!d) return <div key={i} />;
-              const key = fmtDay(d);
+              const key = toAmmanDateKey(d);
               const hasBooking = daysWithBookings.has(key);
               const active = key === selectedDate;
               const isToday = key === todayKey;
