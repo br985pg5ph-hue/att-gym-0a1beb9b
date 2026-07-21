@@ -38,7 +38,7 @@ function BookPage() {
 
   // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
   const today = ammanNow();
-  const todayKey = fmtDay(new Date());
+  const todayKey = toAmmanDateKey(new Date());
   const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const [viewedMonth, setViewedMonth] = useState<Date>(currentMonthStart);
   const y = viewedMonth.getFullYear();
