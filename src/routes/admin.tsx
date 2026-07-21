@@ -584,7 +584,7 @@ function MembersAdmin() {
                 <div className="min-w-0 flex-1">
                   <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
                   {m.member_code && (
-                    <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">{m.member_code}</p>
+                    <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">Member ID: {m.member_code}</p>
                   )}
                   <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
                     {m.role} • {m.membership_status}
