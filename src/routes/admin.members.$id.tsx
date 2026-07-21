@@ -301,7 +301,9 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
   });
 
   const selectedChild = kids.find((k) => k.id === childId);
-  const targetBalance = childId ? (0 ?? 0) : memberBalance;
+  void selectedChild;
+  const targetBalance = childId ? 0 : memberBalance;
+
   const noCredits = targetBalance <= 0;
 
   const bookedClassIds = new Set(
