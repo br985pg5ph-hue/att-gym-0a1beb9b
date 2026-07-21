@@ -12,6 +12,15 @@ export const Route = createFileRoute("/admin/members/$id")({
   component: MemberDetailPage,
 });
 
+function formatGroupStatus(until: string | null | undefined): string {
+  if (!until) return "Group: none";
+  const d = new Date(until);
+  if (isNaN(d.getTime())) return "Group: none";
+  if (d.getTime() <= Date.now()) return "Group: expired";
+  return `Group: active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+
 function MemberDetailPage() {
   const { id } = Route.useParams();
   const nav = useNavigate();
@@ -22,12 +31,13 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, phone, membership_status, pt_sessions_remaining, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until)")
+        .select("id, name, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
     },
   });
+
 
   const { data: bookings = [] } = useQuery({
     queryKey: ["admin-member-bookings", id],
@@ -40,42 +50,76 @@ function MemberDetailPage() {
   const { data: txns = [] } = useQuery({
     queryKey: ["admin-member-txns", id],
     queryFn: async () => (await supabase.from("transactions")
-      .select("id, classes, type, source, payment_method, description, created_at, child_id, children(name)")
+      .select("id, classes, days, service, type, source, payment_method, description, created_at, child_id, children(name)")
       .eq("member_id", id)
       .order("created_at", { ascending: false })
       .limit(30)).data ?? [],
   });
 
-  const [adjustOpen, setAdjustOpen] = useState(false);
-  const [adjChildId, setAdjChildId] = useState("");
-  const [adjClasses, setAdjClasses] = useState(1);
-  const [adjType, setAdjType] = useState<"credit" | "debit">("debit");
-  const [adjNote, setAdjNote] = useState("");
+  const [ptAdjustOpen, setPtAdjustOpen] = useState(false);
+  const [ptAdjSessions, setPtAdjSessions] = useState(1);
+  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
+  const [ptAdjNote, setPtAdjNote] = useState("");
+
+  const [grpAdjustOpen, setGrpAdjustOpen] = useState(false);
+  const [grpAdjChildId, setGrpAdjChildId] = useState("");
+  const [grpAdjDays, setGrpAdjDays] = useState(30);
+  const [grpAdjType, setGrpAdjType] = useState<"credit" | "debit">("credit");
+  const [grpAdjNote, setGrpAdjNote] = useState("");
+
   const [bookOpen, setBookOpen] = useState(false);
 
-  const adjust = useMutation({
+  const adjustPT = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("transactions").insert({
         member_id: id,
-        child_id: adjChildId || null,
-        classes: adjClasses,
-        type: adjType,
+        child_id: null,
+        service: "pt",
+        classes: ptAdjSessions,
+        type: ptAdjType,
         source: "admin_adjustment",
-        payment_method: adjType === "credit" ? "cash" : null,
-        description: adjNote || (adjType === "debit" ? "Admin removed classes" : "Admin added classes"),
+        payment_method: ptAdjType === "credit" ? "cash" : null,
+        description: ptAdjNote || (ptAdjType === "debit" ? "Admin removed PT sessions" : "Admin added PT sessions"),
         created_by: user!.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Balance updated");
-      setAdjustOpen(false); setAdjChildId(""); setAdjClasses(1); setAdjNote(""); setAdjType("debit");
+      toast.success("PT sessions updated");
+      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit");
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const adjustGroup = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("transactions").insert({
+        member_id: id,
+        child_id: grpAdjChildId || null,
+        service: "group",
+        classes: 0,
+        days: grpAdjDays,
+        type: grpAdjType,
+        source: "admin_adjustment",
+        payment_method: grpAdjType === "credit" ? "cash" : null,
+        description: grpAdjNote || (grpAdjType === "debit" ? "Admin removed membership days" : "Admin added membership days"),
+        created_by: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Group membership updated");
+      setGrpAdjustOpen(false); setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit");
+      qc.invalidateQueries({ queryKey: ["admin-member", id] });
+      qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
 
   const cancelBooking = useMutation({
     mutationFn: async (bid: string) => {
@@ -111,10 +155,11 @@ function MemberDetailPage() {
         {/* Overview */}
         <section className="card-surface p-4">
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div><p className="font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Classes left</p></div>
+            <div><p className="font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">PT left</p></div>
             <div><p className="font-display text-3xl leading-none">{member?.classes_attended ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Attended</p></div>
             <div><p className="font-display text-3xl leading-none">{member?.streak ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Streak</p></div>
           </div>
+          <p className="mt-3 text-center text-xs text-muted-foreground">{formatGroupStatus((member as any)?.group_subscription_until)}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-widest">
             <span className={`rounded-pill px-2 py-0.5 font-semibold ${member?.membership_status === "active" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>{member?.membership_status || "—"}</span>
             {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 font-semibold">Parent</span>}
@@ -130,50 +175,42 @@ function MemberDetailPage() {
               {kids.map((k: any) => (
                 <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-sm">
                   <span>{k.name}</span>
-                  <span className="text-xs text-muted-foreground">{0} left</span>
+                  <span className="text-xs text-muted-foreground">{formatGroupStatus(k.group_subscription_until)}</span>
                 </li>
               ))}
             </ul>
           </section>
         )}
 
-        {/* Adjust classes */}
+        {/* Adjust PT sessions */}
         <section className="card-surface p-4">
           <div className="flex items-center justify-between">
-            <p className="font-display text-lg leading-none">Adjust classes</p>
-            {!adjustOpen && (
-              <button onClick={()=>setAdjustOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">Add / Remove</button>
+            <p className="font-display text-lg leading-none">Adjust PT sessions</p>
+            {!ptAdjustOpen && (
+              <button onClick={()=>setPtAdjustOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">Add / Remove</button>
             )}
           </div>
-          {adjustOpen && (
+          {ptAdjustOpen && (
             <div className="mt-3 space-y-2">
               <div className="grid grid-cols-2 gap-2">
-                <button onClick={()=>setAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${adjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add</button>
-                <button onClick={()=>setAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${adjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
+                <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add</button>
+                <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
               </div>
-              {kids.length > 0 && (
-                <select value={adjChildId} onChange={(e)=>setAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                  <option value="">Apply to {member?.name || "member"}</option>
-                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                </select>
-              )}
-              <input type="number" min={1} value={adjClasses} onChange={(e)=>setAdjClasses(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# classes"/>
+              <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
               {(() => {
-                const available = adjChildId
-                  ? (0)
-                  : (member?.pt_sessions_remaining ?? 0);
-                const overDraw = adjType === "debit" && adjClasses > available;
+                const available = member?.pt_sessions_remaining ?? 0;
+                const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
                 return (
                   <>
-                    {adjType === "debit" && (
+                    {ptAdjType === "debit" && (
                       <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
                     )}
-                    <input placeholder="Note (optional)" value={adjNote} onChange={(e)=>setAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                    <input placeholder="Note (optional)" value={ptAdjNote} onChange={(e)=>setPtAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
                     <div className="flex gap-2">
-                      <button onClick={()=>adjust.mutate()} disabled={adjust.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${adjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                        {adjType==="credit" ? "Add" : "Remove"} {adjClasses} {adjClasses===1 ? "class" : "classes"}
+                      <button onClick={()=>adjustPT.mutate()} disabled={adjustPT.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                        {ptAdjType==="credit" ? "Add" : "Remove"} {ptAdjSessions} PT {ptAdjSessions===1 ? "session" : "sessions"}
                       </button>
-                      <button onClick={()=>setAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                      <button onClick={()=>setPtAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
                     </div>
                   </>
                 );
@@ -181,6 +218,47 @@ function MemberDetailPage() {
             </div>
           )}
         </section>
+
+        {/* Adjust group membership */}
+        <section className="card-surface p-4">
+          <div className="flex items-center justify-between">
+            <p className="font-display text-lg leading-none">Adjust group membership</p>
+            {!grpAdjustOpen && (
+              <button onClick={()=>setGrpAdjustOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">Add / Remove</button>
+            )}
+          </div>
+          {grpAdjustOpen && (
+            <div className="mt-3 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={()=>setGrpAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add days</button>
+                <button onClick={()=>setGrpAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove days</button>
+              </div>
+              {kids.length > 0 && (
+                <select value={grpAdjChildId} onChange={(e)=>setGrpAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                  <option value="">Apply to {member?.name || "member"}</option>
+                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                </select>
+              )}
+              <div className="flex gap-2">
+                {[30, 90, 365].map(d => (
+                  <button key={d} onClick={()=>setGrpAdjDays(d)}
+                    className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
+                    {d===30?"1 month":d===90?"3 months":"12 months"}
+                  </button>
+                ))}
+              </div>
+              <input type="number" min={1} value={grpAdjDays} onChange={(e)=>setGrpAdjDays(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# days"/>
+              <input placeholder="Note (optional)" value={grpAdjNote} onChange={(e)=>setGrpAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+              <div className="flex gap-2">
+                <button onClick={()=>adjustGroup.mutate()} disabled={adjustGroup.isPending || grpAdjDays < 1} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                  {grpAdjType==="credit" ? "Add" : "Remove"} {grpAdjDays} days
+                </button>
+                <button onClick={()=>setGrpAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+              </div>
+            </div>
+          )}
+        </section>
+
 
         {/* Book a class */}
         <section className="card-surface flex items-center justify-between p-4">
@@ -233,21 +311,29 @@ function MemberDetailPage() {
           <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Class transactions</p>
           <div className="space-y-1">
             {txns.length === 0 && <p className="text-xs text-muted-foreground">No transactions yet</p>}
-            {txns.map((t: any) => (
-              <div key={t.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
-                <div className="min-w-0">
-                  <p className="truncate">
-                    <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
-                      {t.type === "credit" ? "+" : "−"}{t.classes}
-                    </span>{" "}
-                    <span className="text-muted-foreground">{t.source || t.type}</span>
-                    {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
-                  </p>
-                  {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+            {txns.map((t: any) => {
+              const isGroup = t.service === "group";
+              const amount = isGroup ? (t.days ?? 0) : (t.classes ?? 0);
+              const unit = isGroup
+                ? (amount === 1 ? "day membership" : "days membership")
+                : (amount === 1 ? "PT session" : "PT sessions");
+              return (
+                <div key={t.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
+                  <div className="min-w-0">
+                    <p className="truncate">
+                      <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
+                        {t.type === "credit" ? "+" : "−"}{amount} {unit}
+                      </span>{" "}
+                      <span className="text-muted-foreground">{t.source || t.type}</span>
+                      {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
+                    </p>
+                    {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+                  </div>
+                  <span className="shrink-0 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
                 </div>
-                <span className="shrink-0 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
-              </div>
-            ))}
+              );
+            })}
+
           </div>
         </section>
       </main>
