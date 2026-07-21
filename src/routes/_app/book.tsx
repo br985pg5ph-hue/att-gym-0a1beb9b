@@ -25,8 +25,8 @@ function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
 
 function BookPage() {
   const { t } = useLang();
-  const { user, profile } = useAuth();
-  const { selectedChild } = useChildren();
+  const { user, profile, refresh } = useAuth();
+  const { selectedChild, refreshChildren } = useChildren();
   const parentMode = !!profile?.is_parent;
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
@@ -118,7 +118,11 @@ function BookPage() {
       qc.invalidateQueries({ queryKey: ["all-bookings"] });
       qc.invalidateQueries({ queryKey: ["class-counts"] });
       qc.invalidateQueries({ queryKey: ["next-booking"] });
+      qc.invalidateQueries({ queryKey: ["txns"] });
+      refresh();
+      refreshChildren();
     },
+
     onError: (e: any) => toast.error(e.message ?? "Booking failed"),
   });
 

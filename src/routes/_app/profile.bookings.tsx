@@ -11,9 +11,10 @@ export const Route = createFileRoute("/_app/profile/bookings")({
 });
 
 function BookingsPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth();
   const { t } = useLang();
-  const { children: kids } = useChildren();
+  const { children: kids, refreshChildren } = useChildren();
+
   const parentMode = !!profile?.is_parent;
   const qc = useQueryClient();
 
@@ -32,7 +33,7 @@ function BookingsPage() {
       const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Cancelled"); qc.invalidateQueries({ queryKey: ["all-bookings"] }); qc.invalidateQueries({ queryKey: ["my-bookings"] }); qc.invalidateQueries({ queryKey: ["class-counts"] }); qc.invalidateQueries({ queryKey: ["next-booking"] }); },
+    onSuccess: () => { toast.success("Cancelled"); qc.invalidateQueries({ queryKey: ["all-bookings"] }); qc.invalidateQueries({ queryKey: ["my-bookings"] }); qc.invalidateQueries({ queryKey: ["class-counts"] }); qc.invalidateQueries({ queryKey: ["next-booking"] }); qc.invalidateQueries({ queryKey: ["txns"] }); refresh(); refreshChildren(); },
   });
 
   const now = Date.now();
