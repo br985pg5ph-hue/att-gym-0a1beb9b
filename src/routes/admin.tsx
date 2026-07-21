@@ -494,7 +494,7 @@ function MembersAdmin() {
   const [childId, setChildId] = useState<string>("");
   const [days, setDays] = useState<number>(30);
   const [sessions, setSessions] = useState<number>(10);
-  const [method, setMethod] = useState<"cash" | "cliq">("cash");
+  const [method, setMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
 
   const resetForm = () => {
@@ -679,11 +679,11 @@ function MembersAdmin() {
                   )}
 
                   <select
-                    value={method} onChange={(e)=>setMethod(e.target.value as "cash"|"cliq")}
+                    value={method} onChange={(e)=>setMethod(e.target.value as "cash"|"card")}
                     className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
                   >
                     <option value="cash">Cash</option>
-                    <option value="cliq">Cliq</option>
+                    <option value="card">Cliq</option>
                   </select>
                   <input
                     placeholder="Note (optional)"
