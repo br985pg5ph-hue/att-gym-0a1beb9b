@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
-import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2 } from "lucide-react";
+import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 async function fileToAvatarBlob(file: File, size = 256): Promise<Blob> {
@@ -48,6 +48,7 @@ function EditProfilePage() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
+  const [dob, setDob] = useState("");
   const [avatarSaving, setAvatarSaving] = useState(false);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +104,7 @@ function EditProfilePage() {
   useEffect(() => {
     if (profile) {
       setName(profile.name || "");
+      setDob((profile as any).date_of_birth || "");
       const full = profile.phone || "";
       const matched = COUNTRIES.slice().sort((a, b) => b.code.length - a.code.length).find((c) => full.startsWith(c.code));
       if (matched) {
@@ -121,7 +123,7 @@ function EditProfilePage() {
     mutationFn: async () => {
       if (!user) throw new Error("Not signed in");
       if (!name.trim()) throw new Error("Name is required");
-      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null }).eq("id", user.id);
+      const { error } = await supabase.from("profiles").update({ name: name.trim(), phone: fullPhone || null, date_of_birth: dob || null } as any).eq("id", user.id);
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Profile updated"); await refresh(); qc.invalidateQueries({ queryKey: ["profile"] }); },
@@ -206,6 +208,9 @@ function EditProfilePage() {
               </div>
             </div>
           </label>
+          <Field icon={<Calendar size={16} />} label="Date of birth">
+            <input value={dob} onChange={(e)=>setDob(e.target.value)} type="date" className="w-full bg-transparent text-sm outline-none" />
+          </Field>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
           </button>
