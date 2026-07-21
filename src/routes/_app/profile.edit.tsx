@@ -208,6 +208,9 @@ function EditProfilePage() {
               </div>
             </div>
           </label>
+          <Field icon={<Calendar size={16} />} label="Date of birth">
+            <input value={dob} onChange={(e)=>setDob(e.target.value)} type="date" className="w-full bg-transparent text-sm outline-none" />
+          </Field>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
           </button>
