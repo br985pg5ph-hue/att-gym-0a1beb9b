@@ -95,7 +95,7 @@ function BookPage() {
   );
 
   const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
-  const remaining = bookingForChild ? (bookingForChild.classes_remaining ?? 0) : (profile?.classes_remaining ?? 0);
+  const remaining = bookingForChild ? (0) : (profile?.pt_sessions_remaining ?? 0);
   const noCredits = remaining <= 0;
 
   const daySlots = classes.filter((c: any) => {

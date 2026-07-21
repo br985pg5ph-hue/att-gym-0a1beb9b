@@ -30,7 +30,7 @@ function MembershipPage() {
         <div className="card-surface p-6 bg-gradient-to-br from-primary/25 to-transparent">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Classes Remaining</p>
           <p className="font-display mt-1 text-6xl leading-none">
-            {profile?.classes_remaining ?? 0}
+            {profile?.pt_sessions_remaining ?? 0}
             <span className="ml-2 text-xl text-muted-foreground">classes left</span>
           </p>
           <p className="mt-3 text-xs text-muted-foreground">

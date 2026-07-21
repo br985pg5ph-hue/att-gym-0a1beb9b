@@ -22,7 +22,7 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, phone, membership_status, classes_remaining, streak, classes_attended, is_parent, created_at, children(id, name, classes_remaining)")
+        .select("id, name, phone, membership_status, pt_sessions_remaining, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
@@ -111,7 +111,7 @@ function MemberDetailPage() {
         {/* Overview */}
         <section className="card-surface p-4">
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div><p className="font-display text-3xl leading-none">{member?.classes_remaining ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Classes left</p></div>
+            <div><p className="font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Classes left</p></div>
             <div><p className="font-display text-3xl leading-none">{member?.classes_attended ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Attended</p></div>
             <div><p className="font-display text-3xl leading-none">{member?.streak ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Streak</p></div>
           </div>
@@ -130,7 +130,7 @@ function MemberDetailPage() {
               {kids.map((k: any) => (
                 <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-sm">
                   <span>{k.name}</span>
-                  <span className="text-xs text-muted-foreground">{k.classes_remaining ?? 0} left</span>
+                  <span className="text-xs text-muted-foreground">{0} left</span>
                 </li>
               ))}
             </ul>
@@ -160,8 +160,8 @@ function MemberDetailPage() {
               <input type="number" min={1} value={adjClasses} onChange={(e)=>setAdjClasses(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# classes"/>
               {(() => {
                 const available = adjChildId
-                  ? (kids.find((k: any) => k.id === adjChildId)?.classes_remaining ?? 0)
-                  : (member?.classes_remaining ?? 0);
+                  ? (0)
+                  : (member?.pt_sessions_remaining ?? 0);
                 const overDraw = adjType === "debit" && adjClasses > available;
                 return (
                   <>
@@ -256,7 +256,7 @@ function MemberDetailPage() {
         <BookClassModal
           memberId={id}
           memberName={member.name || "Member"}
-          memberBalance={member.classes_remaining ?? 0}
+          memberBalance={member.pt_sessions_remaining ?? 0}
           kids={kids}
           existingUpcoming={upcoming}
           onClose={()=>setBookOpen(false)}
@@ -301,7 +301,7 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
   });
 
   const selectedChild = kids.find((k) => k.id === childId);
-  const targetBalance = childId ? (selectedChild?.classes_remaining ?? 0) : memberBalance;
+  const targetBalance = childId ? (0 ?? 0) : memberBalance;
   const noCredits = targetBalance <= 0;
 
   const bookedClassIds = new Set(
