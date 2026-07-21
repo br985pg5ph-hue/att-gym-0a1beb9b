@@ -420,7 +420,7 @@ export type Database = {
     Enums: {
       app_role: "member" | "staff"
       booking_status: "upcoming" | "completed" | "cancelled"
-      class_type: "pt" | "women_only" | "mixed" | "kids"
+      class_type: "pt" | "women_only" | "mixed" | "kids" | "yoga" | "gymnastics"
       payment_method: "cash" | "card"
       txn_type: "credit" | "debit"
     }
@@ -552,7 +552,7 @@ export const Constants = {
     Enums: {
       app_role: ["member", "staff"],
       booking_status: ["upcoming", "completed", "cancelled"],
-      class_type: ["pt", "women_only", "mixed", "kids"],
+      class_type: ["pt", "women_only", "mixed", "kids", "yoga", "gymnastics"],
       payment_method: ["cash", "card"],
       txn_type: ["credit", "debit"],
     },
