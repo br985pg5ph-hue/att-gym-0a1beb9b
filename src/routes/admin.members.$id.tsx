@@ -74,7 +74,7 @@ function MemberDetailPage() {
     mutationFn: async () => {
       const { error } = await supabase.from("transactions").insert({
         member_id: id,
-        child_id: null,
+        child_id: ptAdjChildId || null,
         service: "pt",
         classes: ptAdjSessions,
         type: ptAdjType,
@@ -87,7 +87,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit");
+      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId("");
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
