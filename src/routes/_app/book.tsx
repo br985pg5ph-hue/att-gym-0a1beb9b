@@ -26,7 +26,7 @@ function fmtDay(d: Date) { return d.toISOString().slice(0, 10); }
 function BookPage() {
   const { t } = useLang();
   const { user, profile, refresh } = useAuth();
-  const { selectedChild } = useChildren();
+  const { selectedChild, refreshChildren } = useChildren();
   const parentMode = !!profile?.is_parent;
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
