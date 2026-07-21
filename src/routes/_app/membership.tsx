@@ -57,7 +57,7 @@ function MembershipPage() {
             <span className="ml-2 text-xl text-muted-foreground">left</span>
           </p>
           <p className="mt-3 text-xs text-muted-foreground">
-            Pay at the gym (cash or card) and staff will top up your sessions here.
+            Pay at the gym (cash or cliq) and staff will top up your sessions here.
           </p>
         </div>
 
