@@ -158,7 +158,7 @@ function BookPage() {
     setViewedMonth(next);
     const sel = new Date(selectedDate);
     if (sel.getFullYear() !== next.getFullYear() || sel.getMonth() !== next.getMonth()) {
-      setSelectedDate(fmtDay(next));
+      setSelectedDate(toAmmanDateKey(next));
     }
   };
 
