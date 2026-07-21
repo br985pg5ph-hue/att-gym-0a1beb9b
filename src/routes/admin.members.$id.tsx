@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,12 +9,6 @@ import { ArrowLeft, Minus, Plus, X, Mail, Phone, CalendarPlus } from "lucide-rea
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    const { data: prof } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
-    if (prof?.role !== "staff") throw redirect({ to: "/home" });
-  },
   component: MemberDetailPage,
 });
 
