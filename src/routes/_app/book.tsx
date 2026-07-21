@@ -253,12 +253,14 @@ function BookPage() {
 
         {(() => {
           const warnings: string[] = [];
+          const showGroup = filter === "all" || ["mixed", "women_only", "yoga", "gymnastics", "kids"].includes(filter);
+          const showPt = filter === "all" || filter === "pt";
           if (bookingForChild) {
-            if (!groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
-            if (ptRemainingChild <= 0) warnings.push(`${bookingForChild.name} has no PT sessions — visit the gym to add more`);
+            if (showGroup && !groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
+            if (showPt && ptRemainingChild <= 0) warnings.push(`${bookingForChild.name} has no PT sessions — visit the gym to add more`);
           } else {
-            if (!groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
-            if (ptRemainingSelf <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
+            if (showGroup && !groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
+            if (showPt && ptRemainingSelf <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
           }
           if (warnings.length === 0) return null;
           return (
