@@ -202,6 +202,7 @@ function BookPage() {
               if (!d) return <div key={i} />;
               const key = toAmmanDateKey(d);
               const hasBooking = daysWithBookings.has(key);
+              const hasClass = daysWithClasses.has(key);
               const active = key === selectedDate;
               const isToday = key === todayKey;
               return (
@@ -211,7 +212,9 @@ function BookPage() {
                     isToday ? "border hairline" : "hover:bg-muted"
                   }`}>
                   {d.getDate()}
-                  {hasBooking && !active && <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
+                  {!active && (hasBooking || hasClass) && (
+                    <span className={`absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full ${hasBooking ? "bg-primary" : "bg-muted-foreground/60"}`} />
+                  )}
                 </button>
               );
             })}
