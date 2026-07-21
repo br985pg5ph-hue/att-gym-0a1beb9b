@@ -683,7 +683,7 @@ function MembersAdmin() {
                     className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
                   >
                     <option value="cash">Cash</option>
-                    <option value="card">Card</option>
+                    <option value="card">Cliq</option>
                   </select>
                   <input
                     placeholder="Note (optional)"
