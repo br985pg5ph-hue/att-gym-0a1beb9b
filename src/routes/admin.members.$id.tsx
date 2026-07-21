@@ -60,6 +60,7 @@ function MemberDetailPage() {
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
   const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
   const [ptAdjNote, setPtAdjNote] = useState("");
+  const [ptAdjChildId, setPtAdjChildId] = useState("");
 
   const [grpAdjustOpen, setGrpAdjustOpen] = useState(false);
   const [grpAdjChildId, setGrpAdjChildId] = useState("");
