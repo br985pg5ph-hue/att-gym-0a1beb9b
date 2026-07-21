@@ -151,7 +151,30 @@ function ClassesAdmin() {
   const [endDate, setEndDate] = useState("");
 
   const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-...
+  const { data: classes = [] } = useQuery({
+    queryKey: ["admin-classes", cutoff],
+    queryFn: async () => {
+      const { data: cls } = await supabase.from("classes")
+        .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status, member_id, child_id, children(name))")
+        .gte("starts_at", cutoff)
+        .is("cancelled_at", null)
+        .order("starts_at");
+      const list = cls ?? [];
+      const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
+      let nameMap: Record<string, string> = {};
+      if (memberIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, name").in("id", memberIds);
+        nameMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.name]));
+      }
+      return list.map((c: any) => ({
+        ...c,
+        bookings: (c.bookings ?? []).map((b: any) => ({ ...b, profiles: { name: nameMap[b.member_id] ?? "Member" } })),
+      }));
+    },
+  });
+  const { data: coaches = [] } = useQuery({
+    queryKey: ["coaches"], queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [],
+  });
   const create = useMutation({
     mutationFn: async () => {
       if (recurring) {
@@ -177,7 +200,24 @@ function ClassesAdmin() {
     onSuccess: (n) => { setTitle(""); setStartsAt(""); setEndDate(""); setRecurring(false); toast.success(n && n > 1 ? `${n} classes added` : "Class added"); qc.invalidateQueries({ queryKey: ["admin-classes"] }); qc.invalidateQueries({ queryKey: ["classes"] }); },
     onError: (e: any) => toast.error(e.message),
   });
-...
+  const cancelClass = useMutation({
+    mutationFn: async (id: string) => {
+      const { error: bErr } = await supabase.from("bookings").update({ status: "cancelled" }).eq("class_id", id).eq("status", "upcoming");
+      if (bErr) throw bErr;
+      const { error } = await supabase.from("classes").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Class cancelled");
+      qc.invalidateQueries({ queryKey: ["admin-classes"] });
+      qc.invalidateQueries({ queryKey: ["classes"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const removeAttendee = useMutation({
+    mutationFn: async (bid: string) => { await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bid); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-classes"] }),
+  });
   return (
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
