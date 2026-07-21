@@ -98,6 +98,7 @@ export type Database = {
           injuries_notes: string | null
           name: string
           parent_id: string
+          pt_sessions_remaining: number
           streak: number
           updated_at: string
         }
@@ -115,6 +116,7 @@ export type Database = {
           injuries_notes?: string | null
           name: string
           parent_id: string
+          pt_sessions_remaining?: number
           streak?: number
           updated_at?: string
         }
@@ -132,6 +134,7 @@ export type Database = {
           injuries_notes?: string | null
           name?: string
           parent_id?: string
+          pt_sessions_remaining?: number
           streak?: number
           updated_at?: string
         }
