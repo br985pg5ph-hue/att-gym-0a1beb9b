@@ -275,9 +275,7 @@ function ClassesAdmin() {
   });
 
   const openEdit = (c: any) => {
-    const d = new Date(c.starts_at);
-    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-    setEditForm({ title: c.title ?? "", starts_at: local, capacity: c.capacity, coach_id: c.coach_id ?? "", type: c.type });
+    setEditForm({ title: c.title ?? "", starts_at: toAmmanDateInput(new Date(c.starts_at)), capacity: c.capacity, coach_id: c.coach_id ?? "", type: c.type });
     setEditId(c.id);
   };
 
