@@ -264,7 +264,8 @@ function BookPage() {
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
             const eligible = isEligible(c.type);
-            const disabled = full || booked || !eligible;
+            const past = new Date(c.starts_at).getTime() <= Date.now();
+            const disabled = full || booked || !eligible || past;
             return (
               <button key={c.id} onClick={() => !disabled && setPickedId(picked ? null : c.id)}
                 className={`card-surface flex w-full items-center justify-between p-4 text-start transition ${
@@ -276,14 +277,14 @@ function BookPage() {
                     {new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     {c.coaches?.name && ` • ${c.coaches.name}`}
                   </p>
-                  {!eligible && !booked && !full && (
+                  {!eligible && !booked && !full && !past && (
                     <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type)}</p>
                   )}
                 </div>
                 <span className={`shrink-0 rounded-pill px-3 py-1 text-[10px] font-semibold uppercase ${
-                  booked ? "bg-silver/20 text-silver" : full ? "bg-destructive/20 text-destructive" : "bg-primary/15 text-primary"
+                  booked ? "bg-silver/20 text-silver" : (full || past) ? "bg-destructive/20 text-destructive" : "bg-primary/15 text-primary"
                 }`}>
-                  {booked ? t.booked : full ? t.full : `${c.capacity - cnt} ${t.slotsLeft}`}
+                  {booked ? t.booked : past ? "Started" : full ? t.full : `${c.capacity - cnt} ${t.slotsLeft}`}
                 </span>
               </button>
             );
