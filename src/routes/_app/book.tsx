@@ -33,7 +33,7 @@ function BookPage() {
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
-  const [filter, setFilter] = useState<string>(bookingForChild ? "kids" : "all");
+  const [filter, setFilter] = useState<string>("all");
   const [pickedId, setPickedId] = useState<string | null>(null);
 
   // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
