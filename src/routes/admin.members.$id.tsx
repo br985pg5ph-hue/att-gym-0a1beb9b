@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Mail, Phone, CalendarPlus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
