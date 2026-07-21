@@ -146,7 +146,9 @@ function MemberDetailPage() {
       <header className="flex items-center gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
         <button onClick={()=>nav({ to: "/admin" })} className="rounded-pill border hairline p-2"><ArrowLeft size={16}/></button>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Member</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Member{(member as any)?.member_code ? <> · <span className="font-mono text-primary">{(member as any).member_code}</span></> : null}
+          </p>
           <h1 className="font-display text-2xl leading-none truncate">{member?.name || "—"}</h1>
         </div>
         <Logo size={32} />
