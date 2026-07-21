@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
-import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2 } from "lucide-react";
+import { ChevronLeft, User, Mail, Phone, Lock, Camera, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 async function fileToAvatarBlob(file: File, size = 256): Promise<Blob> {
