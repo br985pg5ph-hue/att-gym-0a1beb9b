@@ -98,27 +98,31 @@ function BookPage() {
   );
   const daysWithClasses = new Set(classes.map((c: any) => c.starts_at.slice(0, 10)));
 
-  const effectiveFilter = bookingForChild ? "kids" : (filter === "kids" ? "all" : filter);
-  const ptRemaining = profile?.pt_sessions_remaining ?? 0;
+  // Adult sees all; child sees only kids + pt
+  const effectiveFilter = bookingForChild ? (filter === "pt" ? "pt" : filter === "kids" ? "kids" : "all") : (filter === "kids" ? "all" : filter);
+  const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
+  const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
   const groupActiveSelf = !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
   const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
 
   const isEligible = (type: string) => {
     if (type === "kids") return groupActiveChild;
-    if (type === "pt") return !bookingForChild && ptRemaining > 0;
-    // mixed / women_only / yoga / gymnastics
+    if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
+    // mixed / women_only / yoga / gymnastics — adult group only
     return !bookingForChild && groupActiveSelf;
   };
 
   const eligibilityMessage = (type: string): string => {
     if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
-    if (type === "pt") return "No PT sessions remaining";
+    if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions remaining` : "No PT sessions remaining";
     return "Your group membership isn't active";
   };
 
   const daySlots = classes.filter((c: any) => {
     if (c.starts_at.slice(0, 10) !== selectedDate) return false;
+    // Adults never see kids classes; children only see kids or pt
     if (!bookingForChild && c.type === "kids") return false;
+    if (bookingForChild && c.type !== "kids" && c.type !== "pt") return false;
     return effectiveFilter === "all" || c.type === effectiveFilter;
   });
 
