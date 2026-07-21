@@ -87,13 +87,13 @@ export type Database = {
         Row: {
           avatar_url: string | null
           classes_attended: number
-          classes_remaining: number
           created_at: string
           date_of_birth: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           experience_level: string | null
           gender: string | null
+          group_subscription_until: string | null
           id: string
           injuries_notes: string | null
           name: string
@@ -104,13 +104,13 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           classes_attended?: number
-          classes_remaining?: number
           created_at?: string
           date_of_birth?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           experience_level?: string | null
           gender?: string | null
+          group_subscription_until?: string | null
           id?: string
           injuries_notes?: string | null
           name: string
@@ -121,13 +121,13 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           classes_attended?: number
-          classes_remaining?: number
           created_at?: string
           date_of_birth?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           experience_level?: string | null
           gender?: string | null
+          group_subscription_until?: string | null
           id?: string
           injuries_notes?: string | null
           name?: string
@@ -259,11 +259,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           classes_attended: number
-          classes_remaining: number
           created_at: string
           disciplines: string[]
           experience_level: string | null
           goals: string[]
+          group_subscription_until: string | null
           id: string
           injuries: string | null
           interests: string[]
@@ -272,6 +272,7 @@ export type Database = {
           name: string
           onboarded: boolean
           phone: string | null
+          pt_sessions_remaining: number
           referral_code: string
           referral_reward_granted: boolean
           referred_by: string | null
@@ -282,11 +283,11 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           classes_attended?: number
-          classes_remaining?: number
           created_at?: string
           disciplines?: string[]
           experience_level?: string | null
           goals?: string[]
+          group_subscription_until?: string | null
           id: string
           injuries?: string | null
           interests?: string[]
@@ -295,6 +296,7 @@ export type Database = {
           name?: string
           onboarded?: boolean
           phone?: string | null
+          pt_sessions_remaining?: number
           referral_code?: string
           referral_reward_granted?: boolean
           referred_by?: string | null
@@ -305,11 +307,11 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           classes_attended?: number
-          classes_remaining?: number
           created_at?: string
           disciplines?: string[]
           experience_level?: string | null
           goals?: string[]
+          group_subscription_until?: string | null
           id?: string
           injuries?: string | null
           interests?: string[]
@@ -318,6 +320,7 @@ export type Database = {
           name?: string
           onboarded?: boolean
           phone?: string | null
+          pt_sessions_remaining?: number
           referral_code?: string
           referral_reward_granted?: boolean
           referred_by?: string | null
@@ -341,10 +344,12 @@ export type Database = {
           classes: number
           created_at: string
           created_by: string | null
+          days: number | null
           description: string | null
           id: string
           member_id: string
           payment_method: Database["public"]["Enums"]["payment_method"] | null
+          service: string
           source: string
           type: Database["public"]["Enums"]["txn_type"]
         }
@@ -353,10 +358,12 @@ export type Database = {
           classes: number
           created_at?: string
           created_by?: string | null
+          days?: number | null
           description?: string | null
           id?: string
           member_id: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          service?: string
           source?: string
           type: Database["public"]["Enums"]["txn_type"]
         }
@@ -365,10 +372,12 @@ export type Database = {
           classes?: number
           created_at?: string
           created_by?: string | null
+          days?: number | null
           description?: string | null
           id?: string
           member_id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          service?: string
           source?: string
           type?: Database["public"]["Enums"]["txn_type"]
         }
