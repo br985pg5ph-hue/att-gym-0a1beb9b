@@ -198,8 +198,15 @@ function MemberDetailPage() {
                 <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
               </div>
               <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
+              {kids.length > 0 && (
+                <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                  <option value="">Apply to {member?.name || "member"}</option>
+                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                </select>
+              )}
               {(() => {
-                const available = member?.pt_sessions_remaining ?? 0;
+                const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
+                const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
                 const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
                 return (
                   <>
