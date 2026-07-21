@@ -363,21 +363,19 @@ function MembersAdmin() {
               <button
                 type="button"
                 onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
-                className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
+                className="flex min-w-0 flex-1 items-start gap-3 text-left"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-display text-lg leading-none">{m.name || "—"}</p>
-                    {hasKids && (
-                      <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
-                        {kids.length} {kids.length === 1 ? "child" : "children"}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} classes left</p>
+                  <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                  <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground truncate">{m.role} • {m.membership_status} • {m.classes_remaining ?? 0} left</p>
+                  {hasKids && (
+                    <span className="mt-2 inline-flex items-center rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                      {kids.length} {kids.length === 1 ? "child" : "children"}
+                    </span>
+                  )}
                 </div>
                 {hasKids && (
-                  <span className="shrink-0 text-muted-foreground">
+                  <span className="mt-1 shrink-0 text-muted-foreground">
                     {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
                   </span>
                 )}
