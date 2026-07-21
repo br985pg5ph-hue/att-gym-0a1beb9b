@@ -484,10 +484,11 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until, pt_sessions_remaining)")
+      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until, pt_sessions_remaining)")
       .eq("role", "member")
       .order("name")).data ?? [],
   });
+  const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [addFor, setAddFor] = useState<string | null>(null);
   const [addKind, setAddKind] = useState<"group" | "pt">("group");
@@ -496,6 +497,14 @@ function MembersAdmin() {
   const [sessions, setSessions] = useState<number>(10);
   const [method, setMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
+
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? (data as any[]).filter((m) =>
+        (m.name ?? "").toLowerCase().includes(q) ||
+        (m.member_code ?? "").toLowerCase().includes(q)
+      )
+    : (data as any[]);
 
   const resetForm = () => {
     setAddFor(null); setChildId(""); setDays(30); setSessions(10); setMethod("cash"); setNote("");
