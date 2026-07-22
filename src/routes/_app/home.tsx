@@ -189,38 +189,41 @@ function HomePage() {
 
 
 
-        {/* Latest news */}
-        <Link to="/news" className="card-surface block p-4" data-tour="news-widget">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
-              <Newspaper size={20} />
+        {/* Latest news + Coaches */}
+        <div className="space-y-3" data-tour="news-widget">
+          <Link to="/news" className="card-surface block p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
+                <Newspaper size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.latestNews ?? "Latest News"}</p>
+                <p className="truncate text-sm font-medium">
+                  {latestNews?.title ?? "No announcements yet"}
+                </p>
+                {latestNews?.body && (
+                  <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{latestNews.body}</p>
+                )}
+              </div>
+              <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.latestNews ?? "Latest News"}</p>
-              <p className="truncate text-sm font-medium">
-                {latestNews?.title ?? "No announcements yet"}
-              </p>
-              {latestNews?.body && (
-                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{latestNews.body}</p>
-              )}
-            </div>
-            <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
-          </div>
-        </Link>
+          </Link>
 
-        {/* Coaches */}
-        <Link to="/coaches" className="card-surface block p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
-              <Users size={20} />
+          {/* Coaches */}
+          <Link to="/coaches" className="card-surface block p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
+                <Users size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.coaches}</p>
+                <p className="truncate text-sm font-medium">Meet the team</p>
+              </div>
+              <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.coaches}</p>
-              <p className="truncate text-sm font-medium">Meet the team</p>
-            </div>
-            <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
-          </div>
-        </Link>
+          </Link>
+        </div>
+
 
       </div>
     </div>
