@@ -1,45 +1,51 @@
-## Plan: Enhance Admin Dashboard
 
-Add three new data-rich widgets to the existing admin dashboard in `src/routes/admin.tsx`:
+## Playback of the rules
 
-### 1. Revenue Snapshot
-- Aggregate transactions by payment method (cash / Cliq) for today and this week.
-- Source: `transactions` table, filtered by `created_at` and `payment_method`.
-- Display as a compact KPI card or mini bar with two values: **Today** and **This Week**.
-- Only count `credit` transactions (payments received), ignore debits/refunds.
+- **Applies to:** Mixed, Women Only, Kids group classes.
+- **Exempt:** PT, Yoga, Gymnastics — no track, no monthly cap (unchanged).
+- **Packages:** 1 month or 3 months. Both cap at **12 classes per month**, counted on a **rolling 30-day window** anchored to the subscription's start date.
+- **Day tracks:** Track A = Sat / Mon / Wed. Track B = Sun / Tue / Thu.
+- **Track lock:** picked when the subscription is created/renewed and fixed for that subscription's lifetime. A new track can only be chosen on renewal (once the previous cycle ends, or if admin explicitly resets it).
+- **Kids:** each child has their own track, independent of the parent.
+- **Admin override:** staff can force-book any day for any member and bypass the cap.
 
-### 2. Signup Trend Chart
-- Count new `profiles` created per day over the last 7 and last 30 days.
-- Return an array of `{ date, count }` from the server function.
-- Render a simple CSS-only bar chart (no new charting library) showing daily signups.
-- Add a small toggle or tabs to switch between 7-day and 30-day views.
+## What changes
 
-### 3. Membership Status Breakdown
-- Categorize all members into:
-  - **Active** — has group subscription in future OR PT sessions > 0
-  - **Paused** — `membership_paused_at` is set
-  - **Expired** — group subscription in past and no PT credits
-  - **Never subscribed** — no subscription date and no PT credits
-- Source: `profiles` table.
-- Display as a horizontal stacked bar or segmented progress bar with counts.
+### 1. Database (one migration)
+- Add `group_track` (`'sat_mon_wed' | 'sun_tue_thu' | null`) and `group_subscription_started_at timestamptz` to `profiles` and `children`.
+- Update `sync_classes_remaining` (group branch) to also set `group_subscription_started_at = now()` on a fresh credit when there's no active cycle, and clear both `group_track` + `group_subscription_started_at` when the cycle lapses to null.
+- Update `consume_class_credit` trigger for group class types (`mixed`, `women_only`, `kids`):
+  - If booking `member_id` is the caller (self-booked, i.e. `created via a member RLS path` — detect via `has_role(auth.uid(), 'staff')`; staff bypass both checks), enforce:
+    - **Track check:** class weekday (Amman TZ) must match the profile/child `group_track`. Reject with "This class isn't on your booking days" if not.
+    - **Track missing:** if `group_track IS NULL` while a group subscription is active, reject with "Choose your booking days first."
+    - **Cap check:** count `bookings` for that member/child with `status='upcoming'` OR (attended past) whose class `starts_at` falls in the current rolling 30-day window from `group_subscription_started_at` (i.e. floor((now - start)/30d) window). Reject at ≥ 12 with "You've reached 12 classes this month."
+- Add `set_group_track(target_user uuid, target_child uuid, track text)` SECURITY DEFINER function so members can set their own track once per cycle (only when currently null), and staff can override any time.
 
-### Technical Approach
-- Extend `getAdminDashboardStats` in `src/lib/dashboard.functions.ts` to return the new aggregates.
-- Keep all queries inside the existing staff-auth guard and use `supabaseAdmin` for full visibility.
-- Update `DashboardAdmin` in `src/routes/admin.tsx` to render the new widgets.
-- Place the new widgets logically:
-  - Revenue snapshot and membership breakdown in the right-hand side column (under or above "Expiring Soon").
-  - Signup trend chart as a full-width card below the KPI grid or above recent transactions.
-- No schema changes required; all data is already available in existing tables.
-- No new npm dependencies; build the chart with divs and CSS.
+### 2. Admin (`src/routes/admin.members.$id.tsx`)
+- In the **Group Membership** card's "Renew or Add" flow, add a required Track selector (Track A / Track B) shown whenever the member has no active cycle. If they already have an active cycle with a locked track, show the current track read-only plus a small "Change track" button (staff-only override).
+- Show current track + classes-used-this-window (e.g. "7 / 12 this month") on the card.
+- Staff booking modal is unaffected — staff bookings bypass track/cap via the RLS check above.
 
-### Files to Modify
-- `src/lib/dashboard.functions.ts` — add revenue, signup trend, and membership breakdown queries.
-- `src/routes/admin.tsx` — render the three new dashboard widgets.
-- `src/lib/i18n.ts` — add any new translation keys needed (en/ar).
+### 3. Member UI
+- **Membership page (`src/routes/_app/membership.tsx`)** and profile: display locked track and usage `used / 12` for the current window. If subscription is active but `group_track` is null, show a "Choose your booking days" prompt with a one-time picker (Track A / Track B) calling `set_group_track`.
+- **Booking page (`src/routes/_app/book.tsx`)**:
+  - When the active bookee (self or selected child) has an active group subscription with a locked track, grey out calendar days that don't match the track and hide/disable group slots on off-track days with the message "Not your booking day."
+  - When at cap, disable remaining group slots in the current window with "12/12 this month."
+  - Kids classes already restricted to child bookee — same rules apply per child track.
+- Yoga / Gymnastics slots continue to ignore the track and cap.
 
-### Acceptance Criteria
-- Dashboard loads without errors and displays the three new sections.
-- Revenue numbers reflect actual `credit` transactions for today/this week.
-- Signup trend shows per-day counts for the selected range.
-- Membership breakdown sums to the total number of profiles and updates when statuses change.
+### 4. Signup flow
+- No change at signup — members don't have a subscription yet. Track is chosen at first renewal (admin does it during "Renew or Add") or via the member membership screen if a subscription is granted without a track.
+
+## Notes / edge cases
+
+- Existing active subscriptions will have `group_track = null`. They'll be prompted to pick a track on next booking attempt (or staff sets it in admin). Cap counting for legacy subs uses `now() - 30d` as fallback until they renew.
+- Weekday is computed in Amman timezone (`Asia/Amman`) both in Postgres (`(starts_at AT TIME ZONE 'Asia/Amman')::date` → `extract(dow ...)`) and in the client (via existing `src/lib/time.ts`).
+- Pause/resume unchanged — pause already blocks group bookings.
+
+## Technical details (for engineers)
+
+- Track enum stored as text with CHECK constraint to keep migration simple.
+- Cap query in trigger: `SELECT count(*) FROM bookings b JOIN classes c ON c.id=b.class_id WHERE b.member_id=NEW.member_id AND (b.child_id IS NOT DISTINCT FROM NEW.child_id) AND c.type IN ('mixed','women_only','kids') AND b.status <> 'cancelled' AND c.starts_at >= window_start AND c.starts_at < window_start + interval '30 days'` where `window_start = start + floor(extract(epoch from now()-start)/(30*86400)) * interval '30 days'`.
+- Staff bypass via `has_role(auth.uid(),'staff')` inside the trigger (SECURITY DEFINER preserves `auth.uid()`).
+- RLS on `profiles`/`children` update policies extended to allow updating `group_track` only when the previous value is null (members) or always (staff).
