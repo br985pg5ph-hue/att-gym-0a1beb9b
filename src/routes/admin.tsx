@@ -38,7 +38,6 @@ function AdminPage() {
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "coaches", label: t.manageCoaches, icon: UserCog },
     { key: "members", label: t.membersList, icon: Users },
-    { key: "settings", label: "Gym Info", icon: Settings },
   ];
   const signOut = async () => {
     await qc.cancelQueries();
