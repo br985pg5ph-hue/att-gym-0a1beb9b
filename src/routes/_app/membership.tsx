@@ -101,7 +101,7 @@ function MembershipPage() {
           )}
         </div>
 
-        <div className="card-surface p-6">
+        <div data-tour="membership-pt" className="card-surface p-6">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">PT Sessions</p>
           <p className="font-display mt-1 text-6xl leading-none">
             {profile?.pt_sessions_remaining ?? 0}
@@ -109,7 +109,7 @@ function MembershipPage() {
           </p>
         </div>
 
-        <div className="card-surface p-5">
+        <div data-tour="membership-history" className="card-surface p-5">
           <p className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">Credit history</p>
           <div className="divide-y hairline">
             {txns.length === 0 && <p className="py-4 text-sm text-muted-foreground">No entries yet</p>}
