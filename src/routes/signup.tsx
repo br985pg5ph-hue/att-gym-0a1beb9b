@@ -39,8 +39,9 @@ function SignUpPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) return toast.error("Passwords do not match");
+    if (!gender) return toast.error("Please select your gender");
     setLoading(true);
-    const meta: Record<string, string> = { name, phone: `${cc}${phone}` };
+    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender };
     const trimmedRef = referral.trim();
     if (trimmedRef) meta.referral_code = trimmedRef;
     const { data, error } = await supabase.auth.signUp({
