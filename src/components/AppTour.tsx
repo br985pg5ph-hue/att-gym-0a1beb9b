@@ -66,8 +66,8 @@ export function AppTour() {
     { route: "/home", title: "Classes Attended", description: "Total PT and group classes you've attended. Trophy tiers: Bronze 0–15, Silver 16–50, Gold 51–100.", selector: '[data-tour="attended-card"]' },
     { route: "/home", title: "News & Coaches", description: "Latest announcements and the coaching team live here.", selector: '[data-tour="news-widget"]' },
     { route: "/book", title: "Pick a Day", description: "Grey dots mark days with classes. A red dot means you already have a booking. Tap a day to see its slots.", selector: '[data-tour-day="booking"], [data-tour-day="class"], [data-tour="calendar"]' },
-    { route: "/book", title: "Filter Classes", description: "Switch between Muay Thai, Women only, PT, Yoga and more.", selector: '[data-tour="filters"]' },
     { route: "/book", title: "Book a Slot", description: "Tap a slot to select it, then confirm using the button at the bottom.", selector: '[data-tour="slots"]' },
+
     { route: "/membership", title: "Group Membership", description: "See your group subscription status, expiry date, and pause your membership for up to 45 days.", selector: '[data-tour="membership-group"]' },
     { route: "/membership", title: "Private Sessions", description: "How many PT (private) sessions you have left, renew any time at the gym.", selector: '[data-tour="membership-pt"]' },
     { route: "/membership", title: "Credit History", description: "Review all your membership credits, PT sessions, and payments in one place.", selector: '[data-tour="membership-history"]' },
