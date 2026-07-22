@@ -120,129 +120,168 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true });
 
+  const todayKey = toAmmanDateInput(ammanNow()).slice(0, 10);
+  const todayLabel = new Date(todayKey).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  const occupancy = totalCapacityToday > 0 ? Math.round((totalBookedToday / totalCapacityToday) * 100) : 0;
+
+  const kpis = [
+    { label: t.classesToday, value: stats?.todayClasses.length ?? 0, sub: `${totalBookedToday}/${totalCapacityToday || 0} booked`, icon: CalendarDays, tone: "primary" as const },
+    { label: t.activeGroupMembers, value: stats?.activeGroupMembers ?? 0, sub: "with active subscription", icon: Users, tone: "default" as const },
+    { label: t.ptSessionsOnBooks, value: stats?.ptSessionsOnBooks ?? 0, sub: "outstanding PT credits", icon: UserCog, tone: "default" as const },
+    { label: t.newSignups, value: stats?.newSignupsThisWeek ?? 0, sub: "this week", icon: Plus, tone: "default" as const },
+  ];
+
   return (
-    <div className="space-y-4">
-      <button
-        onClick={() => setTab("settings")}
-        className="flex w-full items-center justify-between rounded-2xl border hairline bg-card p-4 text-left transition-colors active:bg-card/80"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Settings size={20} />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Gym Info</p>
-            <p className="text-[10px] text-muted-foreground">Edit location, links, and contact details</p>
-          </div>
+    <div className="space-y-5">
+      {/* Header row */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
+          <h2 className="font-display text-3xl leading-none">{todayLabel}</h2>
         </div>
-        <ChevronRight size={18} className="text-muted-foreground" />
-      </button>
-
-      <div className="card-surface p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {toAmmanDateInput(ammanNow()).slice(0, 10)}
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border hairline bg-card p-3">
-            <p className="font-display text-3xl leading-none">{stats?.todayClasses.length ?? 0}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.classesToday}</p>
-          </div>
-          <div className="rounded-2xl border hairline bg-card p-3">
-            <p className="font-display text-3xl leading-none">{totalBookedToday}{totalCapacityToday > 0 ? `/${totalCapacityToday}` : ""}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.bookingsToday}</p>
-          </div>
-          <div className="rounded-2xl border hairline bg-card p-3">
-            <p className="font-display text-3xl leading-none">{stats?.activeGroupMembers ?? 0}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.activeGroupMembers}</p>
-          </div>
-          <div className="rounded-2xl border hairline bg-card p-3">
-            <p className="font-display text-3xl leading-none">{stats?.ptSessionsOnBooks ?? 0}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.ptSessionsOnBooks}</p>
-          </div>
-        </div>
+        <button
+          onClick={() => setTab("settings")}
+          className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
+        >
+          <Settings size={14} /> Gym Info
+        </button>
       </div>
 
-      <div className="card-surface p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.classesToday}</p>
-          <button onClick={() => setTab("classes")} className="text-[10px] font-semibold text-primary">{t.viewAll}</button>
-        </div>
-        {(stats?.todayClasses.length ?? 0) === 0 ? (
-          <p className="mt-3 text-center text-xs text-muted-foreground">{t.noClassesToday}</p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {stats?.todayClasses.map((c) => (
-              <div key={c.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2.5">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{c.title}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {formatTime(c.starts_at)} • {c.coach_name || t.coach} • {c.type}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${c.full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
-                    {c.booked}/{c.capacity}
-                  </span>
-                </div>
+      {/* KPI grid */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {kpis.map((k) => {
+          const Icon = k.icon;
+          return (
+            <div key={k.label} className={`card-surface relative overflow-hidden p-4 ${k.tone === "primary" ? "bg-gradient-to-br from-primary/15 to-transparent" : ""}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{k.label}</span>
+                <Icon size={16} className={k.tone === "primary" ? "text-primary" : "text-muted-foreground"} />
               </div>
-            ))}
-          </div>
-        )}
+              <p className="font-display mt-3 text-4xl leading-none">{k.value}</p>
+              <p className="mt-2 text-[10px] text-muted-foreground">{k.sub}</p>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="card-surface p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.newSignups}</p>
-          <p className="mt-1 font-display text-2xl leading-none">{stats?.newSignupsThisWeek ?? 0}</p>
-          <p className="mt-1 text-[10px] text-muted-foreground">this week</p>
+      {/* Two-column body */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {/* Left: today's classes (2 cols) */}
+        <div className="card-surface p-5 lg:col-span-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.classesToday}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Occupancy {occupancy}% · {totalBookedToday}/{totalCapacityToday || 0} seats</p>
+            </div>
+            <button onClick={() => setTab("classes")} className="rounded-pill border hairline px-3 py-1 text-[10px] font-semibold text-primary">{t.viewAll}</button>
+          </div>
+
+          {/* Occupancy bar */}
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-pill bg-muted">
+            <div className="h-full rounded-pill bg-primary transition-all" style={{ width: `${occupancy}%` }} />
+          </div>
+
+          {(stats?.todayClasses.length ?? 0) === 0 ? (
+            <p className="mt-6 py-8 text-center text-xs text-muted-foreground">{t.noClassesToday}</p>
+          ) : (
+            <div className="mt-4 space-y-2">
+              {stats?.todayClasses.map((c) => {
+                const pct = c.capacity > 0 ? Math.round((c.booked / c.capacity) * 100) : 0;
+                return (
+                  <div key={c.id} className="rounded-xl border hairline bg-card p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-display text-lg leading-none">{formatTime(c.starts_at)}</span>
+                          <span className="rounded-pill bg-muted px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">{c.type}</span>
+                        </div>
+                        <p className="mt-1 truncate text-sm font-semibold">{c.title}</p>
+                        <p className="text-[10px] text-muted-foreground">{c.coach_name || t.coach}</p>
+                      </div>
+                      <span className={`shrink-0 rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest ${c.full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                        {c.booked}/{c.capacity}
+                      </span>
+                    </div>
+                    <div className="mt-2 h-1 w-full overflow-hidden rounded-pill bg-muted">
+                      <div className={`h-full rounded-pill ${c.full ? "bg-destructive" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-        <div className="card-surface p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.expiringSoon}</p>
-          <p className="mt-1 font-display text-2xl leading-none">{stats?.expiringSoonCount ?? 0}</p>
-          <p className="mt-1 text-[10px] text-muted-foreground">next 7 days</p>
+
+        {/* Right column: expiring soon + signup mini */}
+        <div className="space-y-4">
+          <div className="card-surface p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-destructive">{t.expiringSoon}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Next 7 days</p>
+              </div>
+              <span className="font-display text-3xl leading-none">{stats?.expiringSoonCount ?? 0}</span>
+            </div>
+            {(stats?.expiringSoonList.length ?? 0) === 0 ? (
+              <p className="mt-4 py-4 text-center text-xs text-muted-foreground">No expirations coming up</p>
+            ) : (
+              <div className="mt-3 space-y-1.5">
+                {stats?.expiringSoonList.map((m) => (
+                  <Link
+                    key={m.id}
+                    to="/admin/members/$id"
+                    params={{ id: m.id }}
+                    className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2 transition-colors hover:border-primary/40"
+                  >
+                    <p className="truncate text-sm font-semibold">{m.name}</p>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="rounded-pill bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold text-destructive">{formatDate(m.group_subscription_until)}</span>
+                      <ChevronRight size={14} className="text-muted-foreground" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setTab("members")}
+            className="card-surface flex w-full items-center justify-between p-5 text-left transition-colors hover:border-primary/40"
+          >
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Members</p>
+              <p className="font-display mt-1 text-2xl leading-none">Manage roster</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">Search, renew, and book on behalf</p>
+            </div>
+            <ChevronRight size={18} className="text-muted-foreground" />
+          </button>
         </div>
       </div>
 
-      {(stats?.expiringSoonList.length ?? 0) > 0 && (
-        <div className="card-surface p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-destructive">{t.expiringSoon}</p>
-          <div className="mt-3 space-y-2">
-            {stats?.expiringSoonList.map((m) => (
-              <Link
-                key={m.id}
-                to="/admin/members/$id"
-                params={{ id: m.id }}
-                className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2 transition-colors hover:bg-card/90 active:bg-card/80"
-              >
-                <p className="text-sm font-semibold">{m.name}</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-[10px] text-muted-foreground">{formatDate(m.group_subscription_until)}</p>
-                  <ChevronRight size={14} className="text-muted-foreground" />
-                </div>
-              </Link>
-            ))}
-          </div>
+      {/* Recent transactions - full width table-ish */}
+      <div className="card-surface p-5">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.recentTransactions}</p>
+          <span className="text-[10px] text-muted-foreground">Last 5</span>
         </div>
-      )}
-
-      <div className="card-surface p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.recentTransactions}</p>
         {(stats?.recentTransactions.length ?? 0) === 0 ? (
-          <p className="mt-3 text-center text-xs text-muted-foreground">No recent transactions</p>
+          <p className="mt-6 py-6 text-center text-xs text-muted-foreground">No recent transactions</p>
         ) : (
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 divide-y divide-[color:var(--color-hairline)]">
             {stats?.recentTransactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{tx.member_name}{tx.child_name ? ` • ${tx.child_name}` : ""}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">
-                    {tx.type} {tx.service}{tx.classes ? ` • ${tx.classes} sessions` : ""}{tx.days ? ` • ${tx.days} days` : ""}
-                  </p>
+              <div key={tx.id} className="flex items-center justify-between gap-3 py-2.5">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-pill ${tx.type === "credit" ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"}`}>
+                    {tx.type === "credit" ? <Plus size={16} /> : <ChevronsRight size={16} />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{tx.member_name}{tx.child_name ? ` · ${tx.child_name}` : ""}</p>
+                    <p className="truncate text-[10px] text-muted-foreground">
+                      {tx.service}{tx.classes ? ` · ${tx.classes} sessions` : ""}{tx.days ? ` · ${tx.days} days` : ""}
+                    </p>
+                  </div>
                 </div>
-                <span className={`shrink-0 rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tx.type === "credit" ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"}`}>
-                  {tx.type}
-                </span>
+                <span className="shrink-0 text-[10px] uppercase tracking-widest text-muted-foreground">{tx.type}</span>
               </div>
             ))}
           </div>
@@ -251,6 +290,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
     </div>
   );
 }
+
 
 function AnnouncementsAdmin() {
   const qc = useQueryClient();
