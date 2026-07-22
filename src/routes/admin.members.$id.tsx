@@ -5,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake, Pause, Play } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake, Pause, Play, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { getMemberEmail } from "@/lib/account.functions";
+import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
