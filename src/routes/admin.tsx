@@ -37,7 +37,6 @@ function AdminPage() {
     { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
-    { key: "coaches", label: t.manageCoaches, icon: UserCog },
     { key: "members", label: t.membersList, icon: Users },
   ];
   const signOut = async () => {
@@ -80,7 +79,7 @@ function AdminPage() {
         {tab === "settings" && <GymInfoAdmin />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
-        <ul className="grid grid-cols-5 items-center px-1">
+        <ul className="grid grid-cols-4 items-center px-1">
 
           {tabs.map(x => {
             const active = tab === x.key;
