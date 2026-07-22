@@ -1038,7 +1038,7 @@ function MembersAdmin() {
   );
 }
 
-function GymInfoAdmin() {
+function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const qc = useQueryClient();
   const { data: gym, isLoading } = useQuery({
     queryKey: ["gym"],
