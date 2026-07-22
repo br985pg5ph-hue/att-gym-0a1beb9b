@@ -197,10 +197,18 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-destructive">{t.expiringSoon}</p>
           <div className="mt-3 space-y-2">
             {stats?.expiringSoonList.map((m) => (
-              <div key={m.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2">
+              <Link
+                key={m.id}
+                to="/admin/members/$id"
+                params={{ id: m.id }}
+                className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2 transition-colors hover:bg-card/90 active:bg-card/80"
+              >
                 <p className="text-sm font-semibold">{m.name}</p>
-                <p className="text-[10px] text-muted-foreground">{formatDate(m.group_subscription_until)}</p>
-              </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] text-muted-foreground">{formatDate(m.group_subscription_until)}</p>
+                  <ChevronRight size={14} className="text-muted-foreground" />
+                </div>
+              </Link>
             ))}
           </div>
         </div>
