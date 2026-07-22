@@ -622,20 +622,12 @@ function MembersAdmin() {
             )}
             <div className="mt-3">
               {!isAdding ? (
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => { setAddFor(m.id); setAddKind("group"); setChildId(""); setDays(30); }}
-                    className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground"
-                  >
-                    <Plus size={12} className="inline"/> Renew group membership
-                  </button>
-                  <button
-                    onClick={() => { setAddFor(m.id); setAddKind("pt"); setChildId(""); setSessions(10); }}
-                    className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold"
-                  >
-                    <Plus size={12} className="inline"/> Add PT sessions
-                  </button>
-                </div>
+                <button
+                  onClick={() => { setAddFor(m.id); setAddKind("group"); setChildId(""); setDays(30); }}
+                  className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground"
+                >
+                  <Plus size={12} className="inline"/> Renew or Add
+                </button>
               ) : (
                 <div className="space-y-2 rounded-xl border hairline p-3">
                   <div className="grid grid-cols-2 gap-2">
