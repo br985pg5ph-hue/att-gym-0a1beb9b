@@ -106,6 +106,7 @@ function EditProfilePage() {
     if (profile) {
       setName(profile.name || "");
       setDob((profile as any).date_of_birth || "");
+      setGender(((profile as any).gender as "male" | "female" | null) || "");
       const full = profile.phone || "";
       const matched = COUNTRIES.slice().sort((a, b) => b.code.length - a.code.length).find((c) => full.startsWith(c.code));
       if (matched) {
