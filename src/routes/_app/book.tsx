@@ -106,18 +106,43 @@ function BookPage() {
   const groupActiveSelf = !selfPaused && !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
   const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
 
-  const isEligible = (type: string) => {
-    if (type === "kids") return groupActiveChild;
+  const trackSelf = (profile as any)?.group_track ?? null;
+  const trackChild = (bookingForChild as any)?.group_track ?? null;
+  const effectiveTrack = bookingForChild ? trackChild : trackSelf;
+  const TRACK_DOWS: Record<string, number[]> = { sat_mon_wed: [6,1,3], sun_tue_thu: [0,2,4] };
+  const isOnTrack = (starts_at: string): boolean => {
+    if (!effectiveTrack) return false;
+    const dow = new Date(new Date(starts_at).toLocaleString("en-US", { timeZone: "Asia/Amman" })).getDay();
+    return (TRACK_DOWS[effectiveTrack] ?? []).includes(dow);
+  };
+  const TRACK_RESTRICTED = new Set(["mixed", "women_only", "kids"]);
+
+  const isEligible = (type: string, starts_at?: string) => {
+    if (type === "kids") {
+      if (!groupActiveChild) return false;
+      if (starts_at && !isOnTrack(starts_at)) return false;
+      return true;
+    }
     if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
     // mixed / women_only / yoga / gymnastics — adult group only
-    return !bookingForChild && groupActiveSelf;
+    if (bookingForChild || !groupActiveSelf) return false;
+    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return false;
+    return true;
   };
 
-  const eligibilityMessage = (type: string): string => {
-    if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
+  const eligibilityMessage = (type: string, starts_at?: string): string => {
+    if (type === "kids") {
+      if (!groupActiveChild) return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
+      if (!effectiveTrack) return "Pick booking days first";
+      if (starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+      return "";
+    }
     if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
     if (selfPaused) return "Membership paused";
-    return "Your group membership isn't active";
+    if (!groupActiveSelf) return "Your group membership isn't active";
+    if (TRACK_RESTRICTED.has(type) && !effectiveTrack) return "Pick booking days first";
+    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+    return "";
   };
 
 
