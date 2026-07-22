@@ -70,8 +70,8 @@ function MemberDetailPage() {
   });
 
   const [activeTab, setActiveTab] = useState<"upcoming" | "history" | "transactions">("upcoming");
-  const [manageOpen, setManageOpen] = useState(false);
-  const [manageMode, setManageMode] = useState<"group" | "pt" | null>(null);
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [ptOpen, setPtOpen] = useState(false);
 
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
   const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
