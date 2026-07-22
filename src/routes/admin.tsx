@@ -589,6 +589,9 @@ function ClassesAdmin() {
         ))}
       </div>
 
+      <p className="font-display text-sm tracking-wide text-muted-foreground">
+        {new Date(selectedDate).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+      </p>
       {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
       {(() => {
         const filtered = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
