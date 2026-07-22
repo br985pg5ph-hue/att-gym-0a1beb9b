@@ -55,6 +55,7 @@ export const dict: Record<Lang, Dict> = {
     notifications: "الإشعارات", legal: "القانوني والخصوصية", deleteAccount: "حذف الحساب",
     manageAnnouncements: "إعلانات", manageClasses: "حصص", manageCoaches: "مدربون", membersList: "أعضاء",
     todaySnapshot: "لقطة اليوم", activeGroupMembers: "أعضاء المجموعة النشطون", ptSessionsOnBooks: "جلسات PT المحجوزة", newSignups: "تسجيلات جديدة", expiringSoon: "تنتهي قريباً", recentTransactions: "آخر الحركات", classesToday: "حصص اليوم", bookingsToday: "حجوزات اليوم", viewAll: "عرض الكل", noClassesToday: "لا توجد حصص مجدولة اليوم",
+    sortBy: "ترتيب حسب", sortNameAsc: "الاسم أ-ي", sortNameDesc: "الاسم ي-أ", sortMemberIdAsc: "رقم العضو ↑", sortMemberIdDesc: "رقم العضو ↓", sortExpiryAsc: "الانتهاء قريباً", sortExpiryDesc: "الانتهاء لاحقاً", sortPtAsc: "جلسات PT: الأقل", sortPtDesc: "جلسات PT: الأكثر",
     save: "حفظ", edit: "تعديل", delete: "حذف", add: "إضافة", title: "العنوان", body: "المحتوى", tag: "الوسم",
     specialty: "التخصص", bio: "نبذة", photoUrl: "رابط الصورة", type: "النوع", coach: "المدرب", capacity: "السعة", startsAt: "يبدأ في",
     membershipActive: "عضو نشط", membershipInactive: "عضو غير نشط", hours: "ساعات العمل", connectWithUs: "تواصل معنا",
