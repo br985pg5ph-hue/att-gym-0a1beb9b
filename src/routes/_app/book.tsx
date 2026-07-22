@@ -102,7 +102,8 @@ function BookPage() {
   const effectiveFilter = bookingForChild ? (filter === "pt" ? "pt" : filter === "kids" ? "kids" : "all") : (filter === "kids" ? "all" : filter);
   const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
   const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
-  const groupActiveSelf = !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
+  const selfPaused = !!(profile as any)?.membership_paused_at;
+  const groupActiveSelf = !selfPaused && !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
   const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
 
   const isEligible = (type: string) => {
@@ -115,8 +116,10 @@ function BookPage() {
   const eligibilityMessage = (type: string): string => {
     if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
     if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
+    if (selfPaused) return "Membership paused — resume to book";
     return "Your group membership isn't active";
   };
+
 
   const daySlots = classes.filter((c: any) => {
     if (c.starts_at.slice(0, 10) !== selectedDate) return false;
