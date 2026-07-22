@@ -303,7 +303,7 @@ function BookPage() {
                     {c.coaches?.name && ` • ${c.coaches.name}`}
                   </p>
                   {!eligible && !booked && !full && !past && (
-                    <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type)}</p>
+                    <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type, c.starts_at)}</p>
                   )}
                 </div>
                 <span className={`shrink-0 rounded-pill px-3 py-1 text-[10px] font-semibold uppercase ${
