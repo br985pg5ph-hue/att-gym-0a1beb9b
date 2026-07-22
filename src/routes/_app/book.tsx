@@ -251,28 +251,6 @@ function BookPage() {
         )}
 
 
-        {(() => {
-          const warnings: string[] = [];
-          const showGroup = filter === "all" || ["mixed", "women_only", "yoga", "gymnastics", "kids"].includes(filter);
-          const showPt = filter === "all" || filter === "pt";
-          if (bookingForChild) {
-            if (showGroup && !groupActiveChild) warnings.push(`${bookingForChild.name}'s group membership isn't active — renew at the gym`);
-            if (showPt && ptRemainingChild <= 0) warnings.push(`${bookingForChild.name} has no PT sessions — visit the gym to add more`);
-          } else {
-            if (showGroup && !groupActiveSelf) warnings.push("Your group membership isn't active — renew at the gym to book group classes");
-            if (showPt && ptRemainingSelf <= 0) warnings.push("No PT sessions remaining — visit the gym to add more");
-          }
-          if (warnings.length === 0) return null;
-          return (
-            <div className="mt-3 space-y-2">
-              {warnings.map((w, i) => (
-                <div key={i} className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-xs font-medium text-destructive">
-                  {w}
-                </div>
-              ))}
-            </div>
-          );
-        })()}
 
         <div className="mt-2 space-y-2">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
