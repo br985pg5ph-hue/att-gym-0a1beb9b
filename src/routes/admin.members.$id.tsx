@@ -205,10 +205,29 @@ function MemberDetailPage() {
                   Member ID: {(member as any)?.member_code || "—"}
                 </p>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  {(member as any)?.date_of_birth && <span className="inline-flex items-center gap-1"><Cake size={12}/>{new Date((member as any).date_of_birth).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>}
                   {member?.created_at && <span>Joined {new Date(member.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>}
                   {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold">Parent</span>}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {member?.phone && (
+                    <a href={`tel:${member.phone}`} className="inline-flex items-center gap-1.5 rounded-pill bg-muted/30 px-3 py-1.5 text-xs text-foreground hover:bg-muted/50">
+                      <Phone size={12} className="text-primary" />
+                      <span>{member.phone}</span>
+                    </a>
+                  )}
+                  {emailData?.email && (
+                    <a href={`mailto:${emailData.email}`} className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-pill bg-muted/30 px-3 py-1.5 text-xs text-foreground hover:bg-muted/50">
+                      <Mail size={12} className="text-primary" />
+                      <span className="truncate">{emailData.email}</span>
+                    </a>
+                  )}
+                  {(member as any)?.date_of_birth && (
+                    <div className="inline-flex items-center gap-1.5 rounded-pill bg-muted/30 px-3 py-1.5 text-xs text-foreground">
+                      <Cake size={12} className="text-primary" />
+                      <span>{new Date((member as any).date_of_birth).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -541,30 +560,6 @@ function MemberDetailPage() {
               );
             })()}
 
-            {/* Contact */}
-            <section className="card-surface p-5">
-              <h3 className="font-display text-lg leading-none">Contact</h3>
-              <div className="mt-3 space-y-2 text-sm">
-                {member?.phone && (
-                  <a href={`tel:${member.phone}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
-                    <Phone size={16} className="text-primary" />
-                    <span>{member.phone}</span>
-                  </a>
-                )}
-                {emailData?.email && (
-                  <a href={`mailto:${emailData.email}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground break-all">
-                    <Mail size={16} className="text-primary" />
-                    <span>{emailData.email}</span>
-                  </a>
-                )}
-                {member?.date_of_birth && (
-                  <div className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
-                    <Cake size={16} className="text-primary" />
-                    <span>{new Date(member.date_of_birth).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
-                  </div>
-                )}
-              </div>
-            </section>
           </div>
         </div>
       </main>
