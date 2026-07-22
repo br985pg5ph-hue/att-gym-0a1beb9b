@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
