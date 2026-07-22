@@ -1,56 +1,91 @@
-# Admin Dashboard — Insights Proposal
+# New Member App Tour
 
-## Current state
-The admin portal already has operational tools: announcements, classes (with recurring creation), coaches, and a member list/detail flow. Under the hood you have rich data: profiles, children, classes, bookings, transactions, coaches, and announcements. A dashboard would surface high-level business health without replacing those tools.
+A guided, spotlight-style tour that auto-starts the first time a new member lands in the app after completing onboarding. It walks them through Home, Booking, Membership, and Profile with a dimmed backdrop, a highlighted target, and a tooltip card with Prev / Next / Skip. Replayable from Settings.
 
-## Recommended dashboard sections
+## User experience
 
-### 1. Today snapshot
-- Classes scheduled today / tomorrow
-- Total bookings today vs capacity
-- Check-in-style "attended so far" estimate
+1. Member finishes signup + onboarding questionnaire → lands on Home.
+2. A small welcome card appears: "Take a tour of ATT Academy?" with **Start tour** and **Skip**.
+3. If they start, the app dims and a spotlight ring highlights the first feature. A tooltip card sits next to it with:
+  - Step title + one-sentence description
+  - `1 / 12` counter, Prev, Next, Skip tour
+  - Next auto-navigates to the right tab when the next step lives on another screen
+4. Final step shows "You're all set" with a Finish button.
+5. Skipping or finishing marks the tour done — it never auto-starts again.
+6. **Settings → Replay app tour** re-runs it any time.
 
-### 2. Membership & revenue health
-- Active group members count (profiles + children with `group_subscription_until > now()`)
-- PT sessions on the books (sum of `pt_sessions_remaining` across profiles + children)
-- Recent credit movements (credits added/removed this week from `transactions`)
-- Upcoming expirations (group subscriptions expiring in next 7 days)
+## Tour steps (12)
 
-### 3. Bookings & attendance
-- Bookings this month vs last month
-- Most-booked class types (Muay Thai, MMA, Kids Group, Yoga, Gymnastics)
-- Classes at risk of low attendance (below a threshold)
-- Cancellation rate
+Home
 
-### 4. Member growth
-- New signups this week / month
-- Referral conversions (members who used a referral code and booked)
-- Top referrers
+- Greeting + member ID
+- Next Session card
+- PT Sessions card
+- Group Membership card (mentions Paused state)
+- News & Coaches widgets
 
-### 5. Operational alerts
-- Classes that are full or nearly full
-- Members with expired group membership who still booked recently
-- Kids classes without enough signups
+Booking tab
 
-## Suggested design
-- Add a new "Dashboard" tab as the first/default tab in the admin bottom nav.
-- Keep it mobile-first: stacked cards with numbers, sparklines optional, and a "View all" link into the relevant tool.
-- Use the existing card + hairline + pill visual language.
+- Calendar with red/grey dots
+- Class-type filter chips
+- Time slots + capacity
 
-## Implementation approach
-- Create a new `/admin/dashboard` route or make Dashboard the default tab inside `/admin`.
-- Build one or more `createServerFn` aggregators that query Supabase with `count`, `sum`, and date filters.
-- Reuse existing admin auth gate; no new RLS needed if queries run through `requireSupabaseAuth` or the existing staff check.
-- Optional: add a lightweight `dashboard_stats` materialized view if the app grows, but start with live queries.
+Membership tab
 
-## Phases
-1. **MVP**: Today snapshot + membership totals + recent signups.
-2. **Add trends**: Month-over-month booking chart and top class types.
-3. **Add alerts**: Full classes, expiring memberships, low-attendance classes.
+- Credits + expiry
+- Pause / resume membership
 
-## Open questions
-- Do you want charts/graphs, or just key-number cards with arrows?
-- Should the dashboard default to "today" or "this week"?
-- Any metric you care about most (e.g. revenue-like tracking even though payments happen in person)?
+Profile tab
 
-Approve this direction and I’ll build the first phase.
+- Edit profile + children (only if parent)
+- Referral link + Settings (includes Replay tour)
+
+Kids-only steps are shown conditionally when `is_parent = true`.
+
+## How it works (technical)
+
+**Library.** Use `driver.js` (~5KB, no deps, mobile-friendly, RTL-compatible, works with fixed bottom nav). Themed to match dark/light tokens.
+
+**Persistence.** Add a `tour_completed_at timestamptz` column to `profiles` (nullable). Set it when the user finishes or skips. Reading/writing goes through the existing profile RLS (owner-only). No new policy needed beyond confirming the existing owner-update policy covers the column.
+
+**Trigger points.**
+
+- Onboarding completion handler (`src/routes/onboarding.tsx`) sets a `sessionStorage` flag `att.startTour = 1` before navigating to `/home`.
+- A new `<AppTour />` component mounted in `src/routes/_app/route.tsx` (the authenticated layout) checks on mount: if `profile.tour_completed_at` is null AND (`sessionStorage` flag OR user clicked "Replay" which sets `att.startTour = 1`), it shows the welcome card, then drives the tour.
+- On finish/skip → clear flag, update profile.
+
+**Cross-route navigation.** driver.js supports `onNextClick` hooks. When a step targets an element on another tab, the hook calls `navigate({ to: '/book' })`, waits for the target selector to mount (short polling with `MutationObserver`, 2s timeout), then calls `driver.moveNext()`.
+
+**Element targeting.** Add stable `data-tour="next-session"`, `data-tour="pt-card"`, etc. attributes to the existing elements. No visual changes to those components.
+
+**i18n + RTL.** Step copy lives in `src/lib/i18n.ts` under a new `tour` namespace (English + Arabic). driver.js `rtl: true` when `lang === 'ar'`.
+
+**Theming.** Custom CSS on `.driver-popover` uses existing tokens (`--card`, `--foreground`, `--primary`, `--border`, `rounded-2xl`, pill buttons) so it matches the app.
+
+**Settings entry.** Add a "Replay app tour" row in `src/routes/_app/profile.settings.tsx` that sets `sessionStorage.att.startTour = '1'`, nulls `tour_completed_at`, and navigates to `/home`.
+
+## Files touched
+
+New
+
+- `src/components/AppTour.tsx` — welcome card + driver.js orchestration, step definitions, cross-route navigation
+- `src/components/AppTour.css` — themed popover styles
+- Migration: `alter table profiles add column tour_completed_at timestamptz`
+
+Edited (attribute + minor additions only)
+
+- `src/routes/_app/route.tsx` — mount `<AppTour />`
+- `src/routes/onboarding.tsx` — set start flag on completion
+- `src/routes/_app/home.tsx`, `book.tsx`, `membership.tsx`, `profile.index.tsx` — add `data-tour="…"` attributes to target elements
+- `src/components/BottomNav.tsx` — `data-tour` on each tab
+- `src/routes/_app/profile.settings.tsx` — "Replay app tour" row
+- `src/lib/i18n.ts` — tour copy (EN + AR)
+- `src/lib/providers.tsx` — add `tour_completed_at` to `Profile` type
+
+Dependency: `bun add driver.js`
+
+## Out of scope
+
+- No changes to existing screens' logic or layout beyond `data-tour` hooks
+- No analytics on tour completion (can add later)
+- No per-step "learn more" deep links
