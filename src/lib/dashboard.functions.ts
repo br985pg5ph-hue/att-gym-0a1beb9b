@@ -101,14 +101,14 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .limit(5),
       supabaseAdmin
         .from("transactions")
-        .select("payment_method, amount_jod")
+        .select("payment_method")
         .eq("type", "credit")
         .gte("created_at", todayStart)
         .lte("created_at", todayEnd)
         .not("payment_method", "is", null),
       supabaseAdmin
         .from("transactions")
-        .select("payment_method, amount_jod")
+        .select("payment_method")
         .eq("type", "credit")
         .gte("created_at", weekAgo.toISOString())
         .lte("created_at", todayEnd)
