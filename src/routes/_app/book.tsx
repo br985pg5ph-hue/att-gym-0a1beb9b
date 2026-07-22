@@ -106,18 +106,43 @@ function BookPage() {
   const groupActiveSelf = !selfPaused && !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
   const groupActiveChild = !!bookingForChild?.group_subscription_until && new Date(bookingForChild!.group_subscription_until!).getTime() > Date.now();
 
-  const isEligible = (type: string) => {
-    if (type === "kids") return groupActiveChild;
+  const trackSelf = (profile as any)?.group_track ?? null;
+  const trackChild = (bookingForChild as any)?.group_track ?? null;
+  const effectiveTrack = bookingForChild ? trackChild : trackSelf;
+  const TRACK_DOWS: Record<string, number[]> = { sat_mon_wed: [6,1,3], sun_tue_thu: [0,2,4] };
+  const isOnTrack = (starts_at: string): boolean => {
+    if (!effectiveTrack) return false;
+    const dow = new Date(new Date(starts_at).toLocaleString("en-US", { timeZone: "Asia/Amman" })).getDay();
+    return (TRACK_DOWS[effectiveTrack] ?? []).includes(dow);
+  };
+  const TRACK_RESTRICTED = new Set(["mixed", "women_only", "kids"]);
+
+  const isEligible = (type: string, starts_at?: string) => {
+    if (type === "kids") {
+      if (!groupActiveChild) return false;
+      if (starts_at && !isOnTrack(starts_at)) return false;
+      return true;
+    }
     if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
     // mixed / women_only / yoga / gymnastics — adult group only
-    return !bookingForChild && groupActiveSelf;
+    if (bookingForChild || !groupActiveSelf) return false;
+    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return false;
+    return true;
   };
 
-  const eligibilityMessage = (type: string): string => {
-    if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
+  const eligibilityMessage = (type: string, starts_at?: string): string => {
+    if (type === "kids") {
+      if (!groupActiveChild) return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
+      if (!effectiveTrack) return "Pick booking days first";
+      if (starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+      return "";
+    }
     if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
     if (selfPaused) return "Membership paused";
-    return "Your group membership isn't active";
+    if (!groupActiveSelf) return "Your group membership isn't active";
+    if (TRACK_RESTRICTED.has(type) && !effectiveTrack) return "Pick booking days first";
+    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+    return "";
   };
 
 
@@ -255,6 +280,42 @@ function BookPage() {
         )}
 
 
+        {(() => {
+          const needsTrack = bookingForChild
+            ? (groupActiveChild && !trackChild)
+            : (groupActiveSelf && !selfPaused && !trackSelf);
+          if (!needsTrack) return null;
+          const target = bookingForChild ? bookingForChild.name : "you";
+          return (
+            <div className="mt-3 rounded-2xl border hairline bg-card p-4">
+              <p className="text-xs font-semibold">Choose booking days for {target}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Mixed / Women Only / Kids classes lock to a track (max 12/month). Ask staff if you need to change it later.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {[
+                  { key: "sat_mon_wed", label: "Sat · Mon · Wed" },
+                  { key: "sun_tue_thu", label: "Sun · Tue · Thu" },
+                ].map((tr) => (
+                  <button
+                    key={tr.key}
+                    onClick={async () => {
+                      if (!confirm(`Lock ${target === "you" ? "your" : target + "'s"} track to ${tr.label}?`)) return;
+                      const { error } = await (supabase as any).rpc("set_group_track", {
+                        target_user: user!.id,
+                        target_child: bookingForChild ? bookingForChild.id : null,
+                        track: tr.key,
+                      });
+                      if (error) toast.error(error.message);
+                      else { toast.success("Booking days saved"); refresh(); refreshChildren(); }
+                    }}
+                    className="rounded-pill border hairline py-2 text-[11px] font-semibold"
+                  >
+                    {tr.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="mt-2 space-y-2" data-tour="slots">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
@@ -263,7 +324,7 @@ function BookPage() {
             const full = cnt >= c.capacity;
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
-            const eligible = isEligible(c.type);
+            const eligible = isEligible(c.type, c.starts_at);
             const past = new Date(c.starts_at).getTime() <= Date.now();
             const disabled = full || booked || !eligible || past;
             return (
@@ -278,7 +339,7 @@ function BookPage() {
                     {c.coaches?.name && ` • ${c.coaches.name}`}
                   </p>
                   {!eligible && !booked && !full && !past && (
-                    <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type)}</p>
+                    <p className="mt-1 text-[10px] font-medium text-destructive">{eligibilityMessage(c.type, c.starts_at)}</p>
                   )}
                 </div>
                 <span className={`shrink-0 rounded-pill px-3 py-1 text-[10px] font-semibold uppercase ${
@@ -294,14 +355,14 @@ function BookPage() {
 
       <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
         {(() => {
-          const pickedIneligible = pickedClass && !isEligible(pickedClass.type);
+          const pickedIneligible = pickedClass && !isEligible(pickedClass.type, pickedClass.starts_at);
           const disabled = !pickedId || pickedIneligible || book.isPending;
           const label = book.isPending
             ? "…"
             : !pickedId
               ? t.selectSlot
               : pickedIneligible
-                ? eligibilityMessage(pickedClass.type)
+                ? eligibilityMessage(pickedClass.type, pickedClass.starts_at)
                 : t.confirmBooking;
           return (
             <button

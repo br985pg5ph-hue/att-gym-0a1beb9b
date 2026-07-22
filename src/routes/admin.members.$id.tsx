@@ -38,7 +38,7 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
+        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, group_track, group_subscription_started_at, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, avatar_url, children(id, name, group_subscription_until, group_track, group_subscription_started_at, pt_sessions_remaining, avatar_url)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
@@ -493,6 +493,9 @@ function MemberDetailPage() {
               );
             })()}
 
+            {/* Booking days (track) — for member and each child */}
+            <TrackAdminPanel member={member} kids={kids} onChanged={()=>qc.invalidateQueries({ queryKey: ["admin-member", id] })} />
+
             {/* PT Sessions */}
             {(() => {
               const ptCount = member?.pt_sessions_remaining ?? 0;
@@ -701,5 +704,76 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
         </div>
       </div>
     </div>
+  );
+}
+
+const TRACK_OPTIONS: { key: "sat_mon_wed" | "sun_tue_thu"; label: string; short: string }[] = [
+  { key: "sat_mon_wed", label: "Sat · Mon · Wed", short: "SMW" },
+  { key: "sun_tue_thu", label: "Sun · Tue · Thu", short: "STT" },
+];
+
+function trackLabel(t: string | null | undefined): string {
+  return TRACK_OPTIONS.find((o) => o.key === t)?.label ?? "Not set";
+}
+
+function TrackAdminPanel({ member, kids, onChanged }: { member: any; kids: any[]; onChanged: () => void }) {
+  const setTrack = useMutation({
+    mutationFn: async (args: { targetUser: string; targetChild: string | null; track: string }) => {
+      const { error } = await (supabase as any).rpc("set_group_track", {
+        target_user: args.targetUser,
+        target_child: args.targetChild,
+        track: args.track,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Booking days updated"); onChanged(); },
+    onError: (e: any) => toast.error(e.message ?? "Update failed"),
+  });
+
+  if (!member) return null;
+
+  const Row = ({ label, current, onPick }: { label: string; current: string | null; onPick: (t: string) => void }) => (
+    <div className="rounded-xl border hairline p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold">{label}</p>
+        <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {trackLabel(current)}
+        </span>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        {TRACK_OPTIONS.map((o) => (
+          <button
+            key={o.key}
+            onClick={() => onPick(o.key)}
+            disabled={setTrack.isPending}
+            className={`rounded-pill py-2 text-[11px] font-semibold ${current === o.key ? "bg-primary text-primary-foreground" : "border hairline"}`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <section className="card-surface p-5">
+      <h3 className="font-display text-lg leading-none">Booking days</h3>
+      <p className="mt-1 text-[11px] text-muted-foreground">Mixed / Women Only / Kids classes can only be booked on chosen days. Max 12 per month.</p>
+      <div className="mt-3 space-y-2">
+        <Row
+          label={member.name || "Member"}
+          current={member.group_track ?? null}
+          onPick={(track) => setTrack.mutate({ targetUser: member.id, targetChild: null, track })}
+        />
+        {kids.map((k: any) => (
+          <Row
+            key={k.id}
+            label={k.name}
+            current={k.group_track ?? null}
+            onPick={(track) => setTrack.mutate({ targetUser: member.id, targetChild: k.id, track })}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
