@@ -78,12 +78,14 @@ function OnboardingPage() {
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Welcome to ATT Academy!");
+    try { sessionStorage.setItem("att.startTour", "1"); } catch {}
     nav({ to: "/home" });
   };
 
   const skip = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (u.user) await supabase.from("profiles").update({ onboarded: true }).eq("id", u.user.id);
+    try { sessionStorage.setItem("att.startTour", "1"); } catch {}
     nav({ to: "/home" });
   };
 
