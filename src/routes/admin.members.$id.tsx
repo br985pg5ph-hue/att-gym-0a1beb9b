@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,9 +199,6 @@ function MemberDetailPage() {
               <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground inline-flex items-center gap-1.5">
                 <CalendarPlus size={14}/> Book class
               </button>
-              <Link to="/admin" className="rounded-pill border hairline px-4 py-2 text-xs font-semibold inline-flex items-center gap-1.5">
-                <ArrowLeft size={14}/> Back to list
-              </Link>
             </div>
           </div>
         </section>
