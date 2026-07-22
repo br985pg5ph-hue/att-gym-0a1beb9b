@@ -20,17 +20,18 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "announcements" | "classes" | "coaches" | "members";
+type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members";
 
 function AdminPage() {
   const { t } = useLang();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<Tab>("announcements");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const pathname = useRouterState({ select: s => s.location.pathname });
   const isChild = pathname !== "/admin" && pathname !== "/admin/";
   if (isChild) return <Outlet />;
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
+    { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "coaches", label: t.manageCoaches, icon: UserCog },
