@@ -38,7 +38,6 @@ function AdminPage() {
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "coaches", label: t.manageCoaches, icon: UserCog },
     { key: "members", label: t.membersList, icon: Users },
-    { key: "settings", label: "Gym Info", icon: Settings },
   ];
   const signOut = async () => {
     await qc.cancelQueries();
@@ -69,7 +68,7 @@ function AdminPage() {
         {tab === "settings" && <GymInfoAdmin />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
-        <ul className="grid grid-cols-6 items-center px-1">
+        <ul className="grid grid-cols-5 items-center px-1">
 
           {tabs.map(x => {
             const active = tab === x.key;
@@ -111,6 +110,22 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
 
   return (
     <div className="space-y-4">
+      <button
+        onClick={() => setTab("settings")}
+        className="flex w-full items-center justify-between rounded-2xl border hairline bg-card p-4 text-left transition-colors active:bg-card/80"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <Settings size={20} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Gym Info</p>
+            <p className="text-[10px] text-muted-foreground">Edit location, links, and contact details</p>
+          </div>
+        </div>
+        <ChevronRight size={18} className="text-muted-foreground" />
+      </button>
+
       <div className="card-surface p-4">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
         <p className="mt-1 text-xs text-muted-foreground">
