@@ -248,6 +248,9 @@ function MemberDetailPage() {
               <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground inline-flex items-center gap-1.5">
                 <CalendarPlus size={14}/> Book class
               </button>
+              <button onClick={()=>{ setDeleteConfirmName(""); setDeleteOpen(true); }} className="rounded-pill border hairline px-4 py-2 text-xs font-semibold text-destructive inline-flex items-center gap-1.5 hover:bg-destructive/10">
+                <Trash2 size={14}/> Delete account
+              </button>
             </div>
           </div>
         </section>
