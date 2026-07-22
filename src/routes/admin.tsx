@@ -283,6 +283,11 @@ function ClassesAdmin() {
   const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
   const [endDate, setEndDate] = useState("");
   const [view, setView] = useState<ClassView>("upcoming");
+  const [selectedDate, setSelectedDate] = useState<string>(toAmmanDateKey(new Date()));
+  const [viewedMonth, setViewedMonth] = useState<Date>(() => {
+    const n = ammanNow();
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  });
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: ClassType }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
 
