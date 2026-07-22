@@ -163,3 +163,50 @@ function MembershipPage() {
     </div>
   );
 }
+
+const TRACKS: { key: "sat_mon_wed" | "sun_tue_thu"; label: string }[] = [
+  { key: "sat_mon_wed", label: "Sat · Mon · Wed" },
+  { key: "sun_tue_thu", label: "Sun · Tue · Thu" },
+];
+
+export function TrackPicker({ userId, childId, current, onChanged }: {
+  userId: string; childId: string | null; current: string | null; onChanged: () => void;
+}) {
+  const setTrack = useMutation({
+    mutationFn: async (track: string) => {
+      const { error } = await (supabase as any).rpc("set_group_track", {
+        target_user: userId, target_child: childId, track,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Booking days saved"); onChanged(); },
+    onError: (e: any) => toast.error(e.message ?? "Couldn't save"),
+  });
+
+  const currentLabel = TRACKS.find(t => t.key === current)?.label ?? null;
+
+  return (
+    <div className="mt-4 border-t hairline pt-4">
+      <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Booking days</p>
+      {current ? (
+        <p className="mt-2 text-sm font-semibold">{currentLabel}</p>
+      ) : (
+        <>
+          <p className="mt-1 text-[11px] text-muted-foreground">Pick your track — you can only book Mixed, Women Only and Kids classes on these days. Max 12 classes per month. This can't be changed once set.</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {TRACKS.map((tr) => (
+              <button
+                key={tr.key}
+                disabled={setTrack.isPending}
+                onClick={() => { if (confirm(`Lock your track to ${tr.label}? Staff can change it later if needed.`)) setTrack.mutate(tr.key); }}
+                className="rounded-pill border hairline py-2 text-[11px] font-semibold disabled:opacity-60"
+              >
+                {tr.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
