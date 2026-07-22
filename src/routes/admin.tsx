@@ -879,13 +879,6 @@ function MembersAdmin() {
   });
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [addFor, setAddFor] = useState<string | null>(null);
-  const [addKind, setAddKind] = useState<"group" | "pt">("group");
-  const [childId, setChildId] = useState<string>("");
-  const [days, setDays] = useState<number>(30);
-  const [sessions, setSessions] = useState<number>(10);
-  const [method, setMethod] = useState<"cash" | "card">("cash");
-  const [note, setNote] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "member_code" | "expiry" | "pt">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
