@@ -99,6 +99,9 @@ function BookPage() {
   const daysWithClasses = new Set(classes.map((c: any) => c.starts_at.slice(0, 10)));
 
   // Adult sees all; child sees only kids + pt
+  const memberGender = (profile as any)?.gender ?? null;
+  const isFemale = memberGender === "female";
+  const FEMALE_ONLY = new Set(["women_only", "yoga", "gymnastics"]);
   const effectiveFilter = bookingForChild ? (filter === "pt" ? "pt" : filter === "kids" ? "kids" : "all") : (filter === "kids" ? "all" : filter);
   const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
   const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
@@ -126,6 +129,7 @@ function BookPage() {
     if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
     // mixed / women_only / yoga / gymnastics — adult group only
     if (bookingForChild || !groupActiveSelf) return false;
+    if (FEMALE_ONLY.has(type) && !isFemale) return false;
     if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return false;
     return true;
   };
@@ -138,6 +142,9 @@ function BookPage() {
       return "";
     }
     if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
+    if (FEMALE_ONLY.has(type) && !isFemale) {
+      return memberGender === null ? "Set your gender in Profile to book" : "Female members only";
+    }
     if (selfPaused) return "Membership paused";
     if (!groupActiveSelf) return "Your group membership isn't active";
     if (TRACK_RESTRICTED.has(type) && !effectiveTrack) return "Pick booking days first";
@@ -151,6 +158,8 @@ function BookPage() {
     // Adults never see kids classes; children only see kids or pt
     if (!bookingForChild && c.type === "kids") return false;
     if (bookingForChild && c.type !== "kids" && c.type !== "pt") return false;
+    // Hide female-only classes from male / gender-unset adults
+    if (!bookingForChild && FEMALE_ONLY.has(c.type) && !isFemale) return false;
     return effectiveFilter === "all" || c.type === effectiveFilter;
   });
 
@@ -254,9 +263,15 @@ function BookPage() {
           </div>
         </div>
 
+        {!bookingForChild && memberGender === null && (
+          <div className="mt-4 rounded-2xl border hairline bg-card p-4">
+            <p className="text-xs font-semibold">Complete your profile</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in Profile → Edit to book group classes.</p>
+          </div>
+        )}
         {!bookingForChild && (
           <div className="mt-4 grid grid-cols-3 gap-2" data-tour="filters">
-            {TYPES.filter((tp) => tp.key !== "kids").map((tp) => (
+            {TYPES.filter((tp) => tp.key !== "kids" && (isFemale || !FEMALE_ONLY.has(tp.key))).map((tp) => (
               <button key={tp.key} onClick={() => setFilter(tp.key)}
                 className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
                   filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"

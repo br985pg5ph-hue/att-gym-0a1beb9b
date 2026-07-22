@@ -1,51 +1,43 @@
+## Gender-Based Class Access
 
-## Playback of the rules
+Add `gender` to accounts and children, then filter class visibility and enforce eligibility on the server.
 
-- **Applies to:** Mixed, Women Only, Kids group classes.
-- **Exempt:** PT, Yoga, Gymnastics — no track, no monthly cap (unchanged).
-- **Packages:** 1 month or 3 months. Both cap at **12 classes per month**, counted on a **rolling 30-day window** anchored to the subscription's start date.
-- **Day tracks:** Track A = Sat / Mon / Wed. Track B = Sun / Tue / Thu.
-- **Track lock:** picked when the subscription is created/renewed and fixed for that subscription's lifetime. A new track can only be chosen on renewal (once the previous cycle ends, or if admin explicitly resets it).
-- **Kids:** each child has their own track, independent of the parent.
-- **Admin override:** staff can force-book any day for any member and bypass the cap.
+### Schema
+Migration:
+- `ALTER TABLE profiles ADD COLUMN gender text CHECK (gender IN ('male','female'))`
+- `ALTER TABLE children ADD COLUMN gender text CHECK (gender IN ('male','female'))` (already exists as `gender` — verify; if present, reuse and constrain values)
+- Update `consume_class_credit` trigger to reject bookings when class type doesn't match caller's gender/account context (staff bypass preserved via `has_role`):
+  - `women_only`, `yoga`, `gymnastics` → require `profiles.gender = 'female'` (adult booking, `child_id IS NULL`)
+  - `mixed` → adults only (already enforced by kids/adult split)
+  - `kids` → child booking only (already enforced)
 
-## What changes
+### Signup
+`src/routes/signup.tsx`: add required Male/Female selector, pass into `auth.signUp` metadata as `gender`. Update `handle_new_user` trigger to persist `raw_user_meta_data->>'gender'` into `profiles.gender`.
 
-### 1. Database (one migration)
-- Add `group_track` (`'sat_mon_wed' | 'sun_tue_thu' | null`) and `group_subscription_started_at timestamptz` to `profiles` and `children`.
-- Update `sync_classes_remaining` (group branch) to also set `group_subscription_started_at = now()` on a fresh credit when there's no active cycle, and clear both `group_track` + `group_subscription_started_at` when the cycle lapses to null.
-- Update `consume_class_credit` trigger for group class types (`mixed`, `women_only`, `kids`):
-  - If booking `member_id` is the caller (self-booked, i.e. `created via a member RLS path` — detect via `has_role(auth.uid(), 'staff')`; staff bypass both checks), enforce:
-    - **Track check:** class weekday (Amman TZ) must match the profile/child `group_track`. Reject with "This class isn't on your booking days" if not.
-    - **Track missing:** if `group_track IS NULL` while a group subscription is active, reject with "Choose your booking days first."
-    - **Cap check:** count `bookings` for that member/child with `status='upcoming'` OR (attended past) whose class `starts_at` falls in the current rolling 30-day window from `group_subscription_started_at` (i.e. floor((now - start)/30d) window). Reject at ≥ 12 with "You've reached 12 classes this month."
-- Add `set_group_track(target_user uuid, target_child uuid, track text)` SECURITY DEFINER function so members can set their own track once per cycle (only when currently null), and staff can override any time.
+### Existing users (soft prompt)
+- `src/routes/_app/profile.edit.tsx`: add Gender field (male/female radio).
+- `src/routes/_app/book.tsx`: when adult profile has `gender IS NULL`, show an inline banner with a link to Profile → Edit; disable booking of any group class (mixed/women_only/yoga/gymnastics) until set. PT and Kids booking unaffected.
 
-### 2. Admin (`src/routes/admin.members.$id.tsx`)
-- In the **Group Membership** card's "Renew or Add" flow, add a required Track selector (Track A / Track B) shown whenever the member has no active cycle. If they already have an active cycle with a locked track, show the current track read-only plus a small "Change track" button (staff-only override).
-- Show current track + classes-used-this-window (e.g. "7 / 12 this month") on the card.
-- Staff booking modal is unaffected — staff bookings bypass track/cap via the RLS check above.
+### Children
+`src/routes/_app/profile.children.tsx` (add-child form): capture gender (male/female) at add time. Records only — no filtering impact today.
 
-### 3. Member UI
-- **Membership page (`src/routes/_app/membership.tsx`)** and profile: display locked track and usage `used / 12` for the current window. If subscription is active but `group_track` is null, show a "Choose your booking days" prompt with a one-time picker (Track A / Track B) calling `set_group_track`.
-- **Booking page (`src/routes/_app/book.tsx`)**:
-  - When the active bookee (self or selected child) has an active group subscription with a locked track, grey out calendar days that don't match the track and hide/disable group slots on off-track days with the message "Not your booking day."
-  - When at cap, disable remaining group slots in the current window with "12/12 this month."
-  - Kids classes already restricted to child bookee — same rules apply per child track.
-- Yoga / Gymnastics slots continue to ignore the track and cap.
+### Class visibility (booking UI)
+`src/routes/_app/book.tsx`: filter available class types by active context:
+- Parent Mode with child selected → only `kids` (unchanged).
+- Adult (self) with `gender = 'male'` → `mixed`, `pt`.
+- Adult (self) with `gender = 'female'` → `mixed`, `women_only`, `yoga`, `gymnastics`, `pt`.
+- Adult with `gender = NULL` → `mixed` shown but disabled with prompt (soft-block until they set gender). PT still bookable.
 
-### 4. Signup flow
-- No change at signup — members don't have a subscription yet. Track is chosen at first renewal (admin does it during "Renew or Add") or via the member membership screen if a subscription is granted without a track.
+Also hide type chips that resolve to zero visible classes for the current context.
 
-## Notes / edge cases
+### Admin
+Staff continues to bypass gender/track/cap rules in the trigger. No admin UI changes required, but member detail (`admin.members.$id.tsx`) will display gender in the Contact section for reference.
 
-- Existing active subscriptions will have `group_track = null`. They'll be prompted to pick a track on next booking attempt (or staff sets it in admin). Cap counting for legacy subs uses `now() - 30d` as fallback until they renew.
-- Weekday is computed in Amman timezone (`Asia/Amman`) both in Postgres (`(starts_at AT TIME ZONE 'Asia/Amman')::date` → `extract(dow ...)`) and in the client (via existing `src/lib/time.ts`).
-- Pause/resume unchanged — pause already blocks group bookings.
+### Technical notes
+- Use existing `has_role(auth.uid(), 'staff')` guard in the trigger for bypass.
+- Keep client-side filtering purely presentational; the trigger is the source of truth.
+- No changes to RLS policies needed.
 
-## Technical details (for engineers)
-
-- Track enum stored as text with CHECK constraint to keep migration simple.
-- Cap query in trigger: `SELECT count(*) FROM bookings b JOIN classes c ON c.id=b.class_id WHERE b.member_id=NEW.member_id AND (b.child_id IS NOT DISTINCT FROM NEW.child_id) AND c.type IN ('mixed','women_only','kids') AND b.status <> 'cancelled' AND c.starts_at >= window_start AND c.starts_at < window_start + interval '30 days'` where `window_start = start + floor(extract(epoch from now()-start)/(30*86400)) * interval '30 days'`.
-- Staff bypass via `has_role(auth.uid(),'staff')` inside the trigger (SECURITY DEFINER preserves `auth.uid()`).
-- RLS on `profiles`/`children` update policies extended to allow updating `group_track` only when the previous value is null (members) or always (staff).
+### Out of scope
+- Changing which classes count toward the 12/month cap.
+- Migrating existing accounts' gender in bulk (they self-set via Profile).

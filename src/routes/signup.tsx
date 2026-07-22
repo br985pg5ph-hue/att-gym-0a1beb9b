@@ -30,6 +30,7 @@ function SignUpPage() {
   const [email, setEmail] = useState("");
   const [cc, setCc] = useState("+962");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "">("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [referral, setReferral] = useState(ref || "");
@@ -38,8 +39,9 @@ function SignUpPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) return toast.error("Passwords do not match");
+    if (!gender) return toast.error("Please select your gender");
     setLoading(true);
-    const meta: Record<string, string> = { name, phone: `${cc}${phone}` };
+    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender };
     const trimmedRef = referral.trim();
     if (trimmedRef) meta.referral_code = trimmedRef;
     const { data, error } = await supabase.auth.signUp({
@@ -90,6 +92,16 @@ function SignUpPage() {
           <CountrySelect value={cc} onChange={setCc} />
           <input required type="tel" placeholder={t.phone} value={phone} onChange={(e)=>setPhone(e.target.value)}
             className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {(["male","female"] as const).map((g) => (
+            <button type="button" key={g} onClick={() => setGender(g)}
+              className={`rounded-pill border px-4 py-3 text-sm font-medium capitalize transition ${
+                gender === g ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+              }`}>
+              {g}
+            </button>
+          ))}
         </div>
         <input required type="password" placeholder={t.password} value={password} onChange={(e)=>setPassword(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />

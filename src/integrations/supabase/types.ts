@@ -275,6 +275,7 @@ export type Database = {
           date_of_birth: string | null
           disciplines: string[]
           experience_level: string | null
+          gender: string | null
           goals: string[]
           group_subscription_started_at: string | null
           group_subscription_until: string | null
@@ -306,6 +307,7 @@ export type Database = {
           date_of_birth?: string | null
           disciplines?: string[]
           experience_level?: string | null
+          gender?: string | null
           goals?: string[]
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
@@ -337,6 +339,7 @@ export type Database = {
           date_of_birth?: string | null
           disciplines?: string[]
           experience_level?: string | null
+          gender?: string | null
           goals?: string[]
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
@@ -452,6 +455,7 @@ export type Database = {
           date_of_birth: string | null
           disciplines: string[]
           experience_level: string | null
+          gender: string | null
           goals: string[]
           group_subscription_started_at: string | null
           group_subscription_until: string | null
@@ -492,6 +496,7 @@ export type Database = {
           date_of_birth: string | null
           disciplines: string[]
           experience_level: string | null
+          gender: string | null
           goals: string[]
           group_subscription_started_at: string | null
           group_subscription_until: string | null

@@ -20,6 +20,7 @@ type Profile = {
   is_parent: boolean;
   membership_paused_at: string | null;
   tour_completed_at: string | null;
+  gender: "male" | "female" | null;
 };
 
 export type Child = {
