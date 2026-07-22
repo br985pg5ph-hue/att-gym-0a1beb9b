@@ -323,6 +323,47 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
         </div>
       </div>
 
+      {/* Signup trend chart */}
+      <div className="card-surface p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-primary" />
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.signupTrend}</p>
+          </div>
+          <div className="flex rounded-pill border hairline p-0.5">
+            {[7, 30].map((range) => (
+              <button
+                key={range}
+                onClick={() => setTrendRange(range as 7 | 30)}
+                className={`rounded-pill px-2.5 py-1 text-[10px] font-semibold transition-colors ${trendRange === range ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                {range === 7 ? t.last7Days : t.last30Days}
+              </button>
+            ))}
+          </div>
+        </div>
+        {signupTrendData.length === 0 ? (
+          <p className="mt-6 py-6 text-center text-xs text-muted-foreground">No signup data</p>
+        ) : (
+          <div className="mt-4 flex h-28 items-end justify-between gap-1">
+            {signupTrendData.map((d) => {
+              const heightPct = Math.round((d.count / maxSignupCount) * 100);
+              const label = new Date(d.date).toLocaleDateString(undefined, { weekday: "narrow" });
+              return (
+                <div key={d.date} className="flex flex-1 flex-col items-center gap-1.5">
+                  <div
+                    className="w-full max-w-[18px] rounded-t-sm bg-primary/80 transition-all hover:bg-primary"
+                    style={{ height: `${Math.max(heightPct, 4)}%` }}
+                    title={`${d.date}: ${d.count}`}
+                  />
+                  <span className="text-[9px] text-muted-foreground">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Recent transactions - full width table-ish */}
       <div className="card-surface p-5">
         <div className="flex items-center justify-between">
