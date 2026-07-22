@@ -436,10 +436,6 @@ function MemberDetailPage() {
                     <span>{member.phone}</span>
                   </a>
                 )}
-                <Link to="/admin" className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
-                  <Mail size={16} className="text-primary" />
-                  <span className="truncate">{user?.email || "—"}</span>
-                </Link>
               </div>
             </section>
           </div>
