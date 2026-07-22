@@ -180,7 +180,7 @@ function BookPage() {
 
 
       <div className="px-5">
-        <div className="card-surface p-4">
+        <div className="card-surface p-4" data-tour="calendar">
           <div className="mb-3 flex items-center justify-between">
             <button
               onClick={() => changeMonth(-1)}
@@ -229,7 +229,7 @@ function BookPage() {
         </div>
 
         {!bookingForChild && (
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2" data-tour="filters">
             {TYPES.filter((tp) => tp.key !== "kids").map((tp) => (
               <button key={tp.key} onClick={() => setFilter(tp.key)}
                 className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
@@ -255,7 +255,7 @@ function BookPage() {
 
 
 
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 space-y-2" data-tour="slots">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
           {daySlots.map((c: any) => {
             const cnt = counts[c.id] ?? 0;
