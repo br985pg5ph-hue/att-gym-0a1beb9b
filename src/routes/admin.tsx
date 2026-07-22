@@ -809,7 +809,7 @@ function MembersAdmin() {
       {sorted.length === 0 && (
         <p className="py-6 text-center text-xs text-muted-foreground">No members found.</p>
       )}
-      {filtered.map((m: any) => {
+      {sorted.map((m: any) => {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
