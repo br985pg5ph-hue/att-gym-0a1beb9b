@@ -1097,6 +1097,12 @@ function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
 
   return (
     <div className="space-y-4">
+      <button
+        onClick={() => setTab("dashboard")}
+        className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft size={16} /> Back to Dashboard
+      </button>
       <div className="card-surface p-5">
         <h2 className="font-display text-xl">Gym Info</h2>
         <p className="mt-1 text-xs text-muted-foreground">Edits appear instantly on the members' Profile and Location pages.</p>
