@@ -51,7 +51,8 @@ function HomePage() {
   const groupUntil = scope === "child" && selectedChild
     ? selectedChild.group_subscription_until
     : profile?.group_subscription_until ?? null;
-  const groupActive = !!groupUntil && new Date(groupUntil).getTime() > Date.now();
+  const isPaused = scope !== "child" && !!(profile as any)?.membership_paused_at;
+  const groupActive = !isPaused && !!groupUntil && new Date(groupUntil).getTime() > Date.now();
   const groupHolderName = scope === "child" && selectedChild ? selectedChild.name : (profile?.name ?? "");
   const ptRemaining = scope === "child" && selectedChild
     ? (selectedChild as any).pt_sessions_remaining ?? 0
