@@ -61,14 +61,6 @@ function SettingsPage() {
       </div>
       <PageHeader title={t.settings} />
       <div className="space-y-4 px-5">
-        <Link to="/profile/edit" className="card-surface flex items-center gap-3 p-4 hover:bg-muted/40">
-          <UserCog size={18} className="text-muted-foreground" />
-          <div className="flex-1">
-            <p className="text-sm font-medium">Edit Profile</p>
-            <p className="text-xs text-muted-foreground">Name, phone, email, password</p>
-          </div>
-          <ChevronRight size={18} className="text-muted-foreground flip-rtl" />
-        </Link>
         <div className="card-surface divide-y hairline overflow-hidden">
 
           <div className="flex items-center gap-3 p-4">
