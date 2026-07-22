@@ -168,7 +168,7 @@ function HomePage() {
             <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
           </div>
           <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} style={{ color: stats.attended >= 51 ? "#FFD700" : stats.attended >= 16 ? "#C0C0C0" : "#CD7F32" }} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
           </div>
         </div>
