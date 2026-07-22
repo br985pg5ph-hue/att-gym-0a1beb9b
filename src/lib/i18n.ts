@@ -5,7 +5,7 @@ export const dict: Record<Lang, Dict> = {
   en: {
     appName: "ATT Academy",
     tagline: "Martial Arts & Functional Training",
-    home: "Home", book: "Booking", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin",
+    home: "Home", book: "Booking", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin", dashboard: "Dashboard",
     signIn: "Sign In", signUp: "Sign Up", signOut: "Sign Out", email: "Email", password: "Password", forgotPassword: "Forgot password?",
     createAccount: "Create Account", name: "Full name", phone: "Phone", confirmPassword: "Confirm password",
     interests: "Interests", pt: "Personal Training", womenOnly: "Women Only", mixed: "Mixed", kids: "Kids Group", yoga: "Yoga", gymnastics: "Gymnastics",
@@ -25,6 +25,7 @@ export const dict: Record<Lang, Dict> = {
     theme: "Theme", language: "Language", dark: "Dark", lightMode: "Light", english: "English", arabic: "العربية",
     notifications: "Notifications", legal: "Legal & Privacy", deleteAccount: "Delete Account",
     manageAnnouncements: "Announcements", manageClasses: "Classes", manageCoaches: "Coaches", membersList: "Members",
+    todaySnapshot: "Today Snapshot", activeGroupMembers: "Active Group Members", ptSessionsOnBooks: "PT Sessions on Books", newSignups: "New Signups", expiringSoon: "Expiring Soon", recentTransactions: "Recent Transactions", classesToday: "Classes Today", bookingsToday: "Bookings Today", viewAll: "View all", noClassesToday: "No classes scheduled today",
     save: "Save", edit: "Edit", delete: "Delete", add: "Add", title: "Title", body: "Body", tag: "Tag",
     specialty: "Specialty", bio: "Bio", photoUrl: "Photo URL", type: "Type", coach: "Coach", capacity: "Capacity", startsAt: "Starts at",
     membershipActive: "Active Member", membershipInactive: "Inactive Member", hours: "Hours", connectWithUs: "Connect with us",
@@ -32,7 +33,7 @@ export const dict: Record<Lang, Dict> = {
   ar: {
     appName: "أكاديمية ATT",
     tagline: "فنون قتالية وتدريب وظيفي",
-    home: "الرئيسية", book: "الحجز", coaches: "المدربون", news: "الأخبار", profile: "الملف", admin: "الإدارة",
+    home: "الرئيسية", book: "الحجز", coaches: "المدربون", news: "الأخبار", profile: "الملف", admin: "الإدارة", dashboard: "لوحة التحكم",
     signIn: "تسجيل الدخول", signUp: "إنشاء حساب", signOut: "تسجيل الخروج", email: "البريد الإلكتروني", password: "كلمة المرور", forgotPassword: "نسيت كلمة المرور؟",
     createAccount: "إنشاء الحساب", name: "الاسم الكامل", phone: "الهاتف", confirmPassword: "تأكيد كلمة المرور",
     interests: "الاهتمامات", pt: "تدريب خاص", womenOnly: "للنساء فقط", mixed: "مختلط", kids: "أطفال", yoga: "يوغا", gymnastics: "جمباز",
@@ -52,6 +53,7 @@ export const dict: Record<Lang, Dict> = {
     theme: "المظهر", language: "اللغة", dark: "داكن", lightMode: "فاتح", english: "English", arabic: "العربية",
     notifications: "الإشعارات", legal: "القانوني والخصوصية", deleteAccount: "حذف الحساب",
     manageAnnouncements: "إعلانات", manageClasses: "حصص", manageCoaches: "مدربون", membersList: "أعضاء",
+    todaySnapshot: "لقطة اليوم", activeGroupMembers: "أعضاء المجموعة النشطون", ptSessionsOnBooks: "جلسات PT المحجوزة", newSignups: "تسجيلات جديدة", expiringSoon: "تنتهي قريباً", recentTransactions: "آخر الحركات", classesToday: "حصص اليوم", bookingsToday: "حجوزات اليوم", viewAll: "عرض الكل", noClassesToday: "لا توجد حصص مجدولة اليوم",
     save: "حفظ", edit: "تعديل", delete: "حذف", add: "إضافة", title: "العنوان", body: "المحتوى", tag: "الوسم",
     specialty: "التخصص", bio: "نبذة", photoUrl: "رابط الصورة", type: "النوع", coach: "المدرب", capacity: "السعة", startsAt: "يبدأ في",
     membershipActive: "عضو نشط", membershipInactive: "عضو غير نشط", hours: "ساعات العمل", connectWithUs: "تواصل معنا",

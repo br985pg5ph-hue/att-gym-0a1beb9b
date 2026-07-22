@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
 import { ammanNow, toAmmanDateInput, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -20,17 +22,18 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "announcements" | "classes" | "coaches" | "members";
+type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members";
 
 function AdminPage() {
   const { t } = useLang();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<Tab>("announcements");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const pathname = useRouterState({ select: s => s.location.pathname });
   const isChild = pathname !== "/admin" && pathname !== "/admin/";
   if (isChild) return <Outlet />;
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
+    { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "coaches", label: t.manageCoaches, icon: UserCog },
@@ -57,13 +60,14 @@ function AdminPage() {
         </button>
       </header>
       <main className="mx-auto max-w-3xl px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]">
+        {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
         {tab === "announcements" && <AnnouncementsAdmin />}
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
-        <ul className="grid grid-cols-4 items-center px-2">
+        <ul className="grid grid-cols-5 items-center px-1">
           {tabs.map(x => {
             const active = tab === x.key;
             const Icon = x.icon;
@@ -81,6 +85,131 @@ function AdminPage() {
           })}
         </ul>
       </nav>
+    </div>
+  );
+}
+
+function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
+  const { t } = useLang();
+  const fetchStats = useServerFn(getAdminDashboardStats);
+  const { data: stats } = useQuery({
+    queryKey: ["admin-dashboard"],
+    queryFn: () => fetchStats(),
+  });
+
+  const totalBookedToday = (stats?.todayClasses ?? []).reduce((sum, c) => sum + c.booked, 0);
+  const totalCapacityToday = (stats?.todayClasses ?? []).reduce((sum, c) => sum + c.capacity, 0);
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true });
+
+  return (
+    <div className="space-y-4">
+      <div className="card-surface p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {toAmmanDateInput(ammanNow()).slice(0, 10)}
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border hairline bg-card p-3">
+            <p className="font-display text-3xl leading-none">{stats?.todayClasses.length ?? 0}</p>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.classesToday}</p>
+          </div>
+          <div className="rounded-2xl border hairline bg-card p-3">
+            <p className="font-display text-3xl leading-none">{totalBookedToday}{totalCapacityToday > 0 ? `/${totalCapacityToday}` : ""}</p>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.bookingsToday}</p>
+          </div>
+          <div className="rounded-2xl border hairline bg-card p-3">
+            <p className="font-display text-3xl leading-none">{stats?.activeGroupMembers ?? 0}</p>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.activeGroupMembers}</p>
+          </div>
+          <div className="rounded-2xl border hairline bg-card p-3">
+            <p className="font-display text-3xl leading-none">{stats?.ptSessionsOnBooks ?? 0}</p>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.ptSessionsOnBooks}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="card-surface p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.classesToday}</p>
+          <button onClick={() => setTab("classes")} className="text-[10px] font-semibold text-primary">{t.viewAll}</button>
+        </div>
+        {(stats?.todayClasses.length ?? 0) === 0 ? (
+          <p className="mt-3 text-center text-xs text-muted-foreground">{t.noClassesToday}</p>
+        ) : (
+          <div className="mt-3 space-y-2">
+            {stats?.todayClasses.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2.5">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{c.title}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {formatTime(c.starts_at)} • {c.coach_name || t.coach} • {c.type}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${c.full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                    {c.booked}/{c.capacity}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="card-surface p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.newSignups}</p>
+          <p className="mt-1 font-display text-2xl leading-none">{stats?.newSignupsThisWeek ?? 0}</p>
+          <p className="mt-1 text-[10px] text-muted-foreground">this week</p>
+        </div>
+        <div className="card-surface p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t.expiringSoon}</p>
+          <p className="mt-1 font-display text-2xl leading-none">{stats?.expiringSoonCount ?? 0}</p>
+          <p className="mt-1 text-[10px] text-muted-foreground">next 7 days</p>
+        </div>
+      </div>
+
+      {(stats?.expiringSoonList.length ?? 0) > 0 && (
+        <div className="card-surface p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-destructive">{t.expiringSoon}</p>
+          <div className="mt-3 space-y-2">
+            {stats?.expiringSoonList.map((m) => (
+              <div key={m.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2">
+                <p className="text-sm font-semibold">{m.name}</p>
+                <p className="text-[10px] text-muted-foreground">{formatDate(m.group_subscription_until)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="card-surface p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.recentTransactions}</p>
+        {(stats?.recentTransactions.length ?? 0) === 0 ? (
+          <p className="mt-3 text-center text-xs text-muted-foreground">No recent transactions</p>
+        ) : (
+          <div className="mt-3 space-y-2">
+            {stats?.recentTransactions.map((tx) => (
+              <div key={tx.id} className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{tx.member_name}{tx.child_name ? ` • ${tx.child_name}` : ""}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {tx.type} {tx.service}{tx.classes ? ` • ${tx.classes} sessions` : ""}{tx.days ? ` • ${tx.days} days` : ""}
+                  </p>
+                </div>
+                <span className={`shrink-0 rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tx.type === "credit" ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"}`}>
+                  {tx.type}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
