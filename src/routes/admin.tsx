@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, fromAmmanDateInput, addAmmanDays, formatAmm
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -607,6 +607,16 @@ function formatGroupStatus(until: string | null | undefined): string {
   return `Group: active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
 }
 
+function daysUntilGroupExpiry(until: string | null | undefined): number | null {
+  if (!until) return null;
+  const expiry = new Date(until);
+  if (isNaN(expiry.getTime())) return null;
+  const now = ammanNow();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const diff = Math.ceil((expiry.getTime() - now.getTime()) / msPerDay);
+  return diff;
+}
+
 function MembersAdmin() {
   const qc = useQueryClient();
   const { user } = useAuth();
@@ -702,6 +712,8 @@ function MembersAdmin() {
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
         const isAdding = addFor === m.id;
+        const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
+        const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
           <div key={m.id} className="card-surface p-4">
             <div className="flex w-full items-start justify-between gap-3">
@@ -711,7 +723,18 @@ function MembersAdmin() {
                 className="flex min-w-0 flex-1 items-start gap-3 text-left"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                    {showFlag && (
+                      <span
+                        title={expiryDays! < 0 ? "Subscription expired" : expiryDays === 0 ? "Expires today" : `${expiryDays} day${expiryDays === 1 ? "" : "s"} left`}
+                        className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive"
+                      >
+                        <Flag size={10} />
+                        {expiryDays! < 0 ? "Expired" : expiryDays === 0 ? "Today" : `${expiryDays}d`}
+                      </span>
+                    )}
+                  </div>
                   {m.member_code && (
                     <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">Member ID: {m.member_code}</p>
                   )}
