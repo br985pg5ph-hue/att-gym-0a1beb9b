@@ -56,6 +56,7 @@ export const dict: Record<Lang, Dict> = {
     notifications: "الإشعارات", legal: "القانوني والخصوصية", deleteAccount: "حذف الحساب",
     manageAnnouncements: "إعلانات", manageClasses: "حصص", manageCoaches: "مدربون", membersList: "أعضاء",
     todaySnapshot: "لقطة اليوم", activeGroupMembers: "أعضاء المجموعة النشطون", ptSessionsOnBooks: "جلسات PT المحجوزة", newSignups: "تسجيلات جديدة", expiringSoon: "تنتهي قريباً", recentTransactions: "آخر الحركات", classesToday: "حصص اليوم", bookingsToday: "حجوزات اليوم", viewAll: "عرض الكل", noClassesToday: "لا توجد حصص مجدولة اليوم",
+    revenueSnapshot: "نظرة على الإيرادات", salesToday: "مبيعات اليوم", salesThisWeek: "مبيعات هذا الأسبوع", cash: "نقد", cliq: "Cliq", signupTrend: "اتجاه التسجيل", last7Days: "آخر 7 أيام", last30Days: "آخر 30 يوماً", membershipStatus: "حالة العضوية", active: "نشط", paused: "متوقف", expired: "منتهي", neverSubscribed: "لم يشترك",
     sortBy: "ترتيب حسب", sortNameAsc: "الاسم أ-ي", sortNameDesc: "الاسم ي-أ", sortMemberIdAsc: "رقم العضو ↑", sortMemberIdDesc: "رقم العضو ↓", sortExpiryAsc: "الانتهاء قريباً", sortExpiryDesc: "الانتهاء لاحقاً", sortPtAsc: "جلسات PT: الأقل", sortPtDesc: "جلسات PT: الأكثر",
     save: "حفظ", edit: "تعديل", delete: "حذف", add: "إضافة", title: "العنوان", body: "المحتوى", tag: "الوسم",
     specialty: "التخصص", bio: "نبذة", photoUrl: "رابط الصورة", type: "النوع", coach: "المدرب", capacity: "السعة", startsAt: "يبدأ في",
