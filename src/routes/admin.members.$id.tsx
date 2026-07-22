@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake, Pause, Play } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMemberEmail } from "@/lib/account.functions";
 
@@ -38,7 +38,7 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, children(id, name, group_subscription_until, pt_sessions_remaining)")
+        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, children(id, name, group_subscription_until, pt_sessions_remaining)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
@@ -146,6 +146,20 @@ function MemberDetailPage() {
       qc.invalidateQueries({ queryKey: ["admin-member-bookings", id] });
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const togglePause = useMutation({
+    mutationFn: async (action: "pause" | "resume") => {
+      const rpc = action === "pause" ? "pause_membership" : "resume_membership";
+      const { error } = await (supabase as any).rpc(rpc, { target_user: id });
+      if (error) throw error;
+    },
+    onSuccess: (_d, action) => {
+      toast.success(action === "pause" ? "Membership paused" : "Membership resumed");
+      qc.invalidateQueries({ queryKey: ["admin-member", id] });
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -346,6 +360,46 @@ function MemberDetailPage() {
 
           {/* Right column: management controls */}
           <div className="space-y-5">
+            {/* Pause membership */}
+            {(() => {
+              const m: any = member || {};
+              const isPaused = !!m.membership_paused_at;
+              const used = m.membership_pause_days_used ?? 0;
+              const remaining = Math.max(0, 45 - used);
+              const hasActive = m.group_subscription_until && new Date(m.group_subscription_until).getTime() > Date.now();
+              const pausedSince = isPaused ? new Date(m.membership_paused_at) : null;
+              const pausedDays = pausedSince ? Math.ceil((Date.now() - pausedSince.getTime()) / 86400000) : 0;
+              return (
+                <section className="card-surface p-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display text-lg leading-none">Membership pause</h3>
+                    {isPaused && <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">Paused</span>}
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {isPaused
+                      ? `Paused for ${pausedDays} day${pausedDays===1?"":"s"} · ${remaining} of 45 days left`
+                      : `${remaining} of 45 pause days remaining this cycle`}
+                  </p>
+                  {isPaused ? (
+                    <button
+                      onClick={()=>togglePause.mutate("resume")}
+                      disabled={togglePause.isPending}
+                      className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60 inline-flex items-center justify-center gap-1.5">
+                      <Play size={12}/> Resume membership
+                    </button>
+                  ) : (
+                    <button
+                      onClick={()=>togglePause.mutate("pause")}
+                      disabled={togglePause.isPending || !hasActive || remaining <= 0}
+                      className="mt-4 w-full rounded-pill border hairline py-2.5 text-xs font-semibold disabled:opacity-50 inline-flex items-center justify-center gap-1.5">
+                      <Pause size={12}/> Pause membership
+                    </button>
+                  )}
+                  {!hasActive && !isPaused && <p className="mt-2 text-[11px] text-muted-foreground">No active group membership to pause.</p>}
+                </section>
+              );
+            })()}
+
             {/* Renew or Add */}
             <section className="card-surface p-5">
               <h3 className="font-display text-lg leading-none">Manage credits</h3>

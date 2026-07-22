@@ -276,6 +276,8 @@ export type Database = {
           interests: string[]
           is_parent: boolean
           member_code: string
+          membership_pause_days_used: number
+          membership_paused_at: string | null
           membership_status: string
           name: string
           onboarded: boolean
@@ -302,6 +304,8 @@ export type Database = {
           interests?: string[]
           is_parent?: boolean
           member_code: string
+          membership_pause_days_used?: number
+          membership_paused_at?: string | null
           membership_status?: string
           name?: string
           onboarded?: boolean
@@ -328,6 +332,8 @@ export type Database = {
           interests?: string[]
           is_parent?: boolean
           member_code?: string
+          membership_pause_days_used?: number
+          membership_paused_at?: string | null
           membership_status?: string
           name?: string
           onboarded?: boolean
@@ -421,6 +427,80 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      pause_membership: {
+        Args: { target_user: string }
+        Returns: {
+          avatar_url: string | null
+          classes_attended: number
+          created_at: string
+          date_of_birth: string | null
+          disciplines: string[]
+          experience_level: string | null
+          goals: string[]
+          group_subscription_until: string | null
+          id: string
+          injuries: string | null
+          interests: string[]
+          is_parent: boolean
+          member_code: string
+          membership_pause_days_used: number
+          membership_paused_at: string | null
+          membership_status: string
+          name: string
+          onboarded: boolean
+          phone: string | null
+          pt_sessions_remaining: number
+          referral_code: string
+          referral_reward_granted: boolean
+          referred_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          streak: number
+          training_frequency: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      resume_membership: {
+        Args: { target_user: string }
+        Returns: {
+          avatar_url: string | null
+          classes_attended: number
+          created_at: string
+          date_of_birth: string | null
+          disciplines: string[]
+          experience_level: string | null
+          goals: string[]
+          group_subscription_until: string | null
+          id: string
+          injuries: string | null
+          interests: string[]
+          is_parent: boolean
+          member_code: string
+          membership_pause_days_used: number
+          membership_paused_at: string | null
+          membership_status: string
+          name: string
+          onboarded: boolean
+          phone: string | null
+          pt_sessions_remaining: number
+          referral_code: string
+          referral_reward_granted: boolean
+          referred_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          streak: number
+          training_frequency: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
