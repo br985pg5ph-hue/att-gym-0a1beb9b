@@ -280,6 +280,42 @@ function BookPage() {
         )}
 
 
+        {(() => {
+          const needsTrack = bookingForChild
+            ? (groupActiveChild && !trackChild)
+            : (groupActiveSelf && !selfPaused && !trackSelf);
+          if (!needsTrack) return null;
+          const target = bookingForChild ? bookingForChild.name : "you";
+          return (
+            <div className="mt-3 rounded-2xl border hairline bg-card p-4">
+              <p className="text-xs font-semibold">Choose booking days for {target}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Mixed / Women Only / Kids classes lock to a track (max 12/month). Ask staff if you need to change it later.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {[
+                  { key: "sat_mon_wed", label: "Sat · Mon · Wed" },
+                  { key: "sun_tue_thu", label: "Sun · Tue · Thu" },
+                ].map((tr) => (
+                  <button
+                    key={tr.key}
+                    onClick={async () => {
+                      if (!confirm(`Lock ${target === "you" ? "your" : target + "'s"} track to ${tr.label}?`)) return;
+                      const { error } = await (supabase as any).rpc("set_group_track", {
+                        target_user: user!.id,
+                        target_child: bookingForChild ? bookingForChild.id : null,
+                        track: tr.key,
+                      });
+                      if (error) toast.error(error.message);
+                      else { toast.success("Booking days saved"); refresh(); refreshChildren(); }
+                    }}
+                    className="rounded-pill border hairline py-2 text-[11px] font-semibold"
+                  >
+                    {tr.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="mt-2 space-y-2" data-tour="slots">
           {daySlots.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No classes this day</p>}
