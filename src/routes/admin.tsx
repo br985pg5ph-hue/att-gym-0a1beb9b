@@ -589,9 +589,6 @@ function MembersAdmin() {
                   <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
                     {m.role} • {m.membership_status}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground truncate">
-                    {m.pt_sessions_remaining ?? 0} PT left • {formatGroupStatus(m.group_subscription_until)}
-                  </p>
                   {hasKids && (
                     <span className="mt-2 inline-flex items-center rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
                       {kids.length} {kids.length === 1 ? "child" : "children"}
