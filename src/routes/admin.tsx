@@ -227,8 +227,58 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           )}
         </div>
 
-        {/* Right column: expiring soon + signup mini */}
+        {/* Right column: revenue + membership + expiring soon + members */}
         <div className="space-y-4">
+          {/* Revenue snapshot */}
+          <div className="card-surface p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.revenueSnapshot}</p>
+              <Wallet size={16} className="text-muted-foreground" />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="rounded-xl border hairline bg-card p-3">
+                <p className="text-[10px] text-muted-foreground">{t.salesToday}</p>
+                <p className="font-display mt-1 text-2xl leading-none">{revenueTodayTotal}</p>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {(stats?.revenueToday?.cash ?? 0)} {t.cash} · {(stats?.revenueToday?.cliq ?? 0)} {t.cliq}
+                </p>
+              </div>
+              <div className="rounded-xl border hairline bg-card p-3">
+                <p className="text-[10px] text-muted-foreground">{t.salesThisWeek}</p>
+                <p className="font-display mt-1 text-2xl leading-none">{revenueWeekTotal}</p>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {(stats?.revenueWeek?.cash ?? 0)} {t.cash} · {(stats?.revenueWeek?.cliq ?? 0)} {t.cliq}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Membership status breakdown */}
+          <div className="card-surface p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.membershipStatus}</p>
+              <span className="font-display text-2xl leading-none">{membershipTotal}</span>
+            </div>
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-pill bg-muted">
+              {membershipSegments.map((seg) => (
+                <div
+                  key={seg.key}
+                  className={`float-left h-full ${seg.color}`}
+                  style={{ width: `${(seg.count / membershipTotal) * 100}%` }}
+                />
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {membershipSegments.map((seg) => (
+                <div key={seg.key} className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${seg.color}`} />
+                  <span className="text-[10px] text-muted-foreground">{seg.label}</span>
+                  <span className="ml-auto text-[10px] font-semibold">{seg.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="card-surface p-5">
             <div className="flex items-center justify-between">
               <div>
