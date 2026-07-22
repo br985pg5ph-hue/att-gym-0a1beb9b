@@ -133,11 +133,16 @@ function HomePage() {
         <div className={`card-surface p-5 ${groupActive ? "bg-gradient-to-br from-primary/20 to-transparent" : ""}`}>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className={`flex items-center gap-2 ${groupActive ? "text-primary" : "text-muted-foreground"}`}>
+              <div className={`flex items-center gap-2 ${groupActive ? "text-primary" : isPaused ? "text-silver" : "text-muted-foreground"}`}>
                 {groupActive ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
                 <span className="text-[10px] uppercase tracking-widest">Group Membership</span>
               </div>
-              {groupActive ? (
+              {isPaused ? (
+                <>
+                  <p className="font-display mt-1 text-2xl leading-tight">Paused</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Resume from Membership to book group classes</p>
+                </>
+              ) : groupActive ? (
                 <>
                   <p className="font-display mt-1 text-2xl leading-tight">
                     {scope === "child" ? `${groupHolderName} - Active` : "Active"}
