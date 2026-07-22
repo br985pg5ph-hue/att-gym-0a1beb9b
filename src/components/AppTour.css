@@ -1,8 +1,8 @@
 /* Themed driver.js popover to match ATT Academy design tokens */
 .att-tour-popover.driver-popover {
-  background: hsl(var(--card));
-  color: hsl(var(--foreground));
-  border: 1px solid hsl(var(--border));
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
   padding: 18px 18px 14px;
@@ -15,14 +15,14 @@
   font-size: 22px;
   line-height: 1.1;
   letter-spacing: 0.02em;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   margin: 0 0 6px;
 }
 
 .att-tour-popover .driver-popover-description {
   font-size: 13px;
   line-height: 1.45;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   margin-bottom: 10px;
 }
 
@@ -35,7 +35,7 @@
 
 .att-tour-popover .driver-popover-progress-text {
   font-size: 11px;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -48,8 +48,8 @@
 
 .att-tour-popover .driver-popover-prev-btn,
 .att-tour-popover .driver-popover-next-btn {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 999px;
   padding: 8px 16px;
@@ -61,8 +61,8 @@
 
 .att-tour-popover .driver-popover-prev-btn {
   background: transparent;
-  color: hsl(var(--muted-foreground));
-  border: 1px solid hsl(var(--border));
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
 }
 
 .att-tour-popover .driver-popover-prev-btn:disabled {
@@ -71,7 +71,7 @@
 }
 
 .att-tour-popover .driver-popover-close-btn {
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   font-size: 20px;
 }
 
@@ -84,12 +84,12 @@
   border: none;
   padding: 0;
   font-size: 11px;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   text-decoration: underline;
   cursor: pointer;
 }
 
-.att-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: hsl(var(--card)); }
-.att-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow { border-bottom-color: hsl(var(--card)); }
-.att-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: hsl(var(--card)); }
-.att-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: hsl(var(--card)); }
+.att-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: var(--card); }
+.att-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow { border-bottom-color: var(--card); }
+.att-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: var(--card); }
+.att-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: var(--card); }
