@@ -553,6 +553,12 @@ function MemberDetailPage() {
                     <span>{member.phone}</span>
                   </a>
                 )}
+                {emailData?.email && (
+                  <a href={`mailto:${emailData.email}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground break-all">
+                    <Mail size={16} className="text-primary" />
+                    <span>{emailData.email}</span>
+                  </a>
+                )}
               </div>
             </section>
           </div>
