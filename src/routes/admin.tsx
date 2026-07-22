@@ -22,7 +22,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members";
+type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members" | "settings";
 
 function AdminPage() {
   const { t } = useLang();
@@ -38,6 +38,7 @@ function AdminPage() {
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "coaches", label: t.manageCoaches, icon: UserCog },
     { key: "members", label: t.membersList, icon: Users },
+    { key: "settings", label: "Gym Info", icon: Settings },
   ];
   const signOut = async () => {
     await qc.cancelQueries();
@@ -65,9 +66,11 @@ function AdminPage() {
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
+        {tab === "settings" && <GymInfoAdmin />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
-        <ul className="grid grid-cols-5 items-center px-1">
+        <ul className="grid grid-cols-6 items-center px-1">
+
           {tabs.map(x => {
             const active = tab === x.key;
             const Icon = x.icon;
