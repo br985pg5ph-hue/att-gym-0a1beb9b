@@ -248,9 +248,6 @@ function MemberDetailPage() {
               <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground inline-flex items-center gap-1.5">
                 <CalendarPlus size={14}/> Book class
               </button>
-              <button onClick={()=>{ setDeleteConfirmName(""); setDeleteOpen(true); }} className="rounded-pill border hairline px-4 py-2 text-xs font-semibold text-destructive inline-flex items-center gap-1.5 hover:bg-destructive/10">
-                <Trash2 size={14}/> Delete account
-              </button>
             </div>
           </div>
         </section>
@@ -579,6 +576,24 @@ function MemberDetailPage() {
                 </section>
               );
             })()}
+
+            {/* Delete account */}
+            <section className="card-surface overflow-hidden border-destructive/20">
+              <div className="flex items-start justify-between gap-3 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-destructive/15 text-destructive">
+                    <Trash2 size={18}/>
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg leading-none">Delete account</h3>
+                    <p className="mt-1 text-[11px] text-muted-foreground">Permanently remove this client and their data</p>
+                  </div>
+                </div>
+                <button onClick={()=>{ setDeleteConfirmName(""); setDeleteOpen(true); }} className="rounded-pill border hairline px-4 py-2 text-xs font-semibold text-destructive inline-flex items-center gap-1.5 hover:bg-destructive/10">
+                  <Trash2 size={14}/> Delete
+                </button>
+              </div>
+            </section>
 
           </div>
         </div>
