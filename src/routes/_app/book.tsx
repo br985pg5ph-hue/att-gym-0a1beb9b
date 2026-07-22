@@ -272,7 +272,7 @@ function BookPage() {
               <p className="text-xs font-semibold">Complete your profile</p>
               <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in profile to book classes.</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
           </Link>
         )}
         {!bookingForChild && (
