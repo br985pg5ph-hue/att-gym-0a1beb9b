@@ -79,7 +79,7 @@ function ChildrenPage() {
               <div className="min-w-0 flex-1">
                 <p className="font-display truncate text-lg leading-none">{c.name}</p>
                 <div className="mt-1.5 flex items-center gap-3 text-[11px] text-muted-foreground">
-                  <span className="inline-flex items-center gap-1"><Ticket size={11} /> {0} left</span>
+                  <span className="inline-flex items-center gap-1"><Ticket size={11} /> {(c as any).pt_sessions_remaining ?? 0} left</span>
                   <span className="inline-flex items-center gap-1"><Flame size={11} /> {c.streak}d</span>
                 </div>
               </div>

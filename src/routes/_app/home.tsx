@@ -46,7 +46,7 @@ function HomePage() {
 
   const jordanTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" }));
   const hour = jordanTime.getHours();
-  const greeting = hour >= 5 && hour < 12 ? t.goodMorning : hour >= 12 && hour < 18 ? t.goodEvening : t.goodNight;
+  const greeting = hour >= 5 && hour < 12 ? t.goodMorning : hour >= 12 && hour < 17 ? t.goodAfternoon : hour >= 17 && hour < 22 ? t.goodEvening : t.goodNight;
 
   const groupUntil = scope === "child" && selectedChild
     ? selectedChild.group_subscription_until
