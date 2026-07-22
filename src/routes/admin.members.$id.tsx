@@ -38,7 +38,7 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, children(id, name, group_subscription_until, pt_sessions_remaining)")
+        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, children(id, name, group_subscription_until, pt_sessions_remaining)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
