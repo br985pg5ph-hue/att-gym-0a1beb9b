@@ -99,6 +99,15 @@ function MembershipPage() {
               )}
             </div>
           )}
+
+          {groupActive && !isPaused && (
+            <TrackPicker
+              userId={user!.id}
+              childId={null}
+              current={(profile as any)?.group_track ?? null}
+              onChanged={()=>{ refresh?.(); qc.invalidateQueries(); }}
+            />
+          )}
         </div>
 
         <div data-tour="membership-pt" className="card-surface p-6">
