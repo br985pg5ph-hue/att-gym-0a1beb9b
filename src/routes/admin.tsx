@@ -467,20 +467,20 @@ function ClassesAdmin() {
           setViewedMonth(new Date(y, m + delta, 1));
         };
         return (
-          <div className="card-surface p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1.5">
-                <ChevronLeft className="h-4 w-4" />
+          <div className="card-surface p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1">
+                <ChevronLeft className="h-3.5 w-3.5" />
               </button>
-              <p className="font-display text-sm tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
-              <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1.5">
-                <ChevronRight className="h-4 w-4" />
+              <p className="font-display text-xs tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
+              <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1">
+                <ChevronRight className="h-3.5 w-3.5" />
               </button>
             </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
+            <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground">
               {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
             </div>
-            <div className="mt-2 grid grid-cols-7 gap-1">
+            <div className="mt-1.5 grid grid-cols-7 gap-0.5">
               {cells.map((d, i) => {
                 if (!d) return <div key={i} />;
                 const key = toAmmanDateKey(d);
@@ -489,7 +489,7 @@ function ClassesAdmin() {
                 const isToday = key === todayKey;
                 return (
                   <button key={i} onClick={() => setSelectedDate(key)}
-                    className={`relative aspect-square rounded-lg text-sm transition ${
+                    className={`relative h-8 rounded-lg text-[11px] transition ${
                       active ? "bg-primary text-primary-foreground font-semibold" :
                       isToday ? "border hairline" : "hover:bg-muted"
                     }`}>
