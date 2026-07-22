@@ -560,30 +560,6 @@ function MemberDetailPage() {
               );
             })()}
 
-            {/* Contact */}
-            <section className="card-surface p-5">
-              <h3 className="font-display text-lg leading-none">Contact</h3>
-              <div className="mt-3 space-y-2 text-sm">
-                {member?.phone && (
-                  <a href={`tel:${member.phone}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
-                    <Phone size={16} className="text-primary" />
-                    <span>{member.phone}</span>
-                  </a>
-                )}
-                {emailData?.email && (
-                  <a href={`mailto:${emailData.email}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground break-all">
-                    <Mail size={16} className="text-primary" />
-                    <span>{emailData.email}</span>
-                  </a>
-                )}
-                {member?.date_of_birth && (
-                  <div className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
-                    <Cake size={16} className="text-primary" />
-                    <span>{new Date(member.date_of_birth).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
-                  </div>
-                )}
-              </div>
-            </section>
           </div>
         </div>
       </main>
