@@ -154,12 +154,20 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
           <h2 className="font-display text-3xl leading-none">{todayLabel}</h2>
         </div>
-        <button
-          onClick={() => setTab("settings")}
-          className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
-        >
-          <Settings size={14} /> Gym Info
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTab("coaches")}
+            className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
+          >
+            <UserCog size={14} /> Coaches
+          </button>
+          <button
+            onClick={() => setTab("settings")}
+            className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
+          >
+            <Settings size={14} /> Gym Info
+          </button>
+        </div>
       </div>
 
       {/* KPI grid */}
