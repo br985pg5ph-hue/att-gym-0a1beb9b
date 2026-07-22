@@ -1,0 +1,2 @@
+DROP POLICY "own bookings insert" ON public.bookings;
+CREATE POLICY "own bookings insert" ON public.bookings FOR INSERT WITH CHECK (member_id = auth.uid() OR public.has_role(auth.uid(), 'staff'::app_role));
