@@ -319,14 +319,14 @@ function BookPage() {
 
       <div className="fixed inset-x-0 bottom-20 z-30 mx-auto max-w-md px-5">
         {(() => {
-          const pickedIneligible = pickedClass && !isEligible(pickedClass.type);
+          const pickedIneligible = pickedClass && !isEligible(pickedClass.type, pickedClass.starts_at);
           const disabled = !pickedId || pickedIneligible || book.isPending;
           const label = book.isPending
             ? "…"
             : !pickedId
               ? t.selectSlot
               : pickedIneligible
-                ? eligibilityMessage(pickedClass.type)
+                ? eligibilityMessage(pickedClass.type, pickedClass.starts_at)
                 : t.confirmBooking;
           return (
             <button
