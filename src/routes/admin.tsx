@@ -26,6 +26,7 @@ type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members" | "
 
 function AdminPage() {
   const { t } = useLang();
+  const { theme, setTheme } = useTheme();
   const nav = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("dashboard");
@@ -45,6 +46,8 @@ function AdminPage() {
     await supabase.auth.signOut();
     nav({ to: "/auth", replace: true });
   };
+  const nextTheme = theme === "dark" ? "light" : "dark";
+  const ThemeIcon = theme === "dark" ? Sun : Moon;
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
@@ -55,9 +58,18 @@ function AdminPage() {
             <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
           </div>
         </div>
-        <button onClick={signOut} className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive">
-          <LogOut size={14} /> {t.signOut}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTheme(nextTheme)}
+            aria-label={`Switch to ${nextTheme} mode`}
+            className="flex h-8 w-8 items-center justify-center rounded-full border hairline text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ThemeIcon size={16} />
+          </button>
+          <button onClick={signOut} className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive">
+            <LogOut size={14} /> {t.signOut}
+          </button>
+        </div>
       </header>
       <main className="mx-auto max-w-3xl px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]">
         {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
