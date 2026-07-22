@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { getMemberEmail } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
@@ -36,11 +38,18 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
-        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, children(id, name, group_subscription_until, pt_sessions_remaining)")
+        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, streak, classes_attended, is_parent, created_at, date_of_birth, children(id, name, group_subscription_until, pt_sessions_remaining)")
         .eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
     },
+  });
+
+  const fetchEmail = useServerFn(getMemberEmail);
+  const { data: emailData } = useQuery({
+    queryKey: ["admin-member-email", id],
+    queryFn: () => fetchEmail({ data: { userId: id } }),
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: bookings = [] } = useQuery({
@@ -177,7 +186,9 @@ function MemberDetailPage() {
                   </span>
                 </div>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  {emailData?.email && <span className="inline-flex items-center gap-1"><Mail size={12}/>{emailData.email}</span>}
                   {member?.phone && <span className="inline-flex items-center gap-1"><Phone size={12}/>{member.phone}</span>}
+                  {(member as any)?.date_of_birth && <span className="inline-flex items-center gap-1"><Cake size={12}/>{new Date((member as any).date_of_birth).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>}
                   {member?.created_at && <span>Joined {new Date(member.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>}
                   {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold">Parent</span>}
                 </p>
