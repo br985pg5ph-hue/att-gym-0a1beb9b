@@ -95,7 +95,7 @@ export function AppTour() {
       prevBtnText: "Back",
       doneBtnText: "Finish",
       onCloseClick: () => { d.destroy(); markDone(); },
-      onDestroyStarted: () => { if (!d.hasNextStep()) markDone(); },
+      onDestroyStarted: () => { if (!d.hasNextStep()) markDone(); d.destroy(); },
       steps: steps.map((s, i) => {
         const isFirst = i === 0;
         const isLast = i === steps.length - 1;
