@@ -93,31 +93,45 @@ export function AppTour() {
       doneBtnText: "Finish",
       onCloseClick: () => { d.destroy(); markDone(); },
       onDestroyStarted: () => { if (!d.hasNextStep()) markDone(); },
-      steps: steps.map((s, i) => ({
-        element: s.selector,
-        popover: {
-          title: s.title,
-          description: s.description + `<div class="att-tour-skip"><button type="button" data-att-skip>Skip tour</button></div>`,
-          side: "top",
-          align: "center",
-        },
-        onHighlightStarted: async () => {
-          if (s.route && path !== s.route) {
-            await navigate({ to: s.route });
-          }
-          if (s.selector) await waitForEl(s.selector);
-        },
-      })),
+      steps: steps.map((s, i) => {
+        const isFirst = i === 0;
+        const isLast = i === steps.length - 1;
+        let extra = "";
+        ifm if (isFirst) {
+          extra = `<div class="att-tour-skip"><button type="button" data-att-skip>Skip tour</button></div>`;
+        } else if (isLast) {
+          extra = `<div class="att-tour-skip"><button type="button" data-att-repeat>Repeat tour</button></div>`;
+        }
+        return {
+          element: s.selector,
+          popover: {
+            title: s.title,
+            description: s.description + extra,
+            side: "top",
+            align: "center",
+          },
+          onHighlightStarted: async () => {
+            if (s.route && path !== s.route) {
+              await navigate({ to: s.route });
+            }
+            if (s.selector) await waitForEl(s.selector);
+          },
+        };
+      }),
     });
     driverRef.current = d;
     d.drive();
 
-    // Delegate skip button clicks inside popovers
+    // Delegate skip/repeat button clicks inside popovers
     const onClick = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
       if (t?.closest("[data-att-skip]")) {
         d.destroy();
         markDone();
+      }
+      if (t?.closest("[data-att-repeat]")) {
+        d.destroy();
+        runTour();
       }
     };
     document.addEventListener("click", onClick);
