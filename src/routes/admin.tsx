@@ -51,7 +51,7 @@ function AdminPage() {
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
         <div className="flex min-w-0 items-center gap-3">
-          {tab !== "dashboard" ? (
+          {tab === "coaches" || tab === "settings" ? (
             <button
               onClick={() => setTab("dashboard")}
               className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
