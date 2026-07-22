@@ -199,9 +199,6 @@ function MemberDetailPage() {
               <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground inline-flex items-center gap-1.5">
                 <CalendarPlus size={14}/> Book class
               </button>
-              <Link to="/admin" className="rounded-pill border hairline px-4 py-2 text-xs font-semibold inline-flex items-center gap-1.5">
-                <ArrowLeft size={14}/> Back to list
-              </Link>
             </div>
           </div>
         </section>
