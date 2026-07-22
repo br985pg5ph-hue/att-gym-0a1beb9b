@@ -1,0 +1,95 @@
+/* Themed driver.js popover to match ATT Academy design tokens */
+.att-tour-popover.driver-popover {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  padding: 18px 18px 14px;
+  max-width: 320px;
+  font-family: inherit;
+}
+
+.att-tour-popover .driver-popover-title {
+  font-family: "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: hsl(var(--foreground));
+  margin: 0 0 6px;
+}
+
+.att-tour-popover .driver-popover-description {
+  font-size: 13px;
+  line-height: 1.45;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 10px;
+}
+
+.att-tour-popover .driver-popover-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.att-tour-popover .driver-popover-progress-text {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.att-tour-popover .driver-popover-navigation-btns {
+  display: flex;
+  gap: 6px;
+  margin-inline-start: auto;
+}
+
+.att-tour-popover .driver-popover-prev-btn,
+.att-tour-popover .driver-popover-next-btn {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.att-tour-popover .driver-popover-prev-btn {
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.att-tour-popover .driver-popover-prev-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.att-tour-popover .driver-popover-close-btn {
+  color: hsl(var(--muted-foreground));
+  font-size: 20px;
+}
+
+.att-tour-popover .att-tour-skip {
+  margin-top: 6px;
+}
+
+.att-tour-popover .att-tour-skip button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.att-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: hsl(var(--card)); }
+.att-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow { border-bottom-color: hsl(var(--card)); }
+.att-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: hsl(var(--card)); }
+.att-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: hsl(var(--card)); }
