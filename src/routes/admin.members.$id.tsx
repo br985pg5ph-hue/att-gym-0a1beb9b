@@ -183,6 +183,9 @@ function MemberDetailPage() {
                     {member?.membership_status || "—"}
                   </span>
                 </div>
+                <p className="mt-1 text-[11px] font-mono text-muted-foreground">
+                  Member ID: {(member as any)?.member_code || "—"}
+                </p>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   {emailData?.email && <span className="inline-flex items-center gap-1"><Mail size={12}/>{emailData.email}</span>}
                   {member?.phone && <span className="inline-flex items-center gap-1"><Phone size={12}/>{member.phone}</span>}
