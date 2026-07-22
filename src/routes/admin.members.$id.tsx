@@ -128,7 +128,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("Group membership updated");
-      setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit"); setManageMode(null); setManageOpen(false);
+      setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit"); setGroupOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
