@@ -879,13 +879,6 @@ function MembersAdmin() {
   });
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [addFor, setAddFor] = useState<string | null>(null);
-  const [addKind, setAddKind] = useState<"group" | "pt">("group");
-  const [childId, setChildId] = useState<string>("");
-  const [days, setDays] = useState<number>(30);
-  const [sessions, setSessions] = useState<number>(10);
-  const [method, setMethod] = useState<"cash" | "card">("cash");
-  const [note, setNote] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "member_code" | "expiry" | "pt">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -912,54 +905,6 @@ function MembersAdmin() {
     return sortDir === "asc" ? cmp : -cmp;
   });
 
-  const resetForm = () => {
-    setAddFor(null); setChildId(""); setDays(30); setSessions(10); setMethod("cash"); setNote("");
-  };
-
-  const addGroup = useMutation({
-    mutationFn: async (memberId: string) => {
-      const { error } = await supabase.from("transactions").insert({
-        member_id: memberId,
-        child_id: childId || null,
-        service: "group",
-        type: "credit",
-        days,
-        classes: 0,
-        payment_method: method,
-        description: note || null,
-        created_by: user!.id,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Group membership renewed");
-      resetForm();
-      qc.invalidateQueries({ queryKey: ["admin-members"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  const addPT = useMutation({
-    mutationFn: async (memberId: string) => {
-      const { error } = await supabase.from("transactions").insert({
-        member_id: memberId,
-        child_id: childId || null,
-        service: "pt",
-        type: "credit",
-        classes: sessions,
-        payment_method: method,
-        description: note || null,
-        created_by: user!.id,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("PT sessions added");
-      resetForm();
-      qc.invalidateQueries({ queryKey: ["admin-members"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
 
   return (
     <div className="space-y-2">
@@ -1000,7 +945,7 @@ function MembersAdmin() {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
-        const isAdding = addFor === m.id;
+        
         const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
         const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
@@ -1068,116 +1013,6 @@ function MembersAdmin() {
                 ))}
               </ul>
             )}
-            <div className="mt-3">
-              {!isAdding ? (
-                <button
-                  onClick={() => { setAddFor(m.id); setAddKind("group"); setChildId(""); setDays(30); }}
-                  className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground"
-                >
-                  <Plus size={12} className="inline"/> Renew or Add
-                </button>
-              ) : (
-                <div className="space-y-2 rounded-xl border hairline p-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={()=>setAddKind("group")}
-                      className={`rounded-pill py-1.5 text-[11px] font-semibold ${addKind==="group" ? "bg-primary text-primary-foreground" : "border hairline"}`}
-                    >Group membership</button>
-                    <button
-                      onClick={()=>setAddKind("pt")}
-                      className={`rounded-pill py-1.5 text-[11px] font-semibold ${addKind==="pt" ? "bg-primary text-primary-foreground" : "border hairline"}`}
-                    >PT sessions</button>
-                  </div>
-
-                  {hasKids && (
-                    <select
-                      value={childId}
-                      onChange={(e)=>setChildId(e.target.value)}
-                      className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
-                    >
-                      <option value="">Apply to {m.name || "member"}</option>
-                      {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                    </select>
-                  )}
-
-                  {addKind === "group" ? (
-                    <>
-                      <div className="flex gap-2">
-                        {[30, 90, 365].map(d => (
-                          <button
-                            key={d}
-                            onClick={()=>setDays(d)}
-                            className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${days===d ? "bg-primary text-primary-foreground" : "border hairline"}`}
-                          >{d===30?"1 month":d===90?"3 months":"12 months"}</button>
-                        ))}
-                      </div>
-                      <input
-                        type="number" min={1} value={days}
-                        onChange={(e)=>setDays(Math.max(1, Number(e.target.value)))}
-                        className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
-                        placeholder="# days"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex gap-2">
-                        {[10, 20].map(n => (
-                          <button
-                            key={n}
-                            onClick={()=>setSessions(n)}
-                            className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${sessions===n ? "bg-primary text-primary-foreground" : "border hairline"}`}
-                          >{n} sessions</button>
-                        ))}
-                      </div>
-                      <input
-                        type="number" min={1} value={sessions}
-                        onChange={(e)=>setSessions(Math.max(1, Number(e.target.value)))}
-                        className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
-                        placeholder="# PT sessions"
-                      />
-                    </>
-                  )}
-
-                  <select
-                    value={method} onChange={(e)=>setMethod(e.target.value as "cash"|"card")}
-                    className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
-                  >
-                    <option value="cash">Cash</option>
-                    <option value="card">Cliq</option>
-                  </select>
-                  <input
-                    placeholder="Note (optional)"
-                    value={note} onChange={(e)=>setNote(e.target.value)}
-                    className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
-                  />
-                  <div className="flex gap-2">
-                    {addKind === "group" ? (
-                      <button
-                        onClick={()=>addGroup.mutate(m.id)}
-                        disabled={addGroup.isPending || days < 1}
-                        className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60"
-                      >
-                        Add {days} days
-                      </button>
-                    ) : (
-                      <button
-                        onClick={()=>addPT.mutate(m.id)}
-                        disabled={addPT.isPending || sessions < 1}
-                        className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60"
-                      >
-                        Add {sessions} PT {sessions===1?"session":"sessions"}
-                      </button>
-                    )}
-                    <button
-                      onClick={resetForm}
-                      className="rounded-pill border hairline px-3 py-2 text-xs font-semibold"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         );
       })}
