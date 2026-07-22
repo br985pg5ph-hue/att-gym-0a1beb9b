@@ -26,6 +26,7 @@ export const dict: Record<Lang, Dict> = {
     notifications: "Notifications", legal: "Legal & Privacy", deleteAccount: "Delete Account",
     manageAnnouncements: "Announcements", manageClasses: "Classes", manageCoaches: "Coaches", membersList: "Members",
     todaySnapshot: "Today Snapshot", activeGroupMembers: "Active Group Members", ptSessionsOnBooks: "PT Sessions on Books", newSignups: "New Signups", expiringSoon: "Expiring Soon", recentTransactions: "Recent Transactions", classesToday: "Classes Today", bookingsToday: "Bookings Today", viewAll: "View all", noClassesToday: "No classes scheduled today",
+    sortBy: "Sort by", sortNameAsc: "Name A-Z", sortNameDesc: "Name Z-A", sortMemberIdAsc: "Member ID ↑", sortMemberIdDesc: "Member ID ↓", sortExpiryAsc: "Expiry soonest", sortExpiryDesc: "Expiry latest", sortPtAsc: "PT sessions: least", sortPtDesc: "PT sessions: most",
     save: "Save", edit: "Edit", delete: "Delete", add: "Add", title: "Title", body: "Body", tag: "Tag",
     specialty: "Specialty", bio: "Bio", photoUrl: "Photo URL", type: "Type", coach: "Coach", capacity: "Capacity", startsAt: "Starts at",
     membershipActive: "Active Member", membershipInactive: "Inactive Member", hours: "Hours", connectWithUs: "Connect with us",
