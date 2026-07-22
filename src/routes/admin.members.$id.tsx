@@ -493,6 +493,9 @@ function MemberDetailPage() {
               );
             })()}
 
+            {/* Booking days (track) — for member and each child */}
+            <TrackAdminPanel member={member} kids={kids} onChanged={()=>qc.invalidateQueries({ queryKey: ["admin-member", id] })} />
+
             {/* PT Sessions */}
             {(() => {
               const ptCount = member?.pt_sessions_remaining ?? 0;
