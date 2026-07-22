@@ -997,8 +997,13 @@ function MembersAdmin() {
                   {m.member_code && (
                     <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">Member ID: {m.member_code}</p>
                   )}
-                  <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
-                    {m.role} • {m.membership_status}
+                  <p className="mt-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
+                    <span className="truncate">{m.role}</span>
+                    <span
+                      className={`inline-flex shrink-0 items-center rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${m.membership_status === "active" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}
+                    >
+                      {m.membership_status}
+                    </span>
                   </p>
                   {hasKids && (
                     <span className="mt-2 inline-flex items-center rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
