@@ -14,15 +14,6 @@ export const Route = createFileRoute("/_app/book")({
 });
 
 
-const TYPES = [
-  { key: "all", labelKey: "all" as const },
-  { key: "pt", labelKey: "pt" as const },
-  { key: "women_only", labelKey: "womenOnly" as const },
-  { key: "mixed", labelKey: "mixed" as const },
-  { key: "yoga", labelKey: "yoga" as const },
-  { key: "gymnastics", labelKey: "gymnastics" as const },
-  { key: "kids", labelKey: "kids" as const },
-];
 
 
 function BookPage() {
