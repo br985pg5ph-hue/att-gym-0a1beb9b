@@ -240,14 +240,14 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
                 <p className="text-[10px] text-muted-foreground">{t.salesToday}</p>
                 <p className="font-display mt-1 text-2xl leading-none">{revenueTodayTotal}</p>
                 <p className="mt-1 text-[10px] text-muted-foreground">
-                  {(stats?.revenueToday?.cash ?? 0)} {t.cash} · {(stats?.revenueToday?.cliq ?? 0)} {t.cliq}
+                  {(stats?.revenueToday?.cash ?? 0)} {t.cash} · {(stats?.revenueToday?.card ?? 0)} {t.cliq}
                 </p>
               </div>
               <div className="rounded-xl border hairline bg-card p-3">
                 <p className="text-[10px] text-muted-foreground">{t.salesThisWeek}</p>
                 <p className="font-display mt-1 text-2xl leading-none">{revenueWeekTotal}</p>
                 <p className="mt-1 text-[10px] text-muted-foreground">
-                  {(stats?.revenueWeek?.cash ?? 0)} {t.cash} · {(stats?.revenueWeek?.cliq ?? 0)} {t.cliq}
+                  {(stats?.revenueWeek?.cash ?? 0)} {t.cash} · {(stats?.revenueWeek?.card ?? 0)} {t.cliq}
                 </p>
               </div>
             </div>
