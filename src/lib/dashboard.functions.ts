@@ -204,8 +204,8 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         member_name: t.profiles?.name ?? null,
         child_name: t.children?.name ?? null,
       })),
-      revenueToday: revenueTodayTotal,
-      revenueWeek: revenueWeekTotal,
+      revenueToday: revenueTodayCounts,
+      revenueWeek: revenueWeekCounts,
       signupTrend: signupTrendList,
       membershipBreakdown: { active, paused, expired, never },
     };
