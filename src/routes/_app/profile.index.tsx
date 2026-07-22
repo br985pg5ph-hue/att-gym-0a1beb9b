@@ -75,7 +75,11 @@ function ProfilePage() {
             {profile?.member_code && (
               <p className="mt-1 font-mono text-[11px] tracking-widest text-muted-foreground">Member ID: {profile.member_code}</p>
             )}
-            {profile?.membership_status === "inactive" ? (
+            {profile?.membership_paused_at ? (
+              <span className="mt-1 inline-block rounded-pill bg-muted px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Paused
+              </span>
+            ) : profile?.membership_status === "inactive" ? (
               <span className="mt-1 inline-block rounded-pill bg-muted px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {t.membershipInactive}
               </span>
