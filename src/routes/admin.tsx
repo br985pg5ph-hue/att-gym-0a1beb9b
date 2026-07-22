@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -896,7 +896,7 @@ function MembersAdmin() {
       .order("name")).data ?? [],
   });
   const [search, setSearch] = useState("");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  
   const [sortBy, setSortBy] = useState<"name" | "member_code" | "expiry" | "pt">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
