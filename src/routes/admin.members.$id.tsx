@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/providers";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { ArrowLeft, Minus, Plus, X, Mail, Phone, CalendarPlus } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
@@ -13,13 +13,18 @@ export const Route = createFileRoute("/admin/members/$id")({
 });
 
 function formatGroupStatus(until: string | null | undefined): string {
-  if (!until) return "Group: none";
+  if (!until) return "No group membership";
   const d = new Date(until);
-  if (isNaN(d.getTime())) return "Group: none";
-  if (d.getTime() <= Date.now()) return "Group: expired";
-  return `Group: active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+  if (isNaN(d.getTime())) return "No group membership";
+  if (d.getTime() <= Date.now()) return "Group expired";
+  return `Active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
 }
 
+function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
 
 function MemberDetailPage() {
   const { id } = Route.useParams();
@@ -38,7 +43,6 @@ function MemberDetailPage() {
     },
   });
 
-
   const { data: bookings = [] } = useQuery({
     queryKey: ["admin-member-bookings", id],
     queryFn: async () => (await supabase.from("bookings")
@@ -56,13 +60,15 @@ function MemberDetailPage() {
       .limit(30)).data ?? [],
   });
 
-  const [ptAdjustOpen, setPtAdjustOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "history" | "transactions">("upcoming");
+  const [manageOpen, setManageOpen] = useState(false);
+  const [manageMode, setManageMode] = useState<"group" | "pt" | null>(null);
+
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
   const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
   const [ptAdjNote, setPtAdjNote] = useState("");
   const [ptAdjChildId, setPtAdjChildId] = useState("");
 
-  const [grpAdjustOpen, setGrpAdjustOpen] = useState(false);
   const [grpAdjChildId, setGrpAdjChildId] = useState("");
   const [grpAdjDays, setGrpAdjDays] = useState(30);
   const [grpAdjType, setGrpAdjType] = useState<"credit" | "debit">("credit");
@@ -87,7 +93,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjustOpen(false); setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId("");
+      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setManageMode(null); setManageOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
@@ -113,14 +119,13 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("Group membership updated");
-      setGrpAdjustOpen(false); setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit");
+      setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit"); setManageMode(null); setManageOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
-
 
   const cancelBooking = useMutation({
     mutationFn: async (bid: string) => {
@@ -141,6 +146,8 @@ function MemberDetailPage() {
   const upcoming = bookings.filter((b: any) => b.status === "upcoming" && new Date(b.classes?.starts_at).getTime() >= now);
   const past = bookings.filter((b: any) => !(b.status === "upcoming" && new Date(b.classes?.starts_at).getTime() >= now));
 
+  const activeStatus = member?.membership_status === "active";
+
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
@@ -154,198 +161,285 @@ function MemberDetailPage() {
         <Logo size={32} />
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-4 px-5 py-5 pb-[max(env(safe-area-inset-bottom),40px)]">
-        {/* Overview */}
-        <section className="card-surface p-4">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div><p className="font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">PT left</p></div>
-            <div><p className="font-display text-3xl leading-none">{member?.classes_attended ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Attended</p></div>
-            <div><p className="font-display text-3xl leading-none">{member?.streak ?? 0}</p><p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Streak</p></div>
-          </div>
-          <p className="mt-3 text-center text-xs text-muted-foreground">{formatGroupStatus((member as any)?.group_subscription_until)}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-widest">
-            <span className={`rounded-pill px-2 py-0.5 font-semibold ${member?.membership_status === "active" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>{member?.membership_status || "—"}</span>
-            {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 font-semibold">Parent</span>}
-            {member?.phone && <span className="inline-flex items-center gap-1 text-muted-foreground normal-case tracking-normal"><Phone size={12}/>{member.phone}</span>}
+      <main className="mx-auto max-w-6xl space-y-5 px-4 py-5 pb-[max(env(safe-area-inset-bottom),40px)] md:px-6 lg:px-8">
+        {/* Member header card */}
+        <section className="card-surface p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-muted">
+                <User size={28} className="text-muted-foreground" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="truncate font-display text-2xl leading-none">{member?.name || "—"}</h2>
+                  <span className={`shrink-0 rounded-pill px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${activeStatus ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    {member?.membership_status || "—"}
+                  </span>
+                </div>
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  {member?.phone && <span className="inline-flex items-center gap-1"><Phone size={12}/>{member.phone}</span>}
+                  {member?.created_at && <span>Joined {new Date(member.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>}
+                  {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold">Parent</span>}
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground inline-flex items-center gap-1.5">
+                <CalendarPlus size={14}/> Book class
+              </button>
+              <Link to="/admin" className="rounded-pill border hairline px-4 py-2 text-xs font-semibold inline-flex items-center gap-1.5">
+                <ArrowLeft size={14}/> Back to list
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Kids */}
-        {kids.length > 0 && (
-          <section className="card-surface p-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Children</p>
-            <ul className="mt-2 space-y-1">
-              {kids.map((k: any) => (
-                <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-sm">
-                  <span>{k.name}</span>
-                  <span className="text-xs text-muted-foreground">{k.pt_sessions_remaining ?? 0} PT • {formatGroupStatus(k.group_subscription_until)}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* Adjust PT sessions */}
-        <section className="card-surface p-4">
-          <div className="flex items-center justify-between">
-            <p className="font-display text-lg leading-none">Adjust PT sessions</p>
-            {!ptAdjustOpen && (
-              <button onClick={()=>setPtAdjustOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">Add / Remove</button>
-            )}
+        {/* Stats grid */}
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Dumbbell size={14}/>
+              <p className="text-[10px] uppercase tracking-widest font-semibold">PT left</p>
+            </div>
+            <p className="mt-2 font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p>
           </div>
-          {ptAdjustOpen && (
-            <div className="mt-3 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add</button>
-                <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
-              </div>
-              <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
-              {kids.length > 0 && (
-                <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                  <option value="">Apply to {member?.name || "member"}</option>
-                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                </select>
-              )}
-              {(() => {
-                const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
-                const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
-                const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
-                return (
-                  <>
-                    {ptAdjType === "debit" && (
-                      <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
-                    )}
-                    <input placeholder="Note (optional)" value={ptAdjNote} onChange={(e)=>setPtAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-                    <div className="flex gap-2">
-                      <button onClick={()=>adjustPT.mutate()} disabled={adjustPT.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                        {ptAdjType==="credit" ? "Add" : "Remove"} {ptAdjSessions} PT {ptAdjSessions===1 ? "session" : "sessions"}
-                      </button>
-                      <button onClick={()=>setPtAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Calendar size={14}/>
+              <p className="text-[10px] uppercase tracking-widest font-semibold">Attended</p>
+            </div>
+            <p className="mt-2 font-display text-3xl leading-none">{member?.classes_attended ?? 0}</p>
+          </div>
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Users size={14}/>
+              <p className="text-[10px] uppercase tracking-widest font-semibold">Kids</p>
+            </div>
+            <p className="mt-2 font-display text-3xl leading-none">{kids.length}</p>
+          </div>
+          <div className="card-surface p-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CreditCard size={14}/>
+              <p className="text-[10px] uppercase tracking-widest font-semibold">Group</p>
+            </div>
+            <p className="mt-2 text-sm font-semibold leading-tight">{formatGroupStatus((member as any)?.group_subscription_until)}</p>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          {/* Left column */}
+          <div className="space-y-5 lg:col-span-2">
+            {/* Kids */}
+            {kids.length > 0 && (
+              <section className="card-surface p-5">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Children</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {kids.map((k: any) => (
+                    <div key={k.id} className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted">
+                        <User size={16} className="text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{k.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {k.pt_sessions_remaining ?? 0} PT · {formatGroupStatus(k.group_subscription_until)}
+                        </p>
+                      </div>
                     </div>
-                  </>
-                );
-              })()}
-            </div>
-          )}
-        </section>
-
-        {/* Adjust group membership */}
-        <section className="card-surface p-4">
-          <div className="flex items-center justify-between">
-            <p className="font-display text-lg leading-none">Adjust group membership</p>
-            {!grpAdjustOpen && (
-              <button onClick={()=>setGrpAdjustOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">Add / Remove</button>
+                  ))}
+                </div>
+              </section>
             )}
-          </div>
-          {grpAdjustOpen && (
-            <div className="mt-3 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={()=>setGrpAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add days</button>
-                <button onClick={()=>setGrpAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove days</button>
+
+            {/* Activity tabs */}
+            <section className="card-surface overflow-hidden">
+              <div className="border-b hairline px-5 pt-1">
+                <nav className="flex gap-5" aria-label="Tabs">
+                  {(["upcoming", "history", "transactions"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`relative py-3.5 text-xs font-semibold uppercase tracking-wider transition-colors ${activeTab === tab ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {tab}
+                      {tab === "upcoming" && <span className="ml-1.5 rounded-pill bg-primary/15 px-1.5 py-0.5 text-[9px] text-primary">{upcoming.length}</span>}
+                      {activeTab === tab && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                    </button>
+                  ))}
+                </nav>
               </div>
-              {kids.length > 0 && (
-                <select value={grpAdjChildId} onChange={(e)=>setGrpAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                  <option value="">Apply to {member?.name || "member"}</option>
-                  {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                </select>
-              )}
-              <div className="flex gap-2">
-                {[30, 90, 365].map(d => (
-                  <button key={d} onClick={()=>setGrpAdjDays(d)}
-                    className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
-                    {d===30?"1 month":d===90?"3 months":"12 months"}
-                  </button>
-                ))}
-              </div>
-              <input type="number" min={1} value={grpAdjDays} onChange={(e)=>setGrpAdjDays(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# days"/>
-              <input placeholder="Note (optional)" value={grpAdjNote} onChange={(e)=>setGrpAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-              <div className="flex gap-2">
-                <button onClick={()=>adjustGroup.mutate()} disabled={adjustGroup.isPending || grpAdjDays < 1} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                  {grpAdjType==="credit" ? "Add" : "Remove"} {grpAdjDays} days
-                </button>
-                <button onClick={()=>setGrpAdjustOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
-              </div>
-            </div>
-          )}
-        </section>
 
-
-        {/* Book a class */}
-        <section className="card-surface flex items-center justify-between p-4">
-          <div>
-            <p className="font-display text-lg leading-none">Book a class</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">Book on behalf of {member?.name || "member"}{kids.length > 0 ? " or a child" : ""}</p>
-          </div>
-          <button onClick={()=>setBookOpen(true)} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground inline-flex items-center gap-1">
-            <CalendarPlus size={12}/> Book
-          </button>
-        </section>
-
-        {/* Upcoming bookings */}
-        <section>
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Upcoming bookings ({upcoming.length})</p>
-          <div className="space-y-2">
-            {upcoming.length === 0 && <p className="text-xs text-muted-foreground">No upcoming bookings</p>}
-            {upcoming.map((b: any) => (
-              <div key={b.id} className="card-surface flex items-start justify-between gap-3 p-3">
-                <div className="min-w-0">
-                  <p className="font-display text-base leading-none">{b.classes?.title || "Class"}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{b.classes?.starts_at ? new Date(b.classes.starts_at).toLocaleString() : "—"}</p>
-                  {b.child_id && <p className="mt-1 text-[10px] uppercase tracking-widest text-primary">For {b.children?.name || "child"}</p>}
-                </div>
-                <button onClick={()=>{ if (confirm("Cancel this booking? Credit will be refunded.")) cancelBooking.mutate(b.id); }} className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">
-                  <X size={12} className="inline"/> Cancel
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Past bookings */}
-        {past.length > 0 && (
-          <section>
-            <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">History</p>
-            <div className="space-y-1">
-              {past.slice(0, 20).map((b: any) => (
-                <div key={b.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
-                  <span className="truncate">{b.classes?.title || "Class"} {b.child_id && <span className="text-muted-foreground">· {b.children?.name}</span>}</span>
-                  <span className="shrink-0 text-muted-foreground">{b.status}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Transactions */}
-        <section>
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Class transactions</p>
-          <div className="space-y-1">
-            {txns.length === 0 && <p className="text-xs text-muted-foreground">No transactions yet</p>}
-            {txns.map((t: any) => {
-              const isGroup = t.service === "group";
-              const amount = isGroup ? (t.days ?? 0) : (t.classes ?? 0);
-              const unit = isGroup
-                ? (amount === 1 ? "day membership" : "days membership")
-                : (amount === 1 ? "PT session" : "PT sessions");
-              return (
-                <div key={t.id} className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2 text-xs">
-                  <div className="min-w-0">
-                    <p className="truncate">
-                      <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
-                        {t.type === "credit" ? "+" : "−"}{amount} {unit}
-                      </span>{" "}
-                      <span className="text-muted-foreground">{t.source || t.type}</span>
-                      {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
-                    </p>
-                    {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+              <div className="p-5">
+                {activeTab === "upcoming" && (
+                  <div className="space-y-3">
+                    {upcoming.length === 0 && <p className="py-4 text-center text-xs text-muted-foreground">No upcoming bookings</p>}
+                    {upcoming.map((b: any) => (
+                      <div key={b.id} className="flex items-start justify-between gap-3 rounded-xl bg-muted/30 p-3">
+                        <div className="min-w-0">
+                          <p className="font-display text-base leading-none">{b.classes?.title || "Class"}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(b.classes?.starts_at)}</p>
+                          {b.child_id && <p className="mt-1 text-[10px] uppercase tracking-widest text-primary">For {b.children?.name || "child"}</p>}
+                        </div>
+                        <button onClick={()=>{ if (confirm("Cancel this booking? Credit will be refunded.")) cancelBooking.mutate(b.id); }} className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">
+                          <X size={12} className="inline"/> Cancel
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                  <span className="shrink-0 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
-                </div>
-              );
-            })}
+                )}
 
+                {activeTab === "history" && (
+                  <div className="space-y-2">
+                    {past.length === 0 && <p className="py-4 text-center text-xs text-muted-foreground">No history yet</p>}
+                    {past.slice(0, 20).map((b: any) => (
+                      <div key={b.id} className="flex items-center justify-between rounded-xl bg-muted/30 px-3 py-2.5 text-xs">
+                        <div className="min-w-0">
+                          <span className="font-medium">{b.classes?.title || "Class"}</span>
+                          {b.child_id && <span className="text-muted-foreground"> · {b.children?.name}</span>}
+                          <p className="mt-0.5 text-muted-foreground">{formatDateTime(b.classes?.starts_at)}</p>
+                        </div>
+                        <span className="shrink-0 rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase">{b.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === "transactions" && (
+                  <div className="space-y-2">
+                    {txns.length === 0 && <p className="py-4 text-center text-xs text-muted-foreground">No transactions yet</p>}
+                    {txns.map((t: any) => {
+                      const isGroup = t.service === "group";
+                      const amount = isGroup ? (t.days ?? 0) : (t.classes ?? 0);
+                      const unit = isGroup
+                        ? (amount === 1 ? "day" : "days")
+                        : (amount === 1 ? "PT session" : "PT sessions");
+                      return (
+                        <div key={t.id} className="flex items-center justify-between rounded-xl bg-muted/30 px-3 py-2.5 text-xs">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate">
+                              <span className={t.type === "credit" ? "text-primary font-semibold" : "text-destructive font-semibold"}>
+                                {t.type === "credit" ? "+" : "−"}{amount} {unit}
+                              </span>{" "}
+                              <span className="text-muted-foreground">{t.source || t.type}</span>
+                              {t.child_id && <span className="text-muted-foreground"> · {t.children?.name}</span>}
+                            </p>
+                            {t.description && <p className="truncate text-muted-foreground">{t.description}</p>}
+                          </div>
+                          <span className="shrink-0 pl-2 text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
-        </section>
+
+          {/* Right column: management controls */}
+          <div className="space-y-5">
+            {/* Renew or Add */}
+            <section className="card-surface p-5">
+              <h3 className="font-display text-lg leading-none">Manage credits</h3>
+              <p className="mt-1 text-xs text-muted-foreground">Renew group membership or add/remove PT sessions.</p>
+              {!manageOpen ? (
+                <button onClick={()=>setManageOpen(true)} className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground">
+                  Renew or Add
+                </button>
+              ) : !manageMode ? (
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button onClick={()=>setManageMode("group")} className="rounded-pill border hairline py-2.5 text-xs font-semibold">Group</button>
+                  <button onClick={()=>setManageMode("pt")} className="rounded-pill border hairline py-2.5 text-xs font-semibold">PT sessions</button>
+                </div>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wider">{manageMode === "group" ? "Group membership" : "PT sessions"}</span>
+                    <button onClick={()=>setManageMode(null)} className="text-[11px] text-muted-foreground underline">Back</button>
+                  </div>
+
+                  {manageMode === "pt" && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add</button>
+                        <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
+                      </div>
+                      <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
+                      {kids.length > 0 && (
+                        <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                          <option value="">Apply to {member?.name || "member"}</option>
+                          {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                        </select>
+                      )}
+                      {(() => {
+                        const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
+                        const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
+                        const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
+                        return (
+                          <>
+                            {ptAdjType === "debit" && (
+                              <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
+                            )}
+                            <input placeholder="Note (optional)" value={ptAdjNote} onChange={(e)=>setPtAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                            <div className="flex gap-2">
+                              <button onClick={()=>adjustPT.mutate()} disabled={adjustPT.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                                {ptAdjType==="credit" ? "Add" : "Remove"} {ptAdjSessions} PT {ptAdjSessions===1 ? "session" : "sessions"}
+                              </button>
+                              <button onClick={()=>{setManageOpen(false); setManageMode(null);}} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </>
+                  )}
+
+                  {manageMode === "group" && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={()=>setGrpAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add days</button>
+                        <button onClick={()=>setGrpAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove days</button>
+                      </div>
+                      {kids.length > 0 && (
+                        <select value={grpAdjChildId} onChange={(e)=>setGrpAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                          <option value="">Apply to {member?.name || "member"}</option>
+                          {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                        </select>
+                      )}
+                      <div className="flex gap-2">
+                        {[30, 90, 365].map(d => (
+                          <button key={d} onClick={()=>setGrpAdjDays(d)}
+                            className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
+                            {d===30?"1 mo":d===90?"3 mo":"1 yr"}
+                          </button>
+                        ))}
+                      </div>
+                      <input type="number" min={1} value={grpAdjDays} onChange={(e)=>setGrpAdjDays(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# days"/>
+                      <input placeholder="Note (optional)" value={grpAdjNote} onChange={(e)=>setGrpAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                      <div className="flex gap-2">
+                        <button onClick={()=>adjustGroup.mutate()} disabled={adjustGroup.isPending || grpAdjDays < 1} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                          {grpAdjType==="credit" ? "Add" : "Remove"} {grpAdjDays} days
+                        </button>
+                        <button onClick={()=>{setManageOpen(false); setManageMode(null);}} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </section>
+
+            {/* Contact */}
+            <section className="card-surface p-5">
+              <h3 className="font-display text-lg leading-none">Contact</h3>
+              <div className="mt-3 space-y-2 text-sm">
+                {member?.phone && (
+                  <a href={`tel:${member.phone}`} className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
+                    <Phone size={16} className="text-primary" />
+                    <span>{member.phone}</span>
+                  </a>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
       </main>
 
       {bookOpen && member && (
@@ -446,7 +540,6 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
           {!isLoading && dayClasses.length === 0 && <p className="py-6 text-center text-xs text-muted-foreground">No classes this day</p>}
           {dayClasses
             .filter((c: any) => {
-              // Adults: hide kids classes. Children: only kids or pt classes.
               if (childId) return c.type === "kids" || c.type === "pt";
               return c.type !== "kids";
             })
