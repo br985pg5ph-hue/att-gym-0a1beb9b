@@ -18,6 +18,7 @@ type Profile = {
   pt_sessions_remaining: number; group_subscription_until: string | null;
   interests: string[];
   is_parent: boolean;
+  membership_paused_at: string | null;
 };
 
 export type Child = {
