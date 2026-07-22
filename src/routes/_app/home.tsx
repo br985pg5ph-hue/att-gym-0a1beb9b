@@ -57,9 +57,22 @@ function HomePage() {
   const ptRemaining = scope === "child" && selectedChild
     ? (selectedChild as any).pt_sessions_remaining ?? 0
     : profile?.pt_sessions_remaining ?? 0;
-  const stats = scope === "child" && selectedChild
-    ? { attended: selectedChild.classes_attended, streak: selectedChild.streak }
-    : { attended: profile?.classes_attended ?? 0, streak: profile?.streak ?? 0 };
+  const { data: attendedCount = 0 } = useQuery({
+    queryKey: ["attended-count", user?.id, scope === "child" ? selectedChild?.id : "self"],
+    enabled: !!user,
+    queryFn: async () => {
+      let q = supabase.from("bookings")
+        .select("id, classes!inner(starts_at)", { count: "exact", head: true })
+        .eq("member_id", user!.id)
+        .eq("status", "upcoming")
+        .lt("classes.starts_at", new Date().toISOString());
+      if (scope === "child") q = q.eq("child_id", selectedChild!.id);
+      else q = q.is("child_id", null);
+      const { count } = await q;
+      return count ?? 0;
+    },
+  });
+  const stats = { attended: attendedCount, streak: scope === "child" && selectedChild ? selectedChild.streak : profile?.streak ?? 0 };
 
   const groupDateLabel = groupUntil
     ? new Date(groupUntil).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })
@@ -168,7 +181,7 @@ function HomePage() {
             <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
           </div>
           <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Trophy size={16} style={{ color: stats.attended >= 51 ? "#FFD700" : stats.attended >= 16 ? "#C0C0C0" : "#CD7F32" }} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{t.classesAttended}</span></div>
             <p className="font-display mt-1 text-3xl">{stats.attended}</p>
           </div>
         </div>
