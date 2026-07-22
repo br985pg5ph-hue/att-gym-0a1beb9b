@@ -107,9 +107,6 @@ function MembershipPage() {
             {profile?.pt_sessions_remaining ?? 0}
             <span className="ml-2 text-xl text-muted-foreground">left</span>
           </p>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Pay at the gym (cash or cliq) and staff will top up your sessions here.
-          </p>
         </div>
 
         <div className="card-surface p-5">
