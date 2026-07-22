@@ -70,8 +70,8 @@ function MemberDetailPage() {
   });
 
   const [activeTab, setActiveTab] = useState<"upcoming" | "history" | "transactions">("upcoming");
-  const [manageOpen, setManageOpen] = useState(false);
-  const [manageMode, setManageMode] = useState<"group" | "pt" | null>(null);
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [ptOpen, setPtOpen] = useState(false);
 
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
   const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
@@ -102,7 +102,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setManageMode(null); setManageOpen(false);
+      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setPtOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
@@ -128,7 +128,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("Group membership updated");
-      setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit"); setManageMode(null); setManageOpen(false);
+      setGrpAdjChildId(""); setGrpAdjDays(30); setGrpAdjNote(""); setGrpAdjType("credit"); setGroupOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
@@ -404,94 +404,144 @@ function MemberDetailPage() {
               );
             })()}
 
-            {/* Renew or Add */}
-            <section className="card-surface p-5">
-              <h3 className="font-display text-lg leading-none">Manage credits</h3>
-              <p className="mt-1 text-xs text-muted-foreground">Renew group membership or add/remove PT sessions.</p>
-              {!manageOpen ? (
-                <button onClick={()=>setManageOpen(true)} className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground">
-                  Renew or Add
-                </button>
-              ) : !manageMode ? (
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <button onClick={()=>setManageMode("group")} className="rounded-pill border hairline py-2.5 text-xs font-semibold">Group</button>
-                  <button onClick={()=>setManageMode("pt")} className="rounded-pill border hairline py-2.5 text-xs font-semibold">PT sessions</button>
-                </div>
-              ) : (
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wider">{manageMode === "group" ? "Group membership" : "PT sessions"}</span>
-                    <button onClick={()=>setManageMode(null)} className="text-[11px] text-muted-foreground underline">Back</button>
+            {/* Group Membership */}
+            {(() => {
+              const until = member?.group_subscription_until ? new Date(member.group_subscription_until) : null;
+              const isActive = !!until && until.getTime() > Date.now();
+              const daysLeft = until ? Math.max(0, Math.ceil((until.getTime() - Date.now()) / 86400000)) : 0;
+              return (
+                <section className="card-surface overflow-hidden">
+                  <div className="flex items-start justify-between gap-3 border-b hairline p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/15 text-primary">
+                        <Calendar size={18}/>
+                      </div>
+                      <div>
+                        <h3 className="font-display text-lg leading-none">Group Membership</h3>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {isActive ? `${daysLeft} day${daysLeft===1?"":"s"} remaining` : until ? "Expired" : "Not active"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`shrink-0 rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${isActive ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      {isActive ? "Active" : "Inactive"}
+                    </span>
                   </div>
-
-                  {manageMode === "pt" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add</button>
-                        <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove</button>
-                      </div>
-                      <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
-                      {kids.length > 0 && (
-                        <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                          <option value="">Apply to {member?.name || "member"}</option>
-                          {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                        </select>
-                      )}
-                      {(() => {
-                        const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
-                        const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
-                        const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
-                        return (
-                          <>
-                            {ptAdjType === "debit" && (
-                              <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
-                            )}
-                            <input placeholder="Note (optional)" value={ptAdjNote} onChange={(e)=>setPtAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-                            <div className="flex gap-2">
-                              <button onClick={()=>adjustPT.mutate()} disabled={adjustPT.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                                {ptAdjType==="credit" ? "Add" : "Remove"} {ptAdjSessions} PT {ptAdjSessions===1 ? "session" : "sessions"}
-                              </button>
-                              <button onClick={()=>{setManageOpen(false); setManageMode(null);}} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </>
-                  )}
-
-                  {manageMode === "group" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button onClick={()=>setGrpAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12} className="inline"/> Add days</button>
-                        <button onClick={()=>setGrpAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold ${grpAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12} className="inline"/> Remove days</button>
-                      </div>
-                      {kids.length > 0 && (
-                        <select value={grpAdjChildId} onChange={(e)=>setGrpAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                          <option value="">Apply to {member?.name || "member"}</option>
-                          {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
-                        </select>
-                      )}
-                      <div className="flex gap-2">
-                        {[30, 90, 365].map(d => (
-                          <button key={d} onClick={()=>setGrpAdjDays(d)}
-                            className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
-                            {d===30?"1 mo":d===90?"3 mo":"1 yr"}
+                  <div className="p-5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-4xl leading-none">{isActive ? daysLeft : 0}</span>
+                      <span className="text-xs text-muted-foreground">day{daysLeft===1?"":"s"} left</span>
+                    </div>
+                    {until && (
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {isActive ? "Until" : "Ended"} {until.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    )}
+                    {!groupOpen ? (
+                      <button onClick={()=>setGroupOpen(true)} className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground inline-flex items-center justify-center gap-1.5">
+                        <Plus size={12}/> Renew or adjust
+                      </button>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={()=>setGrpAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12}/> Add days</button>
+                          <button onClick={()=>setGrpAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${grpAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12}/> Remove</button>
+                        </div>
+                        {kids.length > 0 && (
+                          <select value={grpAdjChildId} onChange={(e)=>setGrpAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                            <option value="">Apply to {member?.name || "member"}</option>
+                            {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                          </select>
+                        )}
+                        <div className="grid grid-cols-3 gap-2">
+                          {[30, 90, 365].map(d => (
+                            <button key={d} onClick={()=>setGrpAdjDays(d)}
+                              className={`rounded-pill py-2 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
+                              {d===30?"1 mo":d===90?"3 mo":"1 yr"}
+                            </button>
+                          ))}
+                        </div>
+                        <input type="number" min={1} value={grpAdjDays} onChange={(e)=>setGrpAdjDays(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# days"/>
+                        <input placeholder="Note (optional)" value={grpAdjNote} onChange={(e)=>setGrpAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                        <div className="flex gap-2">
+                          <button onClick={()=>adjustGroup.mutate()} disabled={adjustGroup.isPending || grpAdjDays < 1} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                            {grpAdjType==="credit" ? "Add" : "Remove"} {grpAdjDays} day{grpAdjDays===1?"":"s"}
                           </button>
-                        ))}
+                          <button onClick={()=>setGroupOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                        </div>
                       </div>
-                      <input type="number" min={1} value={grpAdjDays} onChange={(e)=>setGrpAdjDays(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# days"/>
-                      <input placeholder="Note (optional)" value={grpAdjNote} onChange={(e)=>setGrpAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-                      <div className="flex gap-2">
-                        <button onClick={()=>adjustGroup.mutate()} disabled={adjustGroup.isPending || grpAdjDays < 1} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${grpAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                          {grpAdjType==="credit" ? "Add" : "Remove"} {grpAdjDays} days
-                        </button>
-                        <button onClick={()=>{setManageOpen(false); setManageMode(null);}} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                    )}
+                  </div>
+                </section>
+              );
+            })()}
+
+            {/* PT Sessions */}
+            {(() => {
+              const ptCount = member?.pt_sessions_remaining ?? 0;
+              return (
+                <section className="card-surface overflow-hidden">
+                  <div className="flex items-start justify-between gap-3 border-b hairline p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/15 text-primary">
+                        <Dumbbell size={18}/>
                       </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </section>
+                      <div>
+                        <h3 className="font-display text-lg leading-none">PT Sessions</h3>
+                        <p className="mt-1 text-[11px] text-muted-foreground">Private one-on-one credits</p>
+                      </div>
+                    </div>
+                    <span className={`shrink-0 rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${ptCount > 0 ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      {ptCount > 0 ? "Available" : "None"}
+                    </span>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-4xl leading-none">{ptCount}</span>
+                      <span className="text-xs text-muted-foreground">session{ptCount===1?"":"s"} remaining</span>
+                    </div>
+                    {!ptOpen ? (
+                      <button onClick={()=>setPtOpen(true)} className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground inline-flex items-center justify-center gap-1.5">
+                        <Plus size={12}/> Add or adjust
+                      </button>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12}/> Add</button>
+                          <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12}/> Remove</button>
+                        </div>
+                        <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
+                        {kids.length > 0 && (
+                          <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                            <option value="">Apply to {member?.name || "member"}</option>
+                            {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
+                          </select>
+                        )}
+                        {(() => {
+                          const targetChild = kids.find((k: any) => k.id === ptAdjChildId);
+                          const available = ptAdjChildId ? (targetChild?.pt_sessions_remaining ?? 0) : (member?.pt_sessions_remaining ?? 0);
+                          const overDraw = ptAdjType === "debit" && ptAdjSessions > available;
+                          return (
+                            <>
+                              {ptAdjType === "debit" && (
+                                <p className={`text-[11px] ${overDraw ? "text-destructive" : "text-muted-foreground"}`}>Only {available} available</p>
+                              )}
+                              <input placeholder="Note (optional)" value={ptAdjNote} onChange={(e)=>setPtAdjNote(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+                              <div className="flex gap-2">
+                                <button onClick={()=>adjustPT.mutate()} disabled={adjustPT.isPending || overDraw} className={`flex-1 rounded-pill py-2 text-xs font-semibold disabled:opacity-60 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
+                                  {ptAdjType==="credit" ? "Add" : "Remove"} {ptAdjSessions} PT
+                                </button>
+                                <button onClick={()=>setPtOpen(false)} className="rounded-pill border hairline px-3 py-2 text-xs font-semibold">Cancel</button>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Contact */}
             <section className="card-surface p-5">
