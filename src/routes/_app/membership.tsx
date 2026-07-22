@@ -56,7 +56,7 @@ function MembershipPage() {
     <div>
       <PageHeader title={t.membership} />
       <div className="space-y-4 px-5">
-        <div className={`card-surface p-6 ${groupActive ? "bg-gradient-to-br from-primary/25 to-transparent" : ""}`}>
+        <div data-tour="membership-group" className={`card-surface p-6 ${groupActive ? "bg-gradient-to-br from-primary/25 to-transparent" : ""}`}>
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Group Membership</p>
             {isPaused && <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">Paused</span>}

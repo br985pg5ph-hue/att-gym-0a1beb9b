@@ -19,6 +19,7 @@ type Profile = {
   interests: string[];
   is_parent: boolean;
   membership_paused_at: string | null;
+  tour_completed_at: string | null;
 };
 
 export type Child = {

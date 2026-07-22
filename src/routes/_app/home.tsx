@@ -100,7 +100,7 @@ function HomePage() {
 
       <div className="space-y-4 px-5">
         {/* Next class */}
-        <div className="card-surface p-5">
+        <div className="card-surface p-5" data-tour="next-session">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t.nextClass}</p>
           {nextBooking ? (
             <div className="mt-2">
@@ -130,7 +130,7 @@ function HomePage() {
 
 
         {/* Group membership status */}
-        <div className={`card-surface p-5 ${groupActive ? "bg-gradient-to-br from-primary/20 to-transparent" : ""}`}>
+        <div data-tour="group-card" className={`card-surface p-5 ${groupActive ? "bg-gradient-to-br from-primary/20 to-transparent" : ""}`}>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className={`flex items-center gap-2 ${groupActive ? "text-primary" : isPaused ? "text-silver" : "text-muted-foreground"}`}>
@@ -162,7 +162,7 @@ function HomePage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3" data-tour="pt-card">
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground"><Ticket size={16} /><span className="text-[10px] uppercase tracking-widest whitespace-pre-line">{"PRIVATE\nSESSIONS"}</span></div>
             <p className="font-display mt-1 text-3xl">{ptRemaining} <span className="text-sm text-muted-foreground">left</span></p>
@@ -177,7 +177,7 @@ function HomePage() {
 
 
         {/* Latest news */}
-        <Link to="/news" className="card-surface block p-4">
+        <Link to="/news" className="card-surface block p-4" data-tour="news-widget">
           <div className="flex items-center gap-3">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
               <Newspaper size={20} />

@@ -93,7 +93,7 @@ function ProfilePage() {
         </div>
 
 
-        <div className="card-surface divide-y hairline overflow-hidden">
+        <div className="card-surface divide-y hairline overflow-hidden" data-tour="profile-menu">
           {rows.map(r => {
             const Icon = r.icon;
             return (

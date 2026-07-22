@@ -288,6 +288,7 @@ export type Database = {
           referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
+          tour_completed_at: string | null
           training_frequency: string | null
         }
         Insert: {
@@ -316,6 +317,7 @@ export type Database = {
           referred_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
+          tour_completed_at?: string | null
           training_frequency?: string | null
         }
         Update: {
@@ -344,6 +346,7 @@ export type Database = {
           referred_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           streak?: number
+          tour_completed_at?: string | null
           training_frequency?: string | null
         }
         Relationships: [
@@ -456,6 +459,7 @@ export type Database = {
           referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
+          tour_completed_at: string | null
           training_frequency: string | null
         }
         SetofOptions: {
@@ -493,6 +497,7 @@ export type Database = {
           referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
+          tour_completed_at: string | null
           training_frequency: string | null
         }
         SetofOptions: {
