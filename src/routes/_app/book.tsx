@@ -116,7 +116,7 @@ function BookPage() {
   const eligibilityMessage = (type: string): string => {
     if (type === "kids") return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
     if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
-    if (selfPaused) return "Membership paused — resume to book";
+    if (selfPaused) return "Membership paused, unpause to book";
     return "Your group membership isn't active";
   };
 
