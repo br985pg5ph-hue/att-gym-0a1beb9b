@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
-import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Sun, Languages, Bell, FileText, Trash2, UserCog, Users, Compass } from "lucide-react";
 import { toast } from "sonner";
 import { deleteMyAccount } from "@/lib/account.functions";
 import {
@@ -108,6 +108,19 @@ function SettingsPage() {
 
 
         <div className="card-surface divide-y hairline overflow-hidden">
+          <button
+            onClick={async () => {
+              if (user) await supabase.from("profiles").update({ tour_completed_at: null }).eq("id", user.id);
+              try { sessionStorage.setItem("att.startTour", "1"); } catch {}
+              await refresh();
+              nav({ to: "/home" });
+            }}
+            className="flex w-full items-center gap-3 p-4 text-start"
+          >
+            <Compass size={18} className="text-muted-foreground"/>
+            <span className="flex-1 text-sm font-medium">Replay app tour</span>
+            <ChevronRight size={16} className="text-muted-foreground flip-rtl" />
+          </button>
           <button className="flex w-full items-center gap-3 p-4 text-start">
             <FileText size={18} className="text-muted-foreground"/>
             <span className="flex-1 text-sm font-medium">{t.legal}</span>
