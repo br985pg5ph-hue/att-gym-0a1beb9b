@@ -141,11 +141,17 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       ((ptProfiles ?? []) as any[]).reduce((sum, p) => sum + (p.pt_sessions_remaining ?? 0), 0) +
       ((ptChildren ?? []) as any[]).reduce((sum, c) => sum + (c.pt_sessions_remaining ?? 0), 0);
 
-    const sumRevenue = (rows: any[]) =>
-      rows.reduce((sum, r) => sum + (r.amount_jod ? Number(r.amount_jod) : 0), 0);
+    const countByMethod = (rows: any[]) => {
+      const counts: Record<string, number> = {};
+      rows.forEach((r) => {
+        const method = r.payment_method ?? "other";
+        counts[method] = (counts[method] ?? 0) + 1;
+      });
+      return counts;
+    };
 
-    const revenueTodayTotal = sumRevenue(revenueToday ?? []);
-    const revenueWeekTotal = sumRevenue(revenueWeek ?? []);
+    const revenueTodayCounts = countByMethod(revenueToday ?? []);
+    const revenueWeekCounts = countByMethod(revenueWeek ?? []);
 
     const signupDays: Record<string, number> = {};
     const trendStart = new Date(monthAgo);
