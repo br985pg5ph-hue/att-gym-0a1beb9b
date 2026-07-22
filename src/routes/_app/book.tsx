@@ -263,6 +263,12 @@ function BookPage() {
           </div>
         </div>
 
+        {!bookingForChild && memberGender === null && (
+          <div className="mt-4 rounded-2xl border hairline bg-card p-4">
+            <p className="text-xs font-semibold">Complete your profile</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in Profile → Edit to book group classes.</p>
+          </div>
+        )}
         {!bookingForChild && (
           <div className="mt-4 grid grid-cols-3 gap-2" data-tour="filters">
             {TYPES.filter((tp) => tp.key !== "kids" && (isFemale || !FEMALE_ONLY.has(tp.key))).map((tp) => (
