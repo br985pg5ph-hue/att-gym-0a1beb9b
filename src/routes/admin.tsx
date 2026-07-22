@@ -994,4 +994,91 @@ function MembersAdmin() {
   );
 }
 
+function GymInfoAdmin() {
+  const qc = useQueryClient();
+  const { data: gym, isLoading } = useQuery({
+    queryKey: ["gym"],
+    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
+  });
+  const [form, setForm] = useState<{ name: string; address: string; phone: string; instagram_url: string; whatsapp_number: string; maps_url: string; lat: string; lng: string }>({
+    name: "", address: "", phone: "", instagram_url: "", whatsapp_number: "", maps_url: "", lat: "", lng: "",
+  });
+  const [hydrated, setHydrated] = useState(false);
+  if (gym && !hydrated) {
+    setHydrated(true);
+    setForm({
+      name: gym.name ?? "",
+      address: gym.address ?? "",
+      phone: gym.phone ?? "",
+      instagram_url: (gym as any).instagram_url ?? "",
+      whatsapp_number: (gym as any).whatsapp_number ?? "",
+      maps_url: (gym as any).maps_url ?? "",
+      lat: gym.lat != null ? String(gym.lat) : "",
+      lng: gym.lng != null ? String(gym.lng) : "",
+    });
+  }
+  const save = useMutation({
+    mutationFn: async () => {
+      const payload: any = {
+        name: form.name || null,
+        address: form.address || null,
+        phone: form.phone || null,
+        instagram_url: form.instagram_url || null,
+        whatsapp_number: form.whatsapp_number || null,
+        maps_url: form.maps_url || null,
+        lat: form.lat ? Number(form.lat) : null,
+        lng: form.lng ? Number(form.lng) : null,
+      };
+      const { error } = await supabase.from("gym_info").update(payload).eq("id", 1);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Gym info updated"); qc.invalidateQueries({ queryKey: ["gym"] }); },
+    onError: (e: any) => toast.error(e.message ?? "Failed to save"),
+  });
+
+  const field = (label: string, key: keyof typeof form, placeholder?: string, type = "text") => (
+    <label className="block">
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</span>
+      <input
+        type={type}
+        value={form[key]}
+        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+        placeholder={placeholder}
+        className="mt-1 w-full rounded-2xl border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
+      />
+    </label>
+  );
+
+  if (isLoading) return <p className="text-center text-xs text-muted-foreground">Loading…</p>;
+
+  return (
+    <div className="space-y-4">
+      <div className="card-surface p-5">
+        <h2 className="font-display text-xl">Gym Info</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Edits appear instantly on the members' Profile and Location pages.</p>
+      </div>
+      <div className="card-surface space-y-3 p-5">
+        {field("Gym name", "name")}
+        {field("Address", "address")}
+        {field("Phone", "phone", "+962...")}
+        {field("Instagram URL", "instagram_url", "https://instagram.com/...")}
+        {field("WhatsApp number", "whatsapp_number", "+962...")}
+        {field("Google Maps link", "maps_url", "https://maps.app.goo.gl/...")}
+        <div className="grid grid-cols-2 gap-3">
+          {field("Latitude", "lat", "31.95", "number")}
+          {field("Longitude", "lng", "35.91", "number")}
+        </div>
+        <button
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+        >
+          {save.isPending ? "Saving…" : "Save changes"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 
