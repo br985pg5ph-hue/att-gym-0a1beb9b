@@ -557,6 +557,12 @@ function MemberDetailPage() {
                     <span>{emailData.email}</span>
                   </a>
                 )}
+                {member?.date_of_birth && (
+                  <div className="flex items-center gap-2 rounded-xl bg-muted/30 p-3 text-foreground">
+                    <Cake size={16} className="text-primary" />
+                    <span>{new Date(member.date_of_birth).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
+                  </div>
+                )}
               </div>
             </section>
           </div>
