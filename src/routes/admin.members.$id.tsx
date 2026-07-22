@@ -470,11 +470,11 @@ function MemberDetailPage() {
                             {kids.map((k: any) => <option key={k.id} value={k.id}>Apply to {k.name}</option>)}
                           </select>
                         )}
-                        <div className="grid grid-cols-3 gap-2">
-                          {[30, 90, 365].map(d => (
+                        <div className="grid grid-cols-2 gap-2">
+                          {[30, 90].map(d => (
                             <button key={d} onClick={()=>setGrpAdjDays(d)}
                               className={`rounded-pill py-2 text-[11px] font-semibold ${grpAdjDays===d ? "bg-primary text-primary-foreground" : "border hairline"}`}>
-                              {d===30?"1 mo":d===90?"3 mo":"1 yr"}
+                              {d===30?"1 mo":"3 mo"}
                             </button>
                           ))}
                         </div>
