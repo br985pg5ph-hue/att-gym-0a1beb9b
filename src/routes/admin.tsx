@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -689,7 +689,7 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until, pt_sessions_remaining)")
+      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
       .eq("role", "member")
       .order("name")).data ?? [],
   });
@@ -827,6 +827,13 @@ function MembersAdmin() {
                 onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
                 className="flex min-w-0 flex-1 items-start gap-3 text-left"
               >
+                <div className="shrink-0 h-11 w-11 rounded-full overflow-hidden bg-muted flex items-center justify-center hairline border">
+                  {m.avatar_url ? (
+                    <img src={m.avatar_url} alt={m.name || "member"} className="h-full w-full object-cover" />
+                  ) : (
+                    <User size={18} className="text-muted-foreground" />
+                  )}
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
