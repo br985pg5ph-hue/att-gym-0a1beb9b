@@ -87,7 +87,7 @@ function AdminPage() {
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
-        {tab === "settings" && <GymInfoAdmin />}
+        {tab === "settings" && <GymInfoAdmin setTab={setTab} />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
         <ul className="grid grid-cols-4 items-center px-1">
