@@ -84,6 +84,20 @@ function MemberDetailPage() {
   const [grpAdjNote, setGrpAdjNote] = useState("");
 
   const [bookOpen, setBookOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
+  const deleteFn = useServerFn(deleteMemberByStaff);
+  const deleteMember = useMutation({
+    mutationFn: async () => {
+      await deleteFn({ data: { userId: id } });
+    },
+    onSuccess: () => {
+      toast.success("Client account deleted");
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
+      nav({ to: "/admin" });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
 
   const adjustPT = useMutation({
     mutationFn: async () => {
