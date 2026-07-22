@@ -710,6 +710,20 @@ function MembersAdmin() {
       )
     : (data as any[]);
 
+  const sorted = [...filtered].sort((a: any, b: any) => {
+    let cmp = 0;
+    if (sortBy === "name") cmp = (a.name ?? "").localeCompare(b.name ?? "");
+    else if (sortBy === "member_code") cmp = (a.member_code ?? "").localeCompare(b.member_code ?? "");
+    else if (sortBy === "expiry") {
+      const da = a.group_subscription_until ? new Date(a.group_subscription_until).getTime() : Infinity;
+      const db = b.group_subscription_until ? new Date(b.group_subscription_until).getTime() : Infinity;
+      cmp = da - db;
+    } else if (sortBy === "pt") {
+      cmp = (a.pt_sessions_remaining ?? 0) - (b.pt_sessions_remaining ?? 0);
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
   const resetForm = () => {
     setAddFor(null); setChildId(""); setDays(30); setSessions(10); setMethod("cash"); setNote("");
   };
@@ -761,14 +775,37 @@ function MembersAdmin() {
 
   return (
     <div className="space-y-2">
-      <input
-        type="search"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by name, child name, or member code"
-        className="w-full rounded-pill border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
-      />
-      {filtered.length === 0 && (
+      <div className="flex items-center gap-2">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, child name, or member code"
+          className="min-w-0 flex-1 rounded-pill border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
+        />
+        <div className="relative shrink-0">
+          <select
+            value={`${sortBy}:${sortDir}`}
+            onChange={(e) => {
+              const [field, dir] = e.target.value.split(":") as [typeof sortBy, typeof sortDir];
+              setSortBy(field);
+              setSortDir(dir);
+            }}
+            className="h-[42px] appearance-none rounded-pill border hairline bg-card pl-3 pr-8 text-xs font-semibold outline-none focus:border-primary"
+          >
+            <option value="name:asc">{t.sortNameAsc}</option>
+            <option value="name:desc">{t.sortNameDesc}</option>
+            <option value="member_code:asc">{t.sortMemberIdAsc}</option>
+            <option value="member_code:desc">{t.sortMemberIdDesc}</option>
+            <option value="expiry:asc">{t.sortExpiryAsc}</option>
+            <option value="expiry:desc">{t.sortExpiryDesc}</option>
+            <option value="pt:desc">{t.sortPtDesc}</option>
+            <option value="pt:asc">{t.sortPtAsc}</option>
+          </select>
+          <ArrowUpDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        </div>
+      </div>
+      {sorted.length === 0 && (
         <p className="py-6 text-center text-xs text-muted-foreground">No members found.</p>
       )}
       {filtered.map((m: any) => {
