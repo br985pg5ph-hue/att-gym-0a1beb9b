@@ -24,8 +24,8 @@ function BookPage() {
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
-  const [filter, setFilter] = useState<string>("all");
   const [pickedId, setPickedId] = useState<string | null>(null);
+
 
   // Month grid (declared here so month-scoped queries can use it) — anchored to Amman time
   const today = ammanNow();
@@ -93,8 +93,8 @@ function BookPage() {
   const memberGender = (profile as any)?.gender ?? null;
   const isFemale = memberGender === "female";
   const FEMALE_ONLY = new Set(["women_only", "yoga", "gymnastics"]);
-  const effectiveFilter = bookingForChild ? (filter === "pt" ? "pt" : filter === "kids" ? "kids" : "all") : (filter === "kids" ? "all" : filter);
   const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
+
   const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
   const selfPaused = !!(profile as any)?.membership_paused_at;
   const groupActiveSelf = !selfPaused && !!profile?.group_subscription_until && new Date(profile.group_subscription_until).getTime() > Date.now();
@@ -151,8 +151,9 @@ function BookPage() {
     if (bookingForChild && c.type !== "kids" && c.type !== "pt") return false;
     // Hide female-only classes from male / gender-unset adults
     if (!bookingForChild && FEMALE_ONLY.has(c.type) && !isFemale) return false;
-    return effectiveFilter === "all" || c.type === effectiveFilter;
+    return true;
   });
+
 
   const pickedClass = pickedId ? (daySlots.find((c: any) => c.id === pickedId) as any) : null;
 
@@ -265,30 +266,6 @@ function BookPage() {
             </div>
             <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
           </Link>
-        )}
-        {!bookingForChild && (
-          <div className="mt-4 grid grid-cols-3 gap-2" data-tour="filters">
-            {TYPES.filter((tp) => tp.key !== "kids" && (isFemale || !FEMALE_ONLY.has(tp.key))).map((tp) => (
-              <button key={tp.key} onClick={() => setFilter(tp.key)}
-                className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
-                  filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
-                }`}>
-                {t[tp.labelKey]}
-              </button>
-            ))}
-          </div>
-        )}
-        {bookingForChild && (
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {TYPES.filter((tp) => tp.key === "all" || tp.key === "kids" || tp.key === "pt").map((tp) => (
-              <button key={tp.key} onClick={() => setFilter(tp.key)}
-                className={`rounded-pill border px-2 py-2 text-[11px] font-medium leading-tight transition ${
-                  filter === tp.key ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
-                }`}>
-                {t[tp.labelKey]}
-              </button>
-            ))}
-          </div>
         )}
 
 
