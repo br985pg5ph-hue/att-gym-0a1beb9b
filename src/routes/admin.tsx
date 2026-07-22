@@ -827,6 +827,13 @@ function MembersAdmin() {
                 onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
                 className="flex min-w-0 flex-1 items-start gap-3 text-left"
               >
+                <div className="shrink-0 h-11 w-11 rounded-full overflow-hidden bg-muted flex items-center justify-center hairline border">
+                  {m.avatar_url ? (
+                    <img src={m.avatar_url} alt={m.name || "member"} className="h-full w-full object-cover" />
+                  ) : (
+                    <User size={18} className="text-muted-foreground" />
+                  )}
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
