@@ -186,7 +186,9 @@ function MemberDetailPage() {
                   </span>
                 </div>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  {emailData?.email && <span className="inline-flex items-center gap-1"><Mail size={12}/>{emailData.email}</span>}
                   {member?.phone && <span className="inline-flex items-center gap-1"><Phone size={12}/>{member.phone}</span>}
+                  {(member as any)?.date_of_birth && <span className="inline-flex items-center gap-1"><Cake size={12}/>{new Date((member as any).date_of_birth).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>}
                   {member?.created_at && <span>Joined {new Date(member.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>}
                   {member?.is_parent && <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold">Parent</span>}
                 </p>
