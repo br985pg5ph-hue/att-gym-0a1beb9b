@@ -214,6 +214,7 @@ function BookPage() {
               const isToday = key === todayKey;
               return (
                 <button key={i} onClick={() => setSelectedDate(key)}
+                  data-tour-day={hasBooking ? "booking" : hasClass ? "class" : undefined}
                   className={`relative aspect-square rounded-lg text-sm transition ${
                     active ? "bg-primary text-primary-foreground font-semibold" :
                     isToday ? "border hairline" : "hover:bg-muted"
