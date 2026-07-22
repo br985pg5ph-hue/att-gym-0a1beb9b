@@ -905,54 +905,6 @@ function MembersAdmin() {
     return sortDir === "asc" ? cmp : -cmp;
   });
 
-  const resetForm = () => {
-    setAddFor(null); setChildId(""); setDays(30); setSessions(10); setMethod("cash"); setNote("");
-  };
-
-  const addGroup = useMutation({
-    mutationFn: async (memberId: string) => {
-      const { error } = await supabase.from("transactions").insert({
-        member_id: memberId,
-        child_id: childId || null,
-        service: "group",
-        type: "credit",
-        days,
-        classes: 0,
-        payment_method: method,
-        description: note || null,
-        created_by: user!.id,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Group membership renewed");
-      resetForm();
-      qc.invalidateQueries({ queryKey: ["admin-members"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  const addPT = useMutation({
-    mutationFn: async (memberId: string) => {
-      const { error } = await supabase.from("transactions").insert({
-        member_id: memberId,
-        child_id: childId || null,
-        service: "pt",
-        type: "credit",
-        classes: sessions,
-        payment_method: method,
-        description: note || null,
-        created_by: user!.id,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("PT sessions added");
-      resetForm();
-      qc.invalidateQueries({ queryKey: ["admin-members"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
 
   return (
     <div className="space-y-2">
