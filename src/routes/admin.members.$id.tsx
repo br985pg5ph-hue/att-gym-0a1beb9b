@@ -253,14 +253,7 @@ function MemberDetailPage() {
         </section>
 
         {/* Stats grid */}
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="card-surface p-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Dumbbell size={14}/>
-              <p className="text-[10px] uppercase tracking-widest font-semibold">PT left</p>
-            </div>
-            <p className="mt-2 font-display text-3xl leading-none">{member?.pt_sessions_remaining ?? 0}</p>
-          </div>
+        <section className="grid grid-cols-3 gap-3 md:grid-cols-3">
           <div className="card-surface p-4">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar size={14}/>
