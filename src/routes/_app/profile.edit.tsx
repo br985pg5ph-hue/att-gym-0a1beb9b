@@ -49,6 +49,7 @@ function EditProfilePage() {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [dob, setDob] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "">("");
   const [avatarSaving, setAvatarSaving] = useState(false);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
