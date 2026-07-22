@@ -602,6 +602,50 @@ function MemberDetailPage() {
           }}
         />
       )}
+
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={()=>!deleteMember.isPending && setDeleteOpen(false)}>
+          <div className="w-full max-w-md rounded-2xl border hairline bg-card p-5" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-destructive/15 text-destructive">
+                <Trash2 size={18}/>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-display text-xl leading-none">Delete client account</h3>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  This permanently deletes <span className="font-semibold text-foreground">{member?.name}</span>'s account, bookings, and credit history. This can't be undone.
+                </p>
+              </div>
+              <button onClick={()=>setDeleteOpen(false)} className="rounded-pill border hairline p-1.5" disabled={deleteMember.isPending}>
+                <X size={14}/>
+              </button>
+            </div>
+            <div className="mt-4 space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                Type <span className="text-foreground">{member?.name}</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmName}
+                onChange={(e)=>setDeleteConfirmName(e.target.value)}
+                placeholder={member?.name || ""}
+                className="w-full rounded-xl border hairline bg-muted/30 px-3 py-2.5 text-sm outline-none focus:border-primary"
+                autoFocus
+              />
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button onClick={()=>setDeleteOpen(false)} disabled={deleteMember.isPending} className="rounded-pill border hairline px-4 py-2 text-xs font-semibold">Cancel</button>
+              <button
+                onClick={()=>deleteMember.mutate()}
+                disabled={deleteMember.isPending || deleteConfirmName.trim() !== (member?.name || "").trim() || !member?.name}
+                className="rounded-pill bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground disabled:opacity-40"
+              >
+                {deleteMember.isPending ? "Deleting…" : "Delete account"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
