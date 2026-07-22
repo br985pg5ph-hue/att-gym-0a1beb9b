@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
@@ -266,10 +266,13 @@ function BookPage() {
         {!bookingForChild && memberGender === null && (
           <Link
             to="/profile/edit"
-            className="mt-4 block rounded-2xl border hairline bg-card p-4 transition active:scale-[0.99] hover:border-primary"
+            className="mt-4 flex items-center justify-between rounded-2xl border hairline bg-card p-4 transition active:scale-[0.99] hover:border-primary"
           >
-            <p className="text-xs font-semibold">Complete your profile</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in profile to book classes.</p>
+            <div>
+              <p className="text-xs font-semibold">Complete your profile</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in profile to book classes.</p>
+            </div>
+            <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
           </Link>
         )}
         {!bookingForChild && (
