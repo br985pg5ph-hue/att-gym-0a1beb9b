@@ -11,8 +11,9 @@ export const Route = createFileRoute("/_app/membership")({
 });
 
 function MembershipPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth() as any;
   const { t } = useLang();
+  const qc = useQueryClient();
 
   const { data: txns = [] } = useQuery({
     queryKey: ["txns", user?.id],
@@ -31,15 +32,38 @@ function MembershipPage() {
     ? new Date(groupUntil).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })
     : null;
 
+  const pausedAt = (profile as any)?.membership_paused_at ?? null;
+  const pauseDaysUsed = (profile as any)?.membership_pause_days_used ?? 0;
+  const pauseRemaining = Math.max(0, 45 - pauseDaysUsed);
+  const isPaused = !!pausedAt;
+  const pausedDays = pausedAt ? Math.ceil((Date.now() - new Date(pausedAt).getTime()) / 86400000) : 0;
+
+  const togglePause = useMutation({
+    mutationFn: async (action: "pause" | "resume") => {
+      const rpc = action === "pause" ? "pause_membership" : "resume_membership";
+      const { error } = await (supabase as any).rpc(rpc, { target_user: user!.id });
+      if (error) throw error;
+    },
+    onSuccess: (_d, action) => {
+      toast.success(action === "pause" ? "Membership paused" : "Membership resumed");
+      refresh?.();
+      qc.invalidateQueries();
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   return (
     <div>
       <PageHeader title={t.membership} />
       <div className="space-y-4 px-5">
         <div className={`card-surface p-6 ${groupActive ? "bg-gradient-to-br from-primary/25 to-transparent" : ""}`}>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Group Membership</p>
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Group Membership</p>
+            {isPaused && <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">Paused</span>}
+          </div>
           {groupActive ? (
             <>
-              <p className="font-display mt-1 text-4xl leading-none">Active</p>
+              <p className="font-display mt-1 text-4xl leading-none">{isPaused ? "Paused" : "Active"}</p>
               <p className="mt-2 text-sm text-muted-foreground">Until {groupDateLabel}</p>
             </>
           ) : (
@@ -49,6 +73,31 @@ function MembershipPage() {
               </p>
               <p className="mt-2 text-sm text-muted-foreground">Renew at the gym to access group classes.</p>
             </>
+          )}
+
+          {(groupActive || isPaused) && (
+            <div className="mt-4 border-t hairline pt-4">
+              <p className="text-[11px] text-muted-foreground">
+                {isPaused
+                  ? `Paused for ${pausedDays} day${pausedDays===1?"":"s"} · ${pauseRemaining} of 45 days left`
+                  : `${pauseRemaining} of 45 pause days remaining this cycle`}
+              </p>
+              {isPaused ? (
+                <button
+                  onClick={()=>togglePause.mutate("resume")}
+                  disabled={togglePause.isPending}
+                  className="mt-3 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60 inline-flex items-center justify-center gap-1.5">
+                  <Play size={12}/> Resume membership
+                </button>
+              ) : (
+                <button
+                  onClick={()=>{ if (confirm(`Pause your membership? Your expiry date will be extended by however many days you stay paused (max 45 days total).`)) togglePause.mutate("pause"); }}
+                  disabled={togglePause.isPending || pauseRemaining <= 0}
+                  className="mt-3 w-full rounded-pill border hairline py-2.5 text-xs font-semibold disabled:opacity-50 inline-flex items-center justify-center gap-1.5">
+                  <Pause size={12}/> Pause membership
+                </button>
+              )}
+            </div>
           )}
         </div>
 
