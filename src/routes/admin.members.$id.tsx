@@ -360,6 +360,46 @@ function MemberDetailPage() {
 
           {/* Right column: management controls */}
           <div className="space-y-5">
+            {/* Pause membership */}
+            {(() => {
+              const m: any = member || {};
+              const isPaused = !!m.membership_paused_at;
+              const used = m.membership_pause_days_used ?? 0;
+              const remaining = Math.max(0, 45 - used);
+              const hasActive = m.group_subscription_until && new Date(m.group_subscription_until).getTime() > Date.now();
+              const pausedSince = isPaused ? new Date(m.membership_paused_at) : null;
+              const pausedDays = pausedSince ? Math.ceil((Date.now() - pausedSince.getTime()) / 86400000) : 0;
+              return (
+                <section className="card-surface p-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display text-lg leading-none">Membership pause</h3>
+                    {isPaused && <span className="rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">Paused</span>}
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {isPaused
+                      ? `Paused for ${pausedDays} day${pausedDays===1?"":"s"} · ${remaining} of 45 days left`
+                      : `${remaining} of 45 pause days remaining this cycle`}
+                  </p>
+                  {isPaused ? (
+                    <button
+                      onClick={()=>togglePause.mutate("resume")}
+                      disabled={togglePause.isPending}
+                      className="mt-4 w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60 inline-flex items-center justify-center gap-1.5">
+                      <Play size={12}/> Resume membership
+                    </button>
+                  ) : (
+                    <button
+                      onClick={()=>togglePause.mutate("pause")}
+                      disabled={togglePause.isPending || !hasActive || remaining <= 0}
+                      className="mt-4 w-full rounded-pill border hairline py-2.5 text-xs font-semibold disabled:opacity-50 inline-flex items-center justify-center gap-1.5">
+                      <Pause size={12}/> Pause membership
+                    </button>
+                  )}
+                  {!hasActive && !isPaused && <p className="mt-2 text-[11px] text-muted-foreground">No active group membership to pause.</p>}
+                </section>
+              );
+            })()}
+
             {/* Renew or Add */}
             <section className="card-surface p-5">
               <h3 className="font-display text-lg leading-none">Manage credits</h3>
