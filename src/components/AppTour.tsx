@@ -68,7 +68,7 @@ export function AppTour() {
     { route: "/book", title: "Filter Classes", description: "Switch between Muay Thai, Women only, PT, Yoga and more.", selector: '[data-tour="filters"]' },
     { route: "/book", title: "Book a Slot", description: "Tap a slot to select it, then confirm using the button at the bottom.", selector: '[data-tour="slots"]' },
     { route: "/membership", title: "Group Membership", description: "See your group subscription status, expiry date, and pause your membership for up to 45 days.", selector: '[data-tour="membership-group"]' },
-    { route: "/membership", title: "Private Sessions", description: "How many PT (private) sessions you have left, renew any time at the gym. How many PT and group classes you trained at the gym.", selector: '[data-tour="membership-pt"]' },
+    { route: "/membership", title: "Private Sessions", description: "How many PT (private) sessions you have left, renew any time at the gym.", selector: '[data-tour="membership-pt"]' },
     { route: "/membership", title: "Credit History", description: "Review all your membership credits, PT sessions, and payments in one place.", selector: '[data-tour="membership-history"]' },
     { route: "/profile", title: "Profile & Referral", description: "Edit your info, invite friends with your referral link, and manage settings — including replaying this tour.", selector: '[data-tour="profile-menu"]' },
     { title: "You're all set", description: "Enjoy training at ATT Academy. You can replay this tour any time from Settings." },
