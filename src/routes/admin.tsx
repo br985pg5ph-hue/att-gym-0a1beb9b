@@ -110,6 +110,22 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
 
   return (
     <div className="space-y-4">
+      <button
+        onClick={() => setTab("settings")}
+        className="flex w-full items-center justify-between rounded-2xl border hairline bg-card p-4 text-left transition-colors active:bg-card/80"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <Settings size={20} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Gym Info</p>
+            <p className="text-[10px] text-muted-foreground">Edit location, links, and contact details</p>
+          </div>
+        </div>
+        <ChevronRight size={18} className="text-muted-foreground" />
+      </button>
+
       <div className="card-surface p-4">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
         <p className="mt-1 text-xs text-muted-foreground">
