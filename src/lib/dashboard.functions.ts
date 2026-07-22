@@ -47,6 +47,10 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       { data: newThisMonth },
       { data: expiringSoon },
       { data: recentTxns },
+      { data: revenueToday },
+      { data: revenueWeek },
+      { data: signupTrend },
+      { data: membershipBreakdown },
     ] = await Promise.all([
       supabaseAdmin
         .from("classes")
@@ -95,6 +99,28 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .select("id, type, service, classes, days, description, payment_method, created_at, member_id, profiles(id, name), children(id, name)")
         .order("created_at", { ascending: false })
         .limit(5),
+      supabaseAdmin
+        .from("transactions")
+        .select("payment_method")
+        .eq("type", "credit")
+        .gte("created_at", todayStart)
+        .lte("created_at", todayEnd)
+        .not("payment_method", "is", null),
+      supabaseAdmin
+        .from("transactions")
+        .select("payment_method")
+        .eq("type", "credit")
+        .gte("created_at", weekAgo.toISOString())
+        .lte("created_at", todayEnd)
+        .not("payment_method", "is", null),
+      supabaseAdmin
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", monthAgo.toISOString())
+        .order("created_at", { ascending: true }),
+      supabaseAdmin
+        .from("profiles")
+        .select("id, group_subscription_until, pt_sessions_remaining, membership_paused_at"),
     ]);
 
     const todayList = (todayClasses ?? []).map((c: any) => {
@@ -114,6 +140,44 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
     const ptSessionsOnBooks =
       ((ptProfiles ?? []) as any[]).reduce((sum, p) => sum + (p.pt_sessions_remaining ?? 0), 0) +
       ((ptChildren ?? []) as any[]).reduce((sum, c) => sum + (c.pt_sessions_remaining ?? 0), 0);
+
+    const countByMethod = (rows: any[]) => {
+      const counts: Record<string, number> = {};
+      rows.forEach((r) => {
+        const method = r.payment_method ?? "other";
+        counts[method] = (counts[method] ?? 0) + 1;
+      });
+      return counts;
+    };
+
+    const revenueTodayCounts = countByMethod(revenueToday ?? []);
+    const revenueWeekCounts = countByMethod(revenueWeek ?? []);
+
+    const signupDays: Record<string, number> = {};
+    const trendStart = new Date(monthAgo);
+    for (let d = new Date(trendStart); d <= now; d.setDate(d.getDate() + 1)) {
+      signupDays[toAmmanDateInput(new Date(d)).slice(0, 10)] = 0;
+    }
+    (signupTrend ?? []).forEach((p: any) => {
+      const key = toAmmanDateInput(new Date(p.created_at)).slice(0, 10);
+      if (key in signupDays) signupDays[key] += 1;
+    });
+    const signupTrendList = Object.entries(signupDays).map(([date, count]) => ({ date, count }));
+
+    let active = 0, paused = 0, expired = 0, never = 0;
+    (membershipBreakdown ?? []).forEach((p: any) => {
+      const groupActive = p.group_subscription_until && new Date(p.group_subscription_until).getTime() > now.getTime();
+      const hasPt = (p.pt_sessions_remaining ?? 0) > 0;
+      if (p.membership_paused_at) {
+        paused += 1;
+      } else if (groupActive || hasPt) {
+        active += 1;
+      } else if (p.group_subscription_until) {
+        expired += 1;
+      } else {
+        never += 1;
+      }
+    });
 
     return {
       todayClasses: todayList,
@@ -140,5 +204,9 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         member_name: t.profiles?.name ?? null,
         child_name: t.children?.name ?? null,
       })),
+      revenueToday: revenueTodayCounts,
+      revenueWeek: revenueWeekCounts,
+      signupTrend: signupTrendList,
+      membershipBreakdown: { active, paused, expired, never },
     };
   });

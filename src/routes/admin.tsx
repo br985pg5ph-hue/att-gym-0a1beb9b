@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -131,6 +131,21 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
     { label: t.newSignups, value: stats?.newSignupsThisWeek ?? 0, sub: "this week", icon: Plus, tone: "default" as const },
   ];
 
+  const [trendRange, setTrendRange] = useState<7 | 30>(7);
+  const signupTrendData = (stats?.signupTrend ?? []).slice(-trendRange);
+  const maxSignupCount = Math.max(1, ...signupTrendData.map((d) => d.count));
+
+  const revenueTodayTotal = Object.values(stats?.revenueToday ?? {}).reduce((a, b) => a + b, 0);
+  const revenueWeekTotal = Object.values(stats?.revenueWeek ?? {}).reduce((a, b) => a + b, 0);
+
+  const membershipTotal = Object.values(stats?.membershipBreakdown ?? {}).reduce((a, b) => a + b, 0) || 1;
+  const membershipSegments = [
+    { key: "active", label: t.active, count: stats?.membershipBreakdown.active ?? 0, color: "bg-emerald-500" },
+    { key: "paused", label: t.paused, count: stats?.membershipBreakdown.paused ?? 0, color: "bg-amber-500" },
+    { key: "expired", label: t.expired, count: stats?.membershipBreakdown.expired ?? 0, color: "bg-destructive" },
+    { key: "never", label: t.neverSubscribed, count: stats?.membershipBreakdown.never ?? 0, color: "bg-muted-foreground" },
+  ];
+
   return (
     <div className="space-y-5">
       {/* Header row */}
@@ -212,8 +227,58 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           )}
         </div>
 
-        {/* Right column: expiring soon + signup mini */}
+        {/* Right column: revenue + membership + expiring soon + members */}
         <div className="space-y-4">
+          {/* Revenue snapshot */}
+          <div className="card-surface p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.revenueSnapshot}</p>
+              <Wallet size={16} className="text-muted-foreground" />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="rounded-xl border hairline bg-card p-3">
+                <p className="text-[10px] text-muted-foreground">{t.salesToday}</p>
+                <p className="font-display mt-1 text-2xl leading-none">{revenueTodayTotal}</p>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {(stats?.revenueToday?.cash ?? 0)} {t.cash} · {(stats?.revenueToday?.card ?? 0)} {t.cliq}
+                </p>
+              </div>
+              <div className="rounded-xl border hairline bg-card p-3">
+                <p className="text-[10px] text-muted-foreground">{t.salesThisWeek}</p>
+                <p className="font-display mt-1 text-2xl leading-none">{revenueWeekTotal}</p>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {(stats?.revenueWeek?.cash ?? 0)} {t.cash} · {(stats?.revenueWeek?.card ?? 0)} {t.cliq}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Membership status breakdown */}
+          <div className="card-surface p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.membershipStatus}</p>
+              <span className="font-display text-2xl leading-none">{membershipTotal}</span>
+            </div>
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-pill bg-muted">
+              {membershipSegments.map((seg) => (
+                <div
+                  key={seg.key}
+                  className={`float-left h-full ${seg.color}`}
+                  style={{ width: `${(seg.count / membershipTotal) * 100}%` }}
+                />
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {membershipSegments.map((seg) => (
+                <div key={seg.key} className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${seg.color}`} />
+                  <span className="text-[10px] text-muted-foreground">{seg.label}</span>
+                  <span className="ml-auto text-[10px] font-semibold">{seg.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="card-surface p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -256,6 +321,47 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
             <ChevronRight size={18} className="text-muted-foreground" />
           </button>
         </div>
+      </div>
+
+      {/* Signup trend chart */}
+      <div className="card-surface p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-primary" />
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.signupTrend}</p>
+          </div>
+          <div className="flex rounded-pill border hairline p-0.5">
+            {[7, 30].map((range) => (
+              <button
+                key={range}
+                onClick={() => setTrendRange(range as 7 | 30)}
+                className={`rounded-pill px-2.5 py-1 text-[10px] font-semibold transition-colors ${trendRange === range ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                {range === 7 ? t.last7Days : t.last30Days}
+              </button>
+            ))}
+          </div>
+        </div>
+        {signupTrendData.length === 0 ? (
+          <p className="mt-6 py-6 text-center text-xs text-muted-foreground">No signup data</p>
+        ) : (
+          <div className="mt-4 flex h-28 items-end justify-between gap-1">
+            {signupTrendData.map((d) => {
+              const heightPct = Math.round((d.count / maxSignupCount) * 100);
+              const label = new Date(d.date).toLocaleDateString(undefined, { weekday: "narrow" });
+              return (
+                <div key={d.date} className="flex flex-1 flex-col items-center gap-1.5">
+                  <div
+                    className="w-full max-w-[18px] rounded-t-sm bg-primary/80 transition-all hover:bg-primary"
+                    style={{ height: `${Math.max(heightPct, 4)}%` }}
+                    title={`${d.date}: ${d.count}`}
+                  />
+                  <span className="text-[9px] text-muted-foreground">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Recent transactions - full width table-ish */}
