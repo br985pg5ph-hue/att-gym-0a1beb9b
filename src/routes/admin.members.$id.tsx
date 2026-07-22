@@ -150,6 +150,20 @@ function MemberDetailPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const togglePause = useMutation({
+    mutationFn: async (action: "pause" | "resume") => {
+      const rpc = action === "pause" ? "pause_membership" : "resume_membership";
+      const { error } = await (supabase as any).rpc(rpc, { target_user: id });
+      if (error) throw error;
+    },
+    onSuccess: (_d, action) => {
+      toast.success(action === "pause" ? "Membership paused" : "Membership resumed");
+      qc.invalidateQueries({ queryKey: ["admin-member", id] });
+      qc.invalidateQueries({ queryKey: ["admin-members"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const kids = (member as any)?.children ?? [];
   const now = Date.now();
   const upcoming = bookings.filter((b: any) => b.status === "upcoming" && new Date(b.classes?.starts_at).getTime() >= now);
