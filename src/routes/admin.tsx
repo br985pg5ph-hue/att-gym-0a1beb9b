@@ -698,6 +698,8 @@ function MembersAdmin() {
   const [sessions, setSessions] = useState<number>(10);
   const [method, setMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "member_code" | "expiry" | "pt">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const q = search.trim().toLowerCase();
   const filtered = q
