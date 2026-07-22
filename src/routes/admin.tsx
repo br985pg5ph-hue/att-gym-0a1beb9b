@@ -689,7 +689,7 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, children(id, name, group_subscription_until, pt_sessions_remaining)")
+      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
       .eq("role", "member")
       .order("name")).data ?? [],
   });
