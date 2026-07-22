@@ -30,6 +30,7 @@ function SignUpPage() {
   const [email, setEmail] = useState("");
   const [cc, setCc] = useState("+962");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "">("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [referral, setReferral] = useState(ref || "");
