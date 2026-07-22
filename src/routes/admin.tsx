@@ -945,7 +945,7 @@ function MembersAdmin() {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
-        const isAdding = addFor === m.id;
+        
         const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
         const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
