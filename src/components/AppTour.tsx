@@ -113,10 +113,12 @@ export function AppTour() {
             align: "center",
           },
           onHighlightStarted: async () => {
-            if (s.route && path !== s.route) {
+            const currentPath = window.location.pathname;
+            if (s.route && currentPath !== s.route) {
               await navigate({ to: s.route });
+              await new Promise((r) => setTimeout(r, 400));
             }
-            if (s.selector) await waitForEl(s.selector);
+            if (s.selector) await waitForEl(s.selector, 3000);
           },
         };
       }),
