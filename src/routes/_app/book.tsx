@@ -288,7 +288,7 @@ function BookPage() {
             const full = cnt >= c.capacity;
             const booked = bookedClassIds.has(c.id);
             const picked = pickedId === c.id;
-            const eligible = isEligible(c.type);
+            const eligible = isEligible(c.type, c.starts_at);
             const past = new Date(c.starts_at).getTime() <= Date.now();
             const disabled = full || booked || !eligible || past;
             return (
