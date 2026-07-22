@@ -682,6 +682,7 @@ function daysUntilGroupExpiry(until: string | null | undefined): number | null {
 function MembersAdmin() {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { t } = useLang();
   const { data = [] } = useQuery({
     queryKey: ["admin-members"],
     queryFn: async () => (await supabase.from("profiles")
