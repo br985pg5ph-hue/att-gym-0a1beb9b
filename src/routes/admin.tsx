@@ -607,6 +607,16 @@ function formatGroupStatus(until: string | null | undefined): string {
   return `Group: active until ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
 }
 
+function daysUntilGroupExpiry(until: string | null | undefined): number | null {
+  if (!until) return null;
+  const expiry = new Date(until);
+  if (isNaN(expiry.getTime())) return null;
+  const now = ammanNow();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const diff = Math.ceil((expiry.getTime() - now.getTime()) / msPerDay);
+  return diff;
+}
+
 function MembersAdmin() {
   const qc = useQueryClient();
   const { user } = useAuth();
