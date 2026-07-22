@@ -90,6 +90,8 @@
   --input: rgba(0,0,0,0.12);
   --ring: #c8102e;
   --silver: #7a8189;
+  --success: #22c55e;
+  --success-foreground: #052e16;
 }
 
 @layer base {
