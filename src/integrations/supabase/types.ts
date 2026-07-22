@@ -93,7 +93,9 @@ export type Database = {
           emergency_contact_phone: string | null
           experience_level: string | null
           gender: string | null
+          group_subscription_started_at: string | null
           group_subscription_until: string | null
+          group_track: string | null
           id: string
           injuries_notes: string | null
           name: string
@@ -111,7 +113,9 @@ export type Database = {
           emergency_contact_phone?: string | null
           experience_level?: string | null
           gender?: string | null
+          group_subscription_started_at?: string | null
           group_subscription_until?: string | null
+          group_track?: string | null
           id?: string
           injuries_notes?: string | null
           name: string
@@ -129,7 +133,9 @@ export type Database = {
           emergency_contact_phone?: string | null
           experience_level?: string | null
           gender?: string | null
+          group_subscription_started_at?: string | null
           group_subscription_until?: string | null
+          group_track?: string | null
           id?: string
           injuries_notes?: string | null
           name?: string
@@ -270,7 +276,9 @@ export type Database = {
           disciplines: string[]
           experience_level: string | null
           goals: string[]
+          group_subscription_started_at: string | null
           group_subscription_until: string | null
+          group_track: string | null
           id: string
           injuries: string | null
           interests: string[]
@@ -299,7 +307,9 @@ export type Database = {
           disciplines?: string[]
           experience_level?: string | null
           goals?: string[]
+          group_subscription_started_at?: string | null
           group_subscription_until?: string | null
+          group_track?: string | null
           id: string
           injuries?: string | null
           interests?: string[]
@@ -328,7 +338,9 @@ export type Database = {
           disciplines?: string[]
           experience_level?: string | null
           goals?: string[]
+          group_subscription_started_at?: string | null
           group_subscription_until?: string | null
+          group_track?: string | null
           id?: string
           injuries?: string | null
           interests?: string[]
@@ -441,7 +453,9 @@ export type Database = {
           disciplines: string[]
           experience_level: string | null
           goals: string[]
+          group_subscription_started_at: string | null
           group_subscription_until: string | null
+          group_track: string | null
           id: string
           injuries: string | null
           interests: string[]
@@ -479,7 +493,9 @@ export type Database = {
           disciplines: string[]
           experience_level: string | null
           goals: string[]
+          group_subscription_started_at: string | null
           group_subscription_until: string | null
+          group_track: string | null
           id: string
           injuries: string | null
           interests: string[]
@@ -506,6 +522,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_group_track: {
+        Args: { target_child: string; target_user: string; track: string }
+        Returns: undefined
       }
     }
     Enums: {
