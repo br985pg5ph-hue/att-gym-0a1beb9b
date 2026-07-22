@@ -4,11 +4,11 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang } from "@/lib/providers";
-import { ammanNow, toAmmanDateInput, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
+import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -283,6 +283,11 @@ function ClassesAdmin() {
   const [frequency, setFrequency] = useState<"daily"|"weekly">("weekly");
   const [endDate, setEndDate] = useState("");
   const [view, setView] = useState<ClassView>("upcoming");
+  const [selectedDate, setSelectedDate] = useState<string>(toAmmanDateKey(new Date()));
+  const [viewedMonth, setViewedMonth] = useState<Date>(() => {
+    const n = ammanNow();
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  });
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: ClassType }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
 
@@ -444,6 +449,59 @@ function ClassesAdmin() {
           className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
       </div>
 
+      {(() => {
+        const y = viewedMonth.getFullYear();
+        const m = viewedMonth.getMonth();
+        const first = new Date(y, m, 1);
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const startPad = first.getDay();
+        const cells: Array<Date | null> = [];
+        for (let i = 0; i < startPad; i++) cells.push(null);
+        for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
+        const todayKey = toAmmanDateKey(new Date());
+        const daysWithClasses = new Set<string>(classes.map((c: any) => c.starts_at.slice(0, 10)));
+        const changeMonth = (delta: number) => {
+          setViewedMonth(new Date(y, m + delta, 1));
+        };
+        return (
+          <div className="card-surface p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1.5">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <p className="font-display text-sm tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
+              <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1.5">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
+              {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
+            </div>
+            <div className="mt-2 grid grid-cols-7 gap-1">
+              {cells.map((d, i) => {
+                if (!d) return <div key={i} />;
+                const key = toAmmanDateKey(d);
+                const hasClass = daysWithClasses.has(key);
+                const active = key === selectedDate;
+                const isToday = key === todayKey;
+                return (
+                  <button key={i} onClick={() => setSelectedDate(key)}
+                    className={`relative aspect-square rounded-lg text-sm transition ${
+                      active ? "bg-primary text-primary-foreground font-semibold" :
+                      isToday ? "border hairline" : "hover:bg-muted"
+                    }`}>
+                    {d.getDate()}
+                    {!active && hasClass && (
+                      <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-muted-foreground/60" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       <div className="flex gap-2">
         {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
           <button key={v} onClick={()=>setView(v)}
@@ -454,11 +512,15 @@ function ClassesAdmin() {
       </div>
 
       {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
-      {!isLoading && classes.length === 0 && (
-        <p className="text-center text-xs text-muted-foreground py-4">No {view} classes</p>
-      )}
+      {(() => {
+        const filtered = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
+        if (!isLoading && filtered.length === 0) {
+          return <p className="text-center text-xs text-muted-foreground py-4">No {view} classes on this day</p>;
+        }
+        return null;
+      })()}
       <div className="space-y-2">
-        {classes.map((c: any) => {
+        {classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate).map((c: any) => {
           const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
           const booked = active.length;
           const left = Math.max(0, c.capacity - booked);
