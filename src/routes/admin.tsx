@@ -131,6 +131,21 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
     { label: t.newSignups, value: stats?.newSignupsThisWeek ?? 0, sub: "this week", icon: Plus, tone: "default" as const },
   ];
 
+  const [trendRange, setTrendRange] = useState<7 | 30>(7);
+  const signupTrendData = (stats?.signupTrend ?? []).slice(-trendRange);
+  const maxSignupCount = Math.max(1, ...signupTrendData.map((d) => d.count));
+
+  const revenueTodayTotal = Object.values(stats?.revenueToday ?? {}).reduce((a, b) => a + b, 0);
+  const revenueWeekTotal = Object.values(stats?.revenueWeek ?? {}).reduce((a, b) => a + b, 0);
+
+  const membershipTotal = Object.values(stats?.membershipBreakdown ?? {}).reduce((a, b) => a + b, 0) || 1;
+  const membershipSegments = [
+    { key: "active", label: t.active, count: stats?.membershipBreakdown.active ?? 0, color: "bg-emerald-500" },
+    { key: "paused", label: t.paused, count: stats?.membershipBreakdown.paused ?? 0, color: "bg-amber-500" },
+    { key: "expired", label: t.expired, count: stats?.membershipBreakdown.expired ?? 0, color: "bg-destructive" },
+    { key: "never", label: t.neverSubscribed, count: stats?.membershipBreakdown.never ?? 0, color: "bg-muted-foreground" },
+  ];
+
   return (
     <div className="space-y-5">
       {/* Header row */}
