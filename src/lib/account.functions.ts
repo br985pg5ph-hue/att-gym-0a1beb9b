@@ -25,3 +25,19 @@ export const getMemberEmail = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { email: u.user?.email ?? null };
   });
+
+export const deleteMemberByStaff = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ userId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: isStaff } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "staff",
+    });
+    if (!isStaff) throw new Error("Forbidden");
+    if (data.userId === context.userId) throw new Error("You can't delete your own account here");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
