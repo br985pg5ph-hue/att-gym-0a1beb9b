@@ -97,7 +97,7 @@ export function AppTour() {
         const isFirst = i === 0;
         const isLast = i === steps.length - 1;
         let extra = "";
-        ifm if (isFirst) {
+        if (isFirst) {
           extra = `<div class="att-tour-skip"><button type="button" data-att-skip>Skip tour</button></div>`;
         } else if (isLast) {
           extra = `<div class="att-tour-skip"><button type="button" data-att-repeat>Repeat tour</button></div>`;
