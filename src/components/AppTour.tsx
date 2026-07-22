@@ -64,7 +64,7 @@ export function AppTour() {
     { route: "/home", title: "Group Membership", description: "Shows your group class subscription status — Active, Expired, or Paused.", selector: '[data-tour="group-card"]' },
     { route: "/home", title: "Private Sessions", description: "How many PT (private) sessions you have left. Renew any time at the gym.", selector: '[data-tour="pt-card"]' },
     { route: "/home", title: "News & Coaches", description: "Latest announcements and the coaching team live here.", selector: '[data-tour="news-widget"]' },
-    { route: "/book", title: "Pick a Day", description: "Grey dots mark days with classes. A red dot means you already have a booking.", selector: '[data-tour="calendar"]' },
+    { route: "/book", title: "Pick a Day", description: "Grey dots mark days with classes. A red dot means you already have a booking. Tap a day to see its slots.", selector: '[data-tour-day="booking"], [data-tour-day="class"], [data-tour="calendar"]' },
     { route: "/book", title: "Filter Classes", description: "Switch between Muay Thai, Women only, PT, Yoga and more.", selector: '[data-tour="filters"]' },
     { route: "/book", title: "Book a Slot", description: "Tap a slot to select it, then confirm using the button at the bottom.", selector: '[data-tour="slots"]' },
     { route: "/membership", title: "Membership", description: "See your credits, expiry date and history. You can pause your group membership for up to 45 days.", selector: '[data-tour="membership-group"]' },
