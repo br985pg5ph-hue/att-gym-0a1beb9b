@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -264,10 +264,13 @@ function BookPage() {
         </div>
 
         {!bookingForChild && memberGender === null && (
-          <div className="mt-4 rounded-2xl border hairline bg-card p-4">
+          <Link
+            to="/profile/edit"
+            className="mt-4 block rounded-2xl border hairline bg-card p-4 transition active:scale-[0.99] hover:border-primary"
+          >
             <p className="text-xs font-semibold">Complete your profile</p>
             <p className="mt-1 text-[11px] text-muted-foreground">Set your gender in Profile → Edit to book group classes.</p>
-          </div>
+          </Link>
         )}
         {!bookingForChild && (
           <div className="mt-4 grid grid-cols-3 gap-2" data-tour="filters">
