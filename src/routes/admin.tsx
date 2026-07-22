@@ -87,7 +87,7 @@ function AdminPage() {
         {tab === "classes" && <ClassesAdmin />}
         {tab === "coaches" && <CoachesAdmin />}
         {tab === "members" && <MembersAdmin />}
-        {tab === "settings" && <GymInfoAdmin />}
+        {tab === "settings" && <GymInfoAdmin setTab={setTab} />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
         <ul className="grid grid-cols-4 items-center px-1">
@@ -1038,7 +1038,7 @@ function MembersAdmin() {
   );
 }
 
-function GymInfoAdmin() {
+function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const qc = useQueryClient();
   const { data: gym, isLoading } = useQuery({
     queryKey: ["gym"],
@@ -1097,6 +1097,12 @@ function GymInfoAdmin() {
 
   return (
     <div className="space-y-4">
+      <button
+        onClick={() => setTab("dashboard")}
+        className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft size={16} /> Back to Dashboard
+      </button>
       <div className="card-surface p-5">
         <h2 className="font-display text-xl">Gym Info</h2>
         <p className="mt-1 text-xs text-muted-foreground">Edits appear instantly on the members' Profile and Location pages.</p>
