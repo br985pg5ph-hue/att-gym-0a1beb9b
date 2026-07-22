@@ -45,6 +45,13 @@ function MemberDetailPage() {
     },
   });
 
+  const fetchEmail = useServerFn(getMemberEmail);
+  const { data: emailData } = useQuery({
+    queryKey: ["admin-member-email", id],
+    queryFn: () => fetchEmail({ data: { userId: id } }),
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: bookings = [] } = useQuery({
     queryKey: ["admin-member-bookings", id],
     queryFn: async () => (await supabase.from("bookings")
