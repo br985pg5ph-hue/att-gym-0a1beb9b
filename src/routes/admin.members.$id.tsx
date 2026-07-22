@@ -102,7 +102,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setManageMode(null); setManageOpen(false);
+      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setPtOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
