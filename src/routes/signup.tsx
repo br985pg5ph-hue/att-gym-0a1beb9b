@@ -93,6 +93,16 @@ function SignUpPage() {
           <input required type="tel" placeholder={t.phone} value={phone} onChange={(e)=>setPhone(e.target.value)}
             className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          {(["male","female"] as const).map((g) => (
+            <button type="button" key={g} onClick={() => setGender(g)}
+              className={`rounded-pill border px-4 py-3 text-sm font-medium capitalize transition ${
+                gender === g ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+              }`}>
+              {g}
+            </button>
+          ))}
+        </div>
         <input required type="password" placeholder={t.password} value={password} onChange={(e)=>setPassword(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         <input required type="password" placeholder={t.confirmPassword} value={confirm} onChange={(e)=>setConfirm(e.target.value)}
