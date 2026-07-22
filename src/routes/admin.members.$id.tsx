@@ -187,8 +187,12 @@ function MemberDetailPage() {
         <section className="card-surface p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex min-w-0 items-center gap-4">
-              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-muted">
-                <User size={28} className="text-muted-foreground" />
+              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-muted">
+                {(member as any)?.avatar_url ? (
+                  <img src={(member as any).avatar_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <User size={28} className="text-muted-foreground" />
+                )}
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
