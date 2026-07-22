@@ -213,6 +213,19 @@ function EditProfilePage() {
           <Field icon={<Calendar size={16} />} label="Date of birth">
             <input value={dob} onChange={(e)=>setDob(e.target.value)} type="date" className="w-full bg-transparent text-sm outline-none" />
           </Field>
+          <div>
+            <span className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+              <User size={16} />Gender
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              {(["male","female"] as const).map((g) => (
+                <button type="button" key={g} onClick={() => setGender(g)}
+                  className={`rounded-pill border px-3 py-2.5 text-xs font-semibold capitalize transition ${
+                    gender === g ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+                  }`}>{g}</button>
+              ))}
+            </div>
+          </div>
           <button onClick={()=>saveProfile.mutate()} disabled={saveProfile.isPending} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">
             {saveProfile.isPending ? "Saving…" : "Save Changes"}
           </button>
