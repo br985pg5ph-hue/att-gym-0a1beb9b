@@ -712,6 +712,8 @@ function MembersAdmin() {
         const hasKids = kids.length > 0;
         const isOpen = !!expanded[m.id];
         const isAdding = addFor === m.id;
+        const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
+        const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
           <div key={m.id} className="card-surface p-4">
             <div className="flex w-full items-start justify-between gap-3">
@@ -721,7 +723,18 @@ function MembersAdmin() {
                 className="flex min-w-0 flex-1 items-start gap-3 text-left"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                    {showFlag && (
+                      <span
+                        title={expiryDays! < 0 ? "Subscription expired" : expiryDays === 0 ? "Expires today" : `${expiryDays} day${expiryDays === 1 ? "" : "s"} left`}
+                        className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive"
+                      >
+                        <Flag size={10} />
+                        {expiryDays! < 0 ? "Expired" : expiryDays === 0 ? "Today" : `${expiryDays}d`}
+                      </span>
+                    )}
+                  </div>
                   {m.member_code && (
                     <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">Member ID: {m.member_code}</p>
                   )}
