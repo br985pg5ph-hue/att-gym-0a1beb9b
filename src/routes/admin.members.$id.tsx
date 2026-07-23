@@ -685,6 +685,11 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
       .order("starts_at")).data ?? [],
   });
 
+  const { data: typeDefs = [] } = useClassTypeDefs({ onlyActive: false });
+  const defMap = defsByKey(typeDefs);
+  const isKidsOnly = (k: string) => !!defMap.get(k)?.kids_only;
+  const isPtSrc = (k: string) => defMap.get(k)?.credit_source === "pt";
+
   const selectedChild = kids.find((k) => k.id === childId);
   const childPT = selectedChild?.pt_sessions_remaining ?? 0;
 
