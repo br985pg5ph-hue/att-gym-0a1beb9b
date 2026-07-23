@@ -538,6 +538,19 @@ function MemberDetailPage() {
                           <button onClick={()=>setPtAdjType("credit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${ptAdjType==="credit" ? "bg-primary text-primary-foreground" : "border hairline"}`}><Plus size={12}/> Add</button>
                           <button onClick={()=>setPtAdjType("debit")} className={`rounded-pill py-2 text-xs font-semibold inline-flex items-center justify-center gap-1 ${ptAdjType==="debit" ? "bg-destructive text-destructive-foreground" : "border hairline"}`}><Minus size={12}/> Remove</button>
                         </div>
+                        {ptAdjType === "credit" && (
+                          <div className="flex gap-2">
+                            {[12, 20].map((n) => (
+                              <button
+                                key={n}
+                                onClick={()=>setPtAdjSessions(n)}
+                                className={`flex-1 rounded-pill py-1.5 text-[11px] font-semibold ${ptAdjSessions === n ? "bg-primary text-primary-foreground" : "border hairline"}`}
+                              >
+                                {n} sessions
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         <input type="number" min={1} value={ptAdjSessions} onChange={(e)=>setPtAdjSessions(Math.max(1, Number(e.target.value)))} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm" placeholder="# PT sessions"/>
                         {kids.length > 0 && (
                           <select value={ptAdjChildId} onChange={(e)=>setPtAdjChildId(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
