@@ -473,11 +473,12 @@ function AnnouncementsAdmin() {
 }
 
 type ClassView = "upcoming" | "past" | "cancelled";
-type ClassType = "pt"|"women_only"|"mixed"|"kids"|"yoga"|"gymnastics";
 
 function ClassesAdmin() {
   const qc = useQueryClient();
-  const [type, setType] = useState<ClassType>("mixed");
+  const { data: typeDefs = [] } = useClassTypeDefs({ onlyActive: true });
+  const { data: allTypeDefs = [] } = useClassTypeDefs({ onlyActive: false });
+  const [type, setType] = useState<string>("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
   const [startsAt, setStartsAt] = useState(toAmmanDateInput(ammanNow()));
@@ -492,7 +493,7 @@ function ClassesAdmin() {
     return new Date(n.getFullYear(), n.getMonth(), 1);
   });
   const [editId, setEditId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: ClassType }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
+  const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: string }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
 
   const nowIso = new Date().toISOString();
   const { data: classes = [], isLoading } = useQuery({
