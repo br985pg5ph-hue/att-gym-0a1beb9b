@@ -82,7 +82,7 @@ function AdminPage() {
           </button>
         </div>
       </header>
-      <main className={`mx-auto ${tab === "dashboard" ? "max-w-6xl" : "max-w-3xl"} px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]`}>
+      <main className={`mx-auto ${tab === "dashboard" || tab === "classes" || tab === "members" ? "max-w-7xl" : "max-w-3xl"} px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]`}>
         {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
         {tab === "announcements" && <AnnouncementsAdmin />}
         {tab === "classes" && <ClassesAdmin />}
