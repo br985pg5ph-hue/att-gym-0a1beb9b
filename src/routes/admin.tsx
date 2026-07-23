@@ -622,182 +622,218 @@ function ClassesAdmin() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="card-surface space-y-2 p-4">
-        <div className="grid grid-cols-2 gap-2">
-          <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-            {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
-          </select>
-          <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-            <option value="">Coach…</option>
-            {coaches.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+    <div className="space-y-5">
+      {/* Section header */}
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">Schedule</p>
+          <h2 className="font-display text-2xl leading-none">Classes</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Pick a day to see its classes. Add single or recurring sessions.</p>
         </div>
-        <input placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-        <div className="grid grid-cols-2 gap-2">
-          <input type="datetime-local" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-          <input type="number" placeholder="Capacity" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-        </div>
-        <label className="flex items-center gap-2 px-1 pt-1 text-xs font-medium">
-          <input type="checkbox" checked={recurring} onChange={(e)=>setRecurring(e.target.checked)} className="h-4 w-4 accent-primary"/>
-          Recurring class
-        </label>
-        {recurring && (
+        <button
+          onClick={() => setAddOpen(v => !v)}
+          className={`shrink-0 rounded-pill px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${addOpen ? "border hairline bg-card text-muted-foreground" : "bg-primary text-primary-foreground"}`}
+        >
+          {addOpen ? "Close" : (<><Plus size={12} className="-mt-0.5 inline"/> Add class</>)}
+        </button>
+      </div>
+
+      {/* Collapsible add form */}
+      {addOpen && (
+        <div className="card-surface space-y-2 p-4">
+          <p className="font-display text-sm tracking-wide text-muted-foreground">New class</p>
           <div className="grid grid-cols-2 gap-2">
-            <select value={frequency} onChange={(e)=>setFrequency(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-              <option value="weekly">Weekly</option>
-              <option value="daily">Daily</option>
+            <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+              {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
             </select>
-            <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} placeholder="End date" className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+              <option value="">Coach…</option>
+              {coaches.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
           </div>
-        )}
-        <button onClick={()=>create.mutate()} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
-          className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
-      </div>
+          <input placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+          <div className="grid grid-cols-2 gap-2">
+            <input type="datetime-local" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            <input type="number" placeholder="Capacity" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+          </div>
+          <label className="flex items-center gap-2 px-1 pt-1 text-xs font-medium">
+            <input type="checkbox" checked={recurring} onChange={(e)=>setRecurring(e.target.checked)} className="h-4 w-4 accent-primary"/>
+            Recurring class
+          </label>
+          {recurring && (
+            <div className="grid grid-cols-2 gap-2">
+              <select value={frequency} onChange={(e)=>setFrequency(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="weekly">Weekly</option>
+                <option value="daily">Daily</option>
+              </select>
+              <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} placeholder="End date" className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            </div>
+          )}
+          <button onClick={()=>create.mutate()} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
+            className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
+        </div>
+      )}
 
-      {(() => {
-        const y = viewedMonth.getFullYear();
-        const m = viewedMonth.getMonth();
-        const first = new Date(y, m, 1);
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const startPad = first.getDay();
-        const cells: Array<Date | null> = [];
-        for (let i = 0; i < startPad; i++) cells.push(null);
-        for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
-        const todayKey = toAmmanDateKey(new Date());
-        const daysWithClasses = new Set<string>(classes.map((c: any) => c.starts_at.slice(0, 10)));
-        const changeMonth = (delta: number) => {
-          setViewedMonth(new Date(y, m + delta, 1));
-        };
-        return (
-          <div className="card-surface p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1">
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </button>
-              <p className="font-display text-xs tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
-              <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1">
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground">
-              {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
-            </div>
-            <div className="mt-1.5 grid grid-cols-7 gap-0.5">
-              {cells.map((d, i) => {
-                if (!d) return <div key={i} />;
-                const key = toAmmanDateKey(d);
-                const hasClass = daysWithClasses.has(key);
-                const active = key === selectedDate;
-                const isToday = key === todayKey;
-                return (
-                  <button key={i} onClick={() => setSelectedDate(key)}
-                    className={`relative h-8 rounded-lg text-[11px] transition ${
-                      active ? "bg-primary text-primary-foreground font-semibold" :
-                      isToday ? "border hairline" : "hover:bg-muted"
-                    }`}>
-                    {d.getDate()}
-                    {!active && hasClass && (
-                      <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-muted-foreground/60" />
-                    )}
+      {/* Two-column layout: calendar+filters on the left, day list on the right */}
+      <div className="grid gap-4 md:grid-cols-[320px_1fr]">
+        <div className="space-y-3 md:sticky md:top-4 md:self-start">
+          {(() => {
+            const y = viewedMonth.getFullYear();
+            const m = viewedMonth.getMonth();
+            const first = new Date(y, m, 1);
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            const startPad = first.getDay();
+            const cells: Array<Date | null> = [];
+            for (let i = 0; i < startPad; i++) cells.push(null);
+            for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(y, m, d));
+            const todayKey = toAmmanDateKey(new Date());
+            const daysWithClasses = new Set<string>(classes.map((c: any) => c.starts_at.slice(0, 10)));
+            const changeMonth = (delta: number) => setViewedMonth(new Date(y, m + delta, 1));
+            return (
+              <div className="card-surface p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1">
+                    <ChevronLeft className="h-3.5 w-3.5" />
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
-      <div className="flex gap-2">
-        {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
-          <button key={v} onClick={()=>setView(v)}
-            className={`flex-1 rounded-pill px-3 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${view===v ? "bg-primary text-primary-foreground" : "border hairline bg-card text-muted-foreground"}`}>
-            {v}
-          </button>
-        ))}
-      </div>
-
-      <p className="font-display text-sm tracking-wide text-muted-foreground">
-        {new Date(selectedDate).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-      </p>
-      {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
-      {(() => {
-        const filtered = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
-        if (!isLoading && filtered.length === 0) {
-          return <p className="text-center text-xs text-muted-foreground py-4">No {view} classes on this day</p>;
-        }
-        return null;
-      })()}
-      <div className="space-y-2">
-        {classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate).map((c: any) => {
-          const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
-          const booked = active.length;
-          const left = Math.max(0, c.capacity - booked);
-          const full = left === 0;
-          const isCancelled = !!c.cancelled_at;
-          return (
-            <div key={c.id} className="card-surface p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-display text-lg leading-none">{c.title}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{labelOf(allTypeDefs, c.type)}</span>
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
-                    {!isCancelled && (
-                      <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
-                        {full ? "Full" : `${left} left`}
-                      </span>
-                    )}
-                    {isCancelled && (
-                      <span className="rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive">Cancelled</span>
-                    )}
-                    <span className="text-[10px] text-muted-foreground">of {c.capacity}</span>
-                  </div>
+                  <p className="font-display text-xs tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
+                  <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1">
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  {view === "upcoming" && (
-                    <>
-                      <button onClick={()=>openEdit(c)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold">Edit</button>
-                      <button
-                        onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
-                        className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
-                      >
-                        Cancel
+                <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground">
+                  {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
+                </div>
+                <div className="mt-1.5 grid grid-cols-7 gap-0.5">
+                  {cells.map((d, i) => {
+                    if (!d) return <div key={i} />;
+                    const key = toAmmanDateKey(d);
+                    const hasClass = daysWithClasses.has(key);
+                    const active = key === selectedDate;
+                    const isToday = key === todayKey;
+                    return (
+                      <button key={i} onClick={() => setSelectedDate(key)}
+                        className={`relative h-8 rounded-lg text-[11px] transition ${
+                          active ? "bg-primary text-primary-foreground font-semibold" :
+                          isToday ? "border hairline" : "hover:bg-muted"
+                        }`}>
+                        {d.getDate()}
+                        {!active && hasClass && (
+                          <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-muted-foreground/60" />
+                        )}
                       </button>
-                    </>
-                  )}
-                  {view === "cancelled" && (
-                    <>
-                      <button onClick={()=>restoreClass.mutate(c.id)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary">Restore</button>
-                      <button onClick={()=>{ if (confirm("Delete this class permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
-                    </>
-                  )}
-                  {view === "past" && (
-                    <button onClick={()=>{ if (confirm("Delete this past class record permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
-              {active.length > 0 && (
-                <ul className="mt-3 space-y-1">
-                  {active.map((b: any) => (
-                    <li key={b.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                      <span>
-                        {b.child_id
-                          ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
-                          : (b.profiles?.name ?? "Member")}
-                      </span>
+            );
+          })()}
+
+          <div className="flex gap-2">
+            {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
+              <button key={v} onClick={()=>setView(v)}
+                className={`flex-1 rounded-pill px-3 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${view===v ? "bg-primary text-primary-foreground" : "border hairline bg-card text-muted-foreground"}`}>
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3 min-w-0">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="font-display text-lg leading-none">
+              {new Date(selectedDate).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
+            </p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{view}</p>
+          </div>
+
+          {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
+          {(() => {
+            const filtered = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
+            if (!isLoading && filtered.length === 0) {
+              return (
+                <div className="card-surface flex flex-col items-center gap-1 py-8 text-center">
+                  <p className="text-xs text-muted-foreground">No {view} classes on this day</p>
+                  {view === "upcoming" && (
+                    <button onClick={()=>setAddOpen(true)} className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-primary">Add class</button>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          <div className="space-y-2">
+            {classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate).map((c: any) => {
+              const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
+              const booked = active.length;
+              const left = Math.max(0, c.capacity - booked);
+              const full = left === 0;
+              const isCancelled = !!c.cancelled_at;
+              return (
+                <div key={c.id} className="card-surface p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-display text-lg leading-none">{c.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{labelOf(allTypeDefs, c.type)}</span>
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
+                        {!isCancelled && (
+                          <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                            {full ? "Full" : `${left} left`}
+                          </span>
+                        )}
+                        {isCancelled && (
+                          <span className="rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive">Cancelled</span>
+                        )}
+                        <span className="text-[10px] text-muted-foreground">of {c.capacity}</span>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
                       {view === "upcoming" && (
-                        <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
+                        <>
+                          <button onClick={()=>openEdit(c)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold">Edit</button>
+                          <button
+                            onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
+                            className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
+                          >
+                            Cancel
+                          </button>
+                        </>
                       )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          );
-        })}
+                      {view === "cancelled" && (
+                        <>
+                          <button onClick={()=>restoreClass.mutate(c.id)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary">Restore</button>
+                          <button onClick={()=>{ if (confirm("Delete this class permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
+                        </>
+                      )}
+                      {view === "past" && (
+                        <button onClick={()=>{ if (confirm("Delete this past class record permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
+                      )}
+                    </div>
+                  </div>
+                  {active.length > 0 && (
+                    <ul className="mt-3 space-y-1">
+                      {active.map((b: any) => (
+                        <li key={b.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
+                          <span>
+                            {b.child_id
+                              ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
+                              : (b.profiles?.name ?? "Member")}
+                          </span>
+                          {view === "upcoming" && (
+                            <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {editId && (
@@ -819,17 +855,35 @@ function ClassesAdmin() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <input type="datetime-local" value={editForm.starts_at} onChange={(e)=>setEditForm(f=>({...f, starts_at: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-              <input type="number" value={editForm.capacity} onChange={(e)=>setEditForm(f=>({...f, capacity: Number(e.target.value)}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+              <input type="number" value={editForm.capacity} onChange={(e)=>setEditForm(f=>({...f, capacity: Number(e.target.value))}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
             </div>
             <button onClick={()=>updateClass.mutate()} disabled={updateClass.isPending || !editForm.title || !editForm.starts_at}
               className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60">Save changes</button>
           </div>
         </div>
       )}
-      <ClassTypesAdmin />
+
+      {/* Class Types — collapsible, separated from schedule */}
+      <div className="border-t hairline pt-5">
+        <button
+          onClick={() => setTypesOpen(v => !v)}
+          className="flex w-full items-center justify-between gap-3 rounded-2xl border hairline bg-card px-4 py-3 text-left"
+        >
+          <div className="flex items-center gap-2">
+            <Tags size={16} className="text-primary"/>
+            <div>
+              <p className="font-display text-base leading-none">Class Types</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Rules that power booking eligibility and credit consumption</p>
+            </div>
+          </div>
+          {typesOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground"/> : <ChevronDown className="h-4 w-4 text-muted-foreground"/>}
+        </button>
+        {typesOpen && <div className="mt-3"><ClassTypesAdmin /></div>}
+      </div>
     </div>
   );
 }
+
 
 
 
