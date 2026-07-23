@@ -824,6 +824,7 @@ function ClassesAdmin() {
           </div>
         </div>
       )}
+      <ClassTypesAdmin />
     </div>
   );
 }
