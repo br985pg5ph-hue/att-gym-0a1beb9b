@@ -739,7 +739,7 @@ function ClassesAdmin() {
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{c.title}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{c.type}</span>
+                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{labelOf(allTypeDefs, c.type)}</span>
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
