@@ -623,8 +623,8 @@ function ClassesAdmin() {
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
         <div className="grid grid-cols-2 gap-2">
-          <select value={type} onChange={(e)=>setType(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-            <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
+          <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+            {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
           </select>
           <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
             <option value="">Coach…</option>
