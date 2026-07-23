@@ -977,8 +977,13 @@ function MembersAdmin() {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <p className="font-display text-lg leading-tight truncate">{m.name || "—"}</p>
+                    <span
+                      className={`inline-flex shrink-0 items-center rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${m.membership_status === "active" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}
+                    >
+                      {m.membership_status}
+                    </span>
                     {showFlag && (
                       <span
                         title={expiryDays! < 0 ? "Subscription expired" : expiryDays === 0 ? "Expires today" : `${expiryDays} day${expiryDays === 1 ? "" : "s"} left`}
@@ -992,14 +997,6 @@ function MembersAdmin() {
                   {m.member_code && (
                     <p className="mt-0.5 font-mono text-[10px] tracking-widest text-primary">Member ID: {m.member_code}</p>
                   )}
-                  <p className="mt-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground truncate">
-                    <span className="truncate">{m.role}</span>
-                    <span
-                      className={`inline-flex shrink-0 items-center rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${m.membership_status === "active" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}
-                    >
-                      {m.membership_status}
-                    </span>
-                  </p>
                   {hasKids && (
                     <span className="mt-2 inline-flex items-center rounded-pill bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">
                       {kids.length} {kids.length === 1 ? "child" : "children"}
