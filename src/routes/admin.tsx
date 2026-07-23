@@ -494,6 +494,8 @@ function ClassesAdmin() {
   });
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: string }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
+  const [addOpen, setAddOpen] = useState(false);
+  const [typesOpen, setTypesOpen] = useState(false);
 
   const nowIso = new Date().toISOString();
   const { data: classes = [], isLoading } = useQuery({
