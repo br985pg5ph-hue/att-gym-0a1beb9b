@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake, Pause, Play, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
+import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
@@ -684,6 +685,11 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
       .order("starts_at")).data ?? [],
   });
 
+  const { data: typeDefs = [] } = useClassTypeDefs({ onlyActive: false });
+  const defMap = defsByKey(typeDefs);
+  const isKidsOnly = (k: string) => !!defMap.get(k)?.kids_only;
+  const isPtSrc = (k: string) => defMap.get(k)?.credit_source === "pt";
+
   const selectedChild = kids.find((k) => k.id === childId);
   const childPT = selectedChild?.pt_sessions_remaining ?? 0;
 
@@ -734,15 +740,15 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
           {!isLoading && dayClasses.length === 0 && <p className="py-6 text-center text-xs text-muted-foreground">No classes this day</p>}
           {dayClasses
             .filter((c: any) => {
-              if (childId) return c.type === "kids" || c.type === "pt";
-              return c.type !== "kids";
+              if (childId) return isKidsOnly(c.type) || isPtSrc(c.type);
+              return !isKidsOnly(c.type);
             })
             .map((c: any) => {
               const activeCount = (c.bookings ?? []).filter((b: any) => b.status === "upcoming").length;
               const left = Math.max(0, (c.capacity ?? 0) - activeCount);
               const full = left === 0;
               const alreadyBooked = bookedClassIds.has(c.id);
-              const isPT = c.type === "pt";
+              const isPT = isPtSrc(c.type);
               const noCreditsForThis = isPT && (childId ? childPT <= 0 : memberBalance <= 0);
               const disabled = noCreditsForThis || full || alreadyBooked || pendingId === c.id;
               return (
@@ -752,7 +758,7 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
                     <p className="mt-1 text-[11px] text-muted-foreground">
                       {new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       {c.coaches?.name ? ` · ${c.coaches.name}` : ""}
-                      {c.type === "kids" ? " · Kids" : ""}
+                      {` · ${labelOf(typeDefs, c.type)}`}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">

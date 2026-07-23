@@ -8,7 +8,8 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp, Tags, Eye, EyeOff, Pencil } from "lucide-react";
+import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 
 export const Route = createFileRoute("/admin")({
@@ -472,11 +473,12 @@ function AnnouncementsAdmin() {
 }
 
 type ClassView = "upcoming" | "past" | "cancelled";
-type ClassType = "pt"|"women_only"|"mixed"|"kids"|"yoga"|"gymnastics";
 
 function ClassesAdmin() {
   const qc = useQueryClient();
-  const [type, setType] = useState<ClassType>("mixed");
+  const { data: typeDefs = [] } = useClassTypeDefs({ onlyActive: true });
+  const { data: allTypeDefs = [] } = useClassTypeDefs({ onlyActive: false });
+  const [type, setType] = useState<string>("mixed");
   const [coachId, setCoachId] = useState("");
   const [title, setTitle] = useState("");
   const [startsAt, setStartsAt] = useState(toAmmanDateInput(ammanNow()));
@@ -491,7 +493,7 @@ function ClassesAdmin() {
     return new Date(n.getFullYear(), n.getMonth(), 1);
   });
   const [editId, setEditId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: ClassType }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
+  const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: string }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
 
   const nowIso = new Date().toISOString();
   const { data: classes = [], isLoading } = useQuery({
@@ -621,8 +623,8 @@ function ClassesAdmin() {
     <div className="space-y-4">
       <div className="card-surface space-y-2 p-4">
         <div className="grid grid-cols-2 gap-2">
-          <select value={type} onChange={(e)=>setType(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-            <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
+          <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+            {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
           </select>
           <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
             <option value="">Coach…</option>
@@ -737,7 +739,7 @@ function ClassesAdmin() {
                 <div className="min-w-0">
                   <p className="font-display text-lg leading-none">{c.title}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{c.type}</span>
+                    {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{labelOf(allTypeDefs, c.type)}</span>
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
@@ -805,8 +807,8 @@ function ClassesAdmin() {
             </div>
             <input value={editForm.title} onChange={(e)=>setEditForm(f=>({...f, title: e.target.value}))} placeholder="Title" className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
             <div className="grid grid-cols-2 gap-2">
-              <select value={editForm.type} onChange={(e)=>setEditForm(f=>({...f, type: e.target.value as ClassType}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
+              <select value={editForm.type} onChange={(e)=>setEditForm(f=>({...f, type: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                {allTypeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}{d.active ? "" : " (hidden)"}</option>)}
               </select>
               <select value={editForm.coach_id} onChange={(e)=>setEditForm(f=>({...f, coach_id: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
                 <option value="">Coach…</option>
@@ -1108,9 +1110,198 @@ function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           {save.isPending ? "Saving…" : "Save changes"}
         </button>
       </div>
+      <ClassTypesAdmin />
     </div>
   );
 }
+
+function ClassTypesAdmin() {
+  const qc = useQueryClient();
+  const { data: defs = [], isLoading } = useClassTypeDefs({ onlyActive: false });
+  const [showForm, setShowForm] = useState(false);
+  const empty = { key: "", label: "", gender_restriction: "none", credit_source: "group", kids_only: false, track_restricted: false, sort_order: 100 } as {
+    key: string; label: string; gender_restriction: "none"|"female"|"male"; credit_source: "group"|"pt"; kids_only: boolean; track_restricted: boolean; sort_order: number;
+  };
+  const [form, setForm] = useState(empty);
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["class-type-defs"] });
+    qc.invalidateQueries({ queryKey: ["book"] });
+    qc.invalidateQueries({ queryKey: ["admin-classes"] });
+  };
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const key = form.key.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_");
+      if (!key || !form.label.trim()) throw new Error("Key and label required");
+      if (editingKey) {
+        const { error } = await supabase.from("class_type_defs" as any).update({
+          label: form.label.trim(),
+          gender_restriction: form.gender_restriction,
+          credit_source: form.credit_source,
+          kids_only: form.kids_only,
+          track_restricted: form.track_restricted,
+          sort_order: form.sort_order,
+        }).eq("key", editingKey);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("class_type_defs" as any).insert({
+          key,
+          label: form.label.trim(),
+          gender_restriction: form.gender_restriction,
+          credit_source: form.credit_source,
+          kids_only: form.kids_only,
+          track_restricted: form.track_restricted,
+          sort_order: form.sort_order,
+          is_builtin: false,
+          active: true,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => { toast.success(editingKey ? "Class type updated" : "Class type added"); setForm(empty); setShowForm(false); setEditingKey(null); invalidate(); },
+    onError: (e: any) => toast.error(e.message ?? "Failed to save"),
+  });
+
+  const toggleActive = useMutation({
+    mutationFn: async (d: ClassTypeDef) => {
+      const { error } = await supabase.from("class_type_defs" as any).update({ active: !d.active }).eq("key", d.key);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Updated"); invalidate(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (d: ClassTypeDef) => {
+      if (!confirm(`Delete class type "${d.label}"? Existing classes using it will keep the type but new bookings will fail. Consider hiding instead.`)) return;
+      const { error } = await supabase.from("class_type_defs" as any).delete().eq("key", d.key);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Deleted"); invalidate(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const startEdit = (d: ClassTypeDef) => {
+    setEditingKey(d.key);
+    setForm({
+      key: d.key,
+      label: d.label,
+      gender_restriction: d.gender_restriction,
+      credit_source: d.credit_source,
+      kids_only: d.kids_only,
+      track_restricted: d.track_restricted,
+      sort_order: d.sort_order,
+    });
+    setShowForm(true);
+  };
+
+  const cancelEdit = () => { setEditingKey(null); setForm(empty); setShowForm(false); };
+
+  return (
+    <div className="card-surface space-y-3 p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="flex items-center gap-2 font-display text-xl"><Tags size={18}/> Class Types</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Add custom class types with their own rules. Built-ins can be edited or hidden but not deleted.</p>
+        </div>
+        {!showForm && (
+          <button onClick={() => { setForm(empty); setEditingKey(null); setShowForm(true); }} className="rounded-pill bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground">
+            <Plus size={12} className="inline"/> Add type
+          </button>
+        )}
+      </div>
+
+      {isLoading && <p className="py-4 text-center text-xs text-muted-foreground">Loading…</p>}
+
+      <ul className="divide-y hairline">
+        {defs.map((d) => (
+          <li key={d.key} className="flex items-center justify-between gap-2 py-2">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                {d.label}
+                {d.is_builtin && <span className="rounded-pill bg-muted px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-muted-foreground">built-in</span>}
+                {!d.active && <span className="rounded-pill bg-destructive/15 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-destructive">hidden</span>}
+              </p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">
+                <span className="font-mono">{d.key}</span> · {d.credit_source === "pt" ? "PT credits" : "Group membership"}
+                {d.gender_restriction !== "none" && ` · ${d.gender_restriction}-only`}
+                {d.kids_only && " · kids-only"}
+                {d.track_restricted && " · track-restricted"}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <button onClick={() => toggleActive.mutate(d)} title={d.active ? "Hide" : "Show"} className="rounded-pill border hairline p-1.5 text-muted-foreground">
+                {d.active ? <Eye size={14}/> : <EyeOff size={14}/>}
+              </button>
+              <button onClick={() => startEdit(d)} title="Edit" className="rounded-pill border hairline p-1.5 text-muted-foreground">
+                <Pencil size={14}/>
+              </button>
+              {!d.is_builtin && (
+                <button onClick={() => remove.mutate(d)} title="Delete" className="rounded-pill border hairline p-1.5 text-destructive">
+                  <Trash2 size={14}/>
+                </button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {showForm && (
+        <div className="mt-2 space-y-2 rounded-xl border hairline bg-muted/30 p-3">
+          <p className="font-display text-sm">{editingKey ? "Edit type" : "New type"}</p>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Key</span>
+              <input value={form.key} disabled={!!editingKey} onChange={(e)=>setForm({...form, key: e.target.value})} placeholder="boxing" className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm font-mono disabled:opacity-60"/>
+            </label>
+            <label className="block">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Label</span>
+              <input value={form.label} onChange={(e)=>setForm({...form, label: e.target.value})} placeholder="Boxing" className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            </label>
+            <label className="block">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Credit source</span>
+              <select value={form.credit_source} onChange={(e)=>setForm({...form, credit_source: e.target.value as "group"|"pt"})} className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="group">Group membership</option>
+                <option value="pt">PT sessions</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Gender restriction</span>
+              <select value={form.gender_restriction} onChange={(e)=>setForm({...form, gender_restriction: e.target.value as "none"|"female"|"male"})} className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="none">None</option>
+                <option value="female">Female only</option>
+                <option value="male">Male only</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Sort order</span>
+              <input type="number" value={form.sort_order} onChange={(e)=>setForm({...form, sort_order: Number(e.target.value)})} className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            </label>
+          </div>
+          <div className="flex flex-col gap-1.5 pt-1">
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked={form.kids_only} onChange={(e)=>setForm({...form, kids_only: e.target.checked})} className="h-4 w-4 accent-primary"/>
+              Kids-only (requires booking under a child account)
+            </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked={form.track_restricted} onChange={(e)=>setForm({...form, track_restricted: e.target.checked})} className="h-4 w-4 accent-primary"/>
+              Track-restricted (member must book on their chosen days; counts toward 12/month cap)
+            </label>
+          </div>
+          <div className="flex items-center gap-2 pt-2">
+            <button onClick={()=>save.mutate()} disabled={save.isPending} className="flex-1 rounded-pill bg-primary py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60">
+              {save.isPending ? "Saving…" : editingKey ? "Save changes" : "Add type"}
+            </button>
+            <button onClick={cancelEdit} className="rounded-pill border hairline px-4 py-2 text-xs font-semibold">Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 
 
