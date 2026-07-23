@@ -807,8 +807,8 @@ function ClassesAdmin() {
             </div>
             <input value={editForm.title} onChange={(e)=>setEditForm(f=>({...f, title: e.target.value}))} placeholder="Title" className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
             <div className="grid grid-cols-2 gap-2">
-              <select value={editForm.type} onChange={(e)=>setEditForm(f=>({...f, type: e.target.value as ClassType}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                <option value="mixed">Mixed</option><option value="women_only">Women Only</option><option value="yoga">Yoga</option><option value="gymnastics">Gymnastics</option><option value="pt">PT</option><option value="kids">Kids</option>
+              <select value={editForm.type} onChange={(e)=>setEditForm(f=>({...f, type: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                {allTypeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}{d.active ? "" : " (hidden)"}</option>)}
               </select>
               <select value={editForm.coach_id} onChange={(e)=>setEditForm(f=>({...f, coach_id: e.target.value}))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
                 <option value="">Coach…</option>
