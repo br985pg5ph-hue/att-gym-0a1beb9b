@@ -1016,15 +1016,6 @@ function MembersAdmin() {
               </Link>
             </div>
 
-            {hasKids && (
-                {kids.map((k: any) => (
-                  <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                    <span>{k.name}</span>
-                    <span className="text-muted-foreground">{k.pt_sessions_remaining ?? 0} PT • {formatGroupStatus(k.group_subscription_until)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         );
       })}
