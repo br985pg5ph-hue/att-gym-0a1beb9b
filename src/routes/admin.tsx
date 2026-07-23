@@ -824,6 +824,7 @@ function ClassesAdmin() {
           </div>
         </div>
       )}
+      <ClassTypesAdmin />
     </div>
   );
 }
@@ -1110,7 +1111,6 @@ function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           {save.isPending ? "Saving…" : "Save changes"}
         </button>
       </div>
-      <ClassTypesAdmin />
     </div>
   );
 }
