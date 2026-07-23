@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, Calendar, CreditCard, Mail, Cake, Pause, Play, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
+import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
