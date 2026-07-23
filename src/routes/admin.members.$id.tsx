@@ -75,7 +75,7 @@ function MemberDetailPage() {
   const [ptOpen, setPtOpen] = useState(false);
 
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
-  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
+  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("credit");
   const [ptAdjNote, setPtAdjNote] = useState("");
   const [ptAdjChildId, setPtAdjChildId] = useState("");
 
