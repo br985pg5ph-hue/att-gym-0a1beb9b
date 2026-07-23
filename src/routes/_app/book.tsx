@@ -90,10 +90,16 @@ function BookPage() {
   );
   const daysWithClasses = new Set(classes.map((c: any) => c.starts_at.slice(0, 10)));
 
-  // Adult sees all; child sees only kids + pt
+  // Adult sees group/pt (not kids-only); child sees kids-only + pt
+  const { data: typeDefs = [] } = useClassTypeDefs({ onlyActive: false });
+  const defs = defsByKey(typeDefs);
+  const isFemaleOnlyType = (key: string) => defs.get(key)?.gender_restriction === "female";
+  const isKidsOnlyType = (key: string) => !!defs.get(key)?.kids_only;
+  const isPtType = (key: string) => defs.get(key)?.credit_source === "pt";
+  const isTrackRestrictedType = (key: string) => !!defs.get(key)?.track_restricted;
+
   const memberGender = (profile as any)?.gender ?? null;
   const isFemale = memberGender === "female";
-  const FEMALE_ONLY = new Set(["women_only", "yoga", "gymnastics"]);
   const ptRemainingSelf = profile?.pt_sessions_remaining ?? 0;
 
   const ptRemainingChild = (bookingForChild as any)?.pt_sessions_remaining ?? 0;
@@ -110,48 +116,47 @@ function BookPage() {
     const dow = new Date(new Date(starts_at).toLocaleString("en-US", { timeZone: "Asia/Amman" })).getDay();
     return (TRACK_DOWS[effectiveTrack] ?? []).includes(dow);
   };
-  const TRACK_RESTRICTED = new Set(["mixed", "women_only", "kids"]);
 
   const isEligible = (type: string, starts_at?: string) => {
-    if (type === "kids") {
+    if (isKidsOnlyType(type)) {
       if (!groupActiveChild) return false;
-      if (starts_at && !isOnTrack(starts_at)) return false;
+      if (isTrackRestrictedType(type) && starts_at && !isOnTrack(starts_at)) return false;
       return true;
     }
-    if (type === "pt") return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
-    // mixed / women_only / yoga / gymnastics — adult group only
+    if (isPtType(type)) return bookingForChild ? ptRemainingChild > 0 : ptRemainingSelf > 0;
+    // group adult
     if (bookingForChild || !groupActiveSelf) return false;
-    if (FEMALE_ONLY.has(type) && !isFemale) return false;
-    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return false;
+    if (isFemaleOnlyType(type) && !isFemale) return false;
+    if (isTrackRestrictedType(type) && starts_at && !isOnTrack(starts_at)) return false;
     return true;
   };
 
   const eligibilityMessage = (type: string, starts_at?: string): string => {
-    if (type === "kids") {
+    if (isKidsOnlyType(type)) {
       if (!groupActiveChild) return `${bookingForChild?.name ?? "Child"}'s group membership isn't active`;
-      if (!effectiveTrack) return "Pick booking days first";
-      if (starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+      if (isTrackRestrictedType(type) && !effectiveTrack) return "Pick booking days first";
+      if (isTrackRestrictedType(type) && starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
       return "";
     }
-    if (type === "pt") return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
-    if (FEMALE_ONLY.has(type) && !isFemale) {
+    if (isPtType(type)) return bookingForChild ? `${bookingForChild.name} has no PT sessions` : "No PT sessions remaining";
+    if (isFemaleOnlyType(type) && !isFemale) {
       return memberGender === null ? "Set your gender in Profile to book" : "Female members only";
     }
     if (selfPaused) return "Membership paused";
     if (!groupActiveSelf) return "Your group membership isn't active";
-    if (TRACK_RESTRICTED.has(type) && !effectiveTrack) return "Pick booking days first";
-    if (TRACK_RESTRICTED.has(type) && starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
+    if (isTrackRestrictedType(type) && !effectiveTrack) return "Pick booking days first";
+    if (isTrackRestrictedType(type) && starts_at && !isOnTrack(starts_at)) return "Not on your booking days";
     return "";
   };
 
 
   const daySlots = classes.filter((c: any) => {
     if (c.starts_at.slice(0, 10) !== selectedDate) return false;
-    // Adults never see kids classes; children only see kids or pt
-    if (!bookingForChild && c.type === "kids") return false;
-    if (bookingForChild && c.type !== "kids" && c.type !== "pt") return false;
-    // Hide female-only classes from male / gender-unset adults
-    if (!bookingForChild && FEMALE_ONLY.has(c.type) && !isFemale) return false;
+    // Adults never see kids-only; children only see kids-only + pt
+    if (!bookingForChild && isKidsOnlyType(c.type)) return false;
+    if (bookingForChild && !isKidsOnlyType(c.type) && !isPtType(c.type)) return false;
+    // Hide gender-restricted classes from mismatched adults
+    if (!bookingForChild && isFemaleOnlyType(c.type) && !isFemale) return false;
     return true;
   });
 
