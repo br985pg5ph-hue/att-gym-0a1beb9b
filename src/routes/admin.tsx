@@ -1009,7 +1009,7 @@ function MembersAdmin() {
                 params={{ id: m.id }}
                 className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary"
               >
-                View <ChevronsRight size={12} className="inline"/>
+                View
               </Link>
             </div>
 
