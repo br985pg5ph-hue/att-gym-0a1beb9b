@@ -1269,10 +1269,19 @@ function ClassTypesAdmin() {
             </label>
             <label className="block">
               <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Gender restriction</span>
-              <select value={form.gender_restriction} onChange={(e)=>setForm({...form, gender_restriction: e.target.value as "none"|"female"|"male"})} className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm">
+              <select
+                value={form.kids_only ? "kids" : form.gender_restriction}
+                onChange={(e)=>{
+                  const v = e.target.value;
+                  if (v === "kids") setForm({...form, kids_only: true, gender_restriction: "none"});
+                  else setForm({...form, kids_only: false, gender_restriction: v as "none"|"female"|"male"});
+                }}
+                className="mt-1 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"
+              >
                 <option value="none">None</option>
                 <option value="female">Female only</option>
                 <option value="male">Male only</option>
+                <option value="kids">Kids only</option>
               </select>
             </label>
             <label className="block">
