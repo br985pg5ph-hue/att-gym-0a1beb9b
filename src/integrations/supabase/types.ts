@@ -154,6 +154,48 @@ export type Database = {
           },
         ]
       }
+      class_type_defs: {
+        Row: {
+          active: boolean
+          created_at: string
+          credit_source: string
+          gender_restriction: string
+          is_builtin: boolean
+          key: string
+          kids_only: boolean
+          label: string
+          sort_order: number
+          track_restricted: boolean
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          credit_source?: string
+          gender_restriction?: string
+          is_builtin?: boolean
+          key: string
+          kids_only?: boolean
+          label: string
+          sort_order?: number
+          track_restricted?: boolean
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          credit_source?: string
+          gender_restriction?: string
+          is_builtin?: boolean
+          key?: string
+          kids_only?: boolean
+          label?: string
+          sort_order?: number
+          track_restricted?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       classes: {
         Row: {
           cancelled_at: string | null
@@ -164,7 +206,7 @@ export type Database = {
           id: string
           starts_at: string
           title: string | null
-          type: Database["public"]["Enums"]["class_type"]
+          type: string
         }
         Insert: {
           cancelled_at?: string | null
@@ -175,7 +217,7 @@ export type Database = {
           id?: string
           starts_at: string
           title?: string | null
-          type: Database["public"]["Enums"]["class_type"]
+          type?: string
         }
         Update: {
           cancelled_at?: string | null
@@ -186,7 +228,7 @@ export type Database = {
           id?: string
           starts_at?: string
           title?: string | null
-          type?: Database["public"]["Enums"]["class_type"]
+          type?: string
         }
         Relationships: [
           {
@@ -195,6 +237,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "coaches"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_type_fkey"
+            columns: ["type"]
+            isOneToOne: false
+            referencedRelation: "class_type_defs"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -536,7 +585,6 @@ export type Database = {
     Enums: {
       app_role: "member" | "staff"
       booking_status: "upcoming" | "completed" | "cancelled"
-      class_type: "pt" | "women_only" | "mixed" | "kids" | "yoga" | "gymnastics"
       payment_method: "cash" | "card"
       txn_type: "credit" | "debit"
     }
@@ -668,7 +716,6 @@ export const Constants = {
     Enums: {
       app_role: ["member", "staff"],
       booking_status: ["upcoming", "completed", "cancelled"],
-      class_type: ["pt", "women_only", "mixed", "kids", "yoga", "gymnastics"],
       payment_method: ["cash", "card"],
       txn_type: ["credit", "debit"],
     },
