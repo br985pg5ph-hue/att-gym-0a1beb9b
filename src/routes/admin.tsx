@@ -8,7 +8,7 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronDown, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ChevronLeft, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp } from "lucide-react";
 
 
 export const Route = createFileRoute("/admin")({
@@ -896,7 +896,7 @@ function MembersAdmin() {
       .order("name")).data ?? [],
   });
   const [search, setSearch] = useState("");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  
   const [sortBy, setSortBy] = useState<"name" | "member_code" | "expiry" | "pt">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -962,18 +962,13 @@ function MembersAdmin() {
       {sorted.map((m: any) => {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
-        const isOpen = !!expanded[m.id];
-        
+
         const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
         const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
           <div key={m.id} className="card-surface p-4">
             <div className="flex w-full items-start justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => hasKids && setExpanded(s => ({ ...s, [m.id]: !s[m.id] }))}
-                className="flex min-w-0 flex-1 items-start gap-3 text-left"
-              >
+              <div className="flex min-w-0 flex-1 items-start gap-3">
                 <div className="shrink-0 h-11 w-11 rounded-full overflow-hidden bg-muted flex items-center justify-center hairline border">
                   {m.avatar_url ? (
                     <img src={m.avatar_url} alt={m.name || "member"} className="h-full w-full object-cover" />
@@ -1011,12 +1006,7 @@ function MembersAdmin() {
                     </span>
                   )}
                 </div>
-                {hasKids && (
-                  <span className="mt-1 shrink-0 text-muted-foreground">
-                    {isOpen ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
-                  </span>
-                )}
-              </button>
+              </div>
               <Link
                 to="/admin/members/$id"
                 params={{ id: m.id }}
@@ -1026,16 +1016,6 @@ function MembersAdmin() {
               </Link>
             </div>
 
-            {hasKids && isOpen && (
-              <ul className="mt-3 space-y-1">
-                {kids.map((k: any) => (
-                  <li key={k.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                    <span>{k.name}</span>
-                    <span className="text-muted-foreground">{k.pt_sessions_remaining ?? 0} PT • {formatGroupStatus(k.group_subscription_until)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         );
       })}
