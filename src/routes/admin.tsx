@@ -496,6 +496,7 @@ function ClassesAdmin() {
   const [editForm, setEditForm] = useState<{ title: string; starts_at: string; capacity: number; coach_id: string; type: string }>({ title: "", starts_at: "", capacity: 15, coach_id: "", type: "mixed" });
   const [addOpen, setAddOpen] = useState(false);
   const [typesOpen, setTypesOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const nowIso = new Date().toISOString();
   const { data: classes = [], isLoading } = useQuery({
@@ -621,6 +622,17 @@ function ClassesAdmin() {
     setEditId(c.id);
   };
 
+  // Palette for class-type dots (cycles by index)
+  const typeDotColor = (idx: number) => {
+    const palette = ["bg-primary", "bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-pink-500", "bg-cyan-500"];
+    return palette[idx % palette.length];
+  };
+  const dayClasses = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
+  // Counts per type in current view
+  const typeCounts = new Map<string, number>();
+  classes.forEach((c: any) => typeCounts.set(c.type, (typeCounts.get(c.type) ?? 0) + 1));
+  const initialsOf = (name?: string) => (name ?? "?").split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]?.toUpperCase() ?? "").join("") || "?";
+
   return (
     <div className="space-y-5">
       {/* Section header */}
@@ -628,55 +640,20 @@ function ClassesAdmin() {
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">Schedule</p>
           <h2 className="font-display text-2xl leading-none">Classes</h2>
-          <p className="mt-1 text-xs text-muted-foreground">Pick a day to see its classes. Add single or recurring sessions.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Pick a day, expand a class to see attendees.</p>
         </div>
         <button
-          onClick={() => setAddOpen(v => !v)}
-          className={`shrink-0 rounded-pill px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${addOpen ? "border hairline bg-card text-muted-foreground" : "bg-primary text-primary-foreground"}`}
+          onClick={() => setAddOpen(true)}
+          className="shrink-0 rounded-pill bg-primary px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-primary-foreground"
         >
-          {addOpen ? "Close" : (<><Plus size={12} className="-mt-0.5 inline"/> Add class</>)}
+          <Plus size={12} className="-mt-0.5 mr-1 inline"/> Add class
         </button>
       </div>
 
-      {/* Collapsible add form */}
-      {addOpen && (
-        <div className="card-surface space-y-2 p-4">
-          <p className="font-display text-sm tracking-wide text-muted-foreground">New class</p>
-          <div className="grid grid-cols-2 gap-2">
-            <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-              {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
-            </select>
-            <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-              <option value="">Coach…</option>
-              {coaches.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-          <input placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-          <div className="grid grid-cols-2 gap-2">
-            <input type="datetime-local" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-            <input type="number" placeholder="Capacity" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-          </div>
-          <label className="flex items-center gap-2 px-1 pt-1 text-xs font-medium">
-            <input type="checkbox" checked={recurring} onChange={(e)=>setRecurring(e.target.checked)} className="h-4 w-4 accent-primary"/>
-            Recurring class
-          </label>
-          {recurring && (
-            <div className="grid grid-cols-2 gap-2">
-              <select value={frequency} onChange={(e)=>setFrequency(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
-                <option value="weekly">Weekly</option>
-                <option value="daily">Daily</option>
-              </select>
-              <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} placeholder="End date" className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
-            </div>
-          )}
-          <button onClick={()=>create.mutate()} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
-            className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"><Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}</button>
-        </div>
-      )}
-
-      {/* Two-column layout: calendar+filters on the left, day list on the right */}
-      <div className="grid gap-4 md:grid-cols-[320px_1fr]">
-        <div className="space-y-3 md:sticky md:top-4 md:self-start">
+      {/* Unified workspace shell */}
+      <div className="grid overflow-hidden rounded-2xl border hairline bg-card md:grid-cols-[280px_1fr]">
+        {/* SIDEBAR */}
+        <aside className="border-b hairline bg-muted/20 p-4 md:border-b-0 md:border-r">
           {(() => {
             const y = viewedMonth.getFullYear();
             const m = viewedMonth.getMonth();
@@ -690,35 +667,37 @@ function ClassesAdmin() {
             const daysWithClasses = new Set<string>(classes.map((c: any) => c.starts_at.slice(0, 10)));
             const changeMonth = (delta: number) => setViewedMonth(new Date(y, m + delta, 1));
             return (
-              <div className="card-surface p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-pill hairline border p-1">
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </button>
-                  <p className="font-display text-xs tracking-wide">{first.toLocaleString([], { month: "long", year: "numeric" })}</p>
-                  <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-pill hairline border p-1">
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{first.toLocaleString([], { month: "long", year: "numeric" })}</span>
+                  <div className="flex gap-1">
+                    <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="rounded-md p-1 text-muted-foreground hover:bg-muted">
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                    </button>
+                    <button onClick={() => changeMonth(1)} aria-label="Next month" className="rounded-md p-1 text-muted-foreground hover:bg-muted">
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground">
+                <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-medium text-muted-foreground/70">
                   {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
                 </div>
-                <div className="mt-1.5 grid grid-cols-7 gap-0.5">
+                <div className="mt-1 grid grid-cols-7 gap-1">
                   {cells.map((d, i) => {
-                    if (!d) return <div key={i} />;
+                    if (!d) return <div key={i} className="h-7" />;
                     const key = toAmmanDateKey(d);
                     const hasClass = daysWithClasses.has(key);
                     const active = key === selectedDate;
                     const isToday = key === todayKey;
                     return (
                       <button key={i} onClick={() => setSelectedDate(key)}
-                        className={`relative h-8 rounded-lg text-[11px] transition ${
-                          active ? "bg-primary text-primary-foreground font-semibold" :
-                          isToday ? "border hairline" : "hover:bg-muted"
+                        className={`relative flex h-7 items-center justify-center rounded-md text-[11px] transition ${
+                          active ? "bg-primary font-bold text-primary-foreground" :
+                          isToday ? "bg-muted font-semibold" : "hover:bg-muted"
                         }`}>
                         {d.getDate()}
                         {!active && hasClass && (
-                          <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-muted-foreground/60" />
+                          <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-primary" />
                         )}
                       </button>
                     );
@@ -728,113 +707,216 @@ function ClassesAdmin() {
             );
           })()}
 
-          <div className="flex gap-2">
-            {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
-              <button key={v} onClick={()=>setView(v)}
-                className={`flex-1 rounded-pill px-3 py-2 text-[11px] font-semibold uppercase tracking-widest transition-colors ${view===v ? "bg-primary text-primary-foreground" : "border hairline bg-card text-muted-foreground"}`}>
-                {v}
+          {/* Class Types shortcut list */}
+          <div className="mt-6">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Class Types</span>
+              <button onClick={() => setTypesOpen(v => !v)} className="text-[10px] font-semibold uppercase tracking-widest text-primary hover:underline">
+                {typesOpen ? "Hide" : "Manage"}
               </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-3 min-w-0">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="font-display text-lg leading-none">
-              {new Date(selectedDate).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
-            </p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{view}</p>
-          </div>
-
-          {isLoading && <p className="text-center text-xs text-muted-foreground py-4">Loading…</p>}
-          {(() => {
-            const filtered = classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate);
-            if (!isLoading && filtered.length === 0) {
-              return (
-                <div className="card-surface flex flex-col items-center gap-1 py-8 text-center">
-                  <p className="text-xs text-muted-foreground">No {view} classes on this day</p>
-                  {view === "upcoming" && (
-                    <button onClick={()=>setAddOpen(true)} className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-primary">Add class</button>
-                  )}
+            </div>
+            <div className="space-y-1.5">
+              {typeDefs.map((d, idx) => (
+                <div key={d.key} className="flex items-center gap-3 rounded-pill border hairline bg-card/60 px-3 py-1.5 text-xs">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${typeDotColor(idx)}`} />
+                  <span className="flex-1 truncate font-medium">{d.label}</span>
+                  <span className="text-[10px] text-muted-foreground">{typeCounts.get(d.key) ?? 0}</span>
                 </div>
-              );
-            }
-            return null;
-          })()}
+              ))}
+            </div>
+          </div>
+        </aside>
 
-          <div className="space-y-2">
-            {classes.filter((c: any) => c.starts_at.slice(0, 10) === selectedDate).map((c: any) => {
-              const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
-              const booked = active.length;
-              const left = Math.max(0, c.capacity - booked);
-              const full = left === 0;
-              const isCancelled = !!c.cancelled_at;
-              return (
-                <div key={c.id} className="card-surface p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-display text-lg leading-none">{c.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatAmmanDateTime(c.starts_at)} • {c.coaches?.name || "—"} • <span className="uppercase">{labelOf(allTypeDefs, c.type)}</span>
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">{booked} booked</span>
-                        {!isCancelled && (
-                          <span className={`rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
-                            {full ? "Full" : `${left} left`}
-                          </span>
-                        )}
-                        {isCancelled && (
-                          <span className="rounded-pill bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-destructive">Cancelled</span>
-                        )}
-                        <span className="text-[10px] text-muted-foreground">of {c.capacity}</span>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      {view === "upcoming" && (
-                        <>
-                          <button onClick={()=>openEdit(c)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold">Edit</button>
-                          <button
-                            onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
-                            className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      )}
-                      {view === "cancelled" && (
-                        <>
-                          <button onClick={()=>restoreClass.mutate(c.id)} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary">Restore</button>
-                          <button onClick={()=>{ if (confirm("Delete this class permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
-                        </>
-                      )}
-                      {view === "past" && (
-                        <button onClick={()=>{ if (confirm("Delete this past class record permanently?")) deleteClass.mutate(c.id); }} className="rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-destructive">Delete</button>
-                      )}
-                    </div>
-                  </div>
-                  {active.length > 0 && (
-                    <ul className="mt-3 space-y-1">
-                      {active.map((b: any) => (
-                        <li key={b.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
-                          <span>
-                            {b.child_id
-                              ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">(child of {b.profiles?.name ?? "member"})</span></>
-                              : (b.profiles?.name ?? "Member")}
-                          </span>
-                          {view === "upcoming" && (
-                            <button onClick={()=>removeAttendee.mutate(b.id)} className="text-destructive text-[10px]">Remove</button>
+        {/* MAIN */}
+        <main className="flex min-w-0 flex-col">
+          {/* Filter bar */}
+          <div className="flex flex-wrap items-center gap-3 border-b hairline bg-muted/10 px-4 py-3">
+            <div className="flex gap-0.5 rounded-pill bg-muted/50 p-0.5">
+              {(["upcoming","past","cancelled"] as ClassView[]).map(v => (
+                <button key={v} onClick={()=>setView(v)}
+                  className={`rounded-pill px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-colors ${view===v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  {v}
+                </button>
+              ))}
+            </div>
+            <span className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground">
+              {dayClasses.length} {dayClasses.length === 1 ? "class" : "classes"}
+            </span>
+          </div>
+
+          {/* Agenda */}
+          <div className="min-h-[320px] space-y-4 p-4">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-lg leading-none">
+                {new Date(selectedDate).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
+              </span>
+              <div className="h-px flex-1 bg-border/60" />
+            </div>
+
+            {isLoading && <p className="py-6 text-center text-xs text-muted-foreground">Loading…</p>}
+            {!isLoading && dayClasses.length === 0 && (
+              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed hairline py-10 text-center">
+                <p className="text-xs text-muted-foreground">No {view} classes on this day</p>
+                {view === "upcoming" && (
+                  <button onClick={()=>setAddOpen(true)} className="text-[11px] font-semibold uppercase tracking-widest text-primary">+ Add class</button>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {dayClasses.map((c: any) => {
+                const active = (c.bookings ?? []).filter((b:any)=>b.status==="upcoming");
+                const booked = active.length;
+                const left = Math.max(0, c.capacity - booked);
+                const full = left === 0;
+                const isCancelled = !!c.cancelled_at;
+                const isExpanded = expandedId === c.id;
+                const typeIdx = Math.max(0, typeDefs.findIndex((d: any) => d.key === c.type));
+                const time = new Date(c.starts_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Amman" });
+                const shown = active.slice(0, 3);
+                const overflow = Math.max(0, booked - shown.length);
+                return (
+                  <div key={c.id} className={`overflow-hidden rounded-xl border transition-colors ${isExpanded ? "border-primary/40 bg-muted/20" : "hairline bg-card hover:border-white/20"}`}>
+                    <button onClick={() => setExpandedId(isExpanded ? null : c.id)} className="flex w-full items-center gap-4 p-3 text-left">
+                      <div className={`w-14 shrink-0 font-mono text-xs font-medium ${isExpanded ? "text-primary" : "text-muted-foreground"}`}>{time}</div>
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${typeDotColor(typeIdx)}`} />
+                          <span className="truncate text-sm font-semibold">{c.title}</span>
+                          {isCancelled ? (
+                            <span className="shrink-0 rounded bg-destructive/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-destructive">Cancelled</span>
+                          ) : (
+                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${full ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+                              {full ? "Full" : `${booked}/${c.capacity}`}
+                            </span>
                           )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            })}
+                        </div>
+                        <span className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+                          {c.coaches?.name || "No coach"} • {labelOf(allTypeDefs, c.type)}
+                        </span>
+                      </div>
+                      <div className="hidden items-center gap-3 sm:flex">
+                        {booked > 0 && (
+                          <div className="flex -space-x-1.5">
+                            {shown.map((b: any, i: number) => (
+                              <span key={b.id} className="grid h-6 w-6 place-items-center rounded-full border-2 border-card bg-muted text-[9px] font-bold" style={{ zIndex: 10 - i }}>
+                                {initialsOf(b.child_id ? b.children?.name : b.profiles?.name)}
+                              </span>
+                            ))}
+                            {overflow > 0 && (
+                              <span className="grid h-6 w-6 place-items-center rounded-full border-2 border-card bg-muted text-[9px] font-bold text-muted-foreground">+{overflow}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-180 text-primary" : ""}`} />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="grid gap-4 border-t hairline bg-card/60 p-4 md:grid-cols-[1fr_180px]">
+                        <div>
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Attendees ({booked})</span>
+                            <span className="text-[10px] text-muted-foreground">{left} spot{left===1?"":"s"} left</span>
+                          </div>
+                          {active.length === 0 ? (
+                            <p className="rounded-lg border border-dashed hairline py-6 text-center text-[11px] text-muted-foreground">No attendees yet</p>
+                          ) : (
+                            <ul className="space-y-1">
+                              {active.map((b: any) => (
+                                <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/40 px-3 py-1.5 text-xs">
+                                  <div className="flex min-w-0 items-center gap-2">
+                                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-muted text-[9px] font-bold">
+                                      {initialsOf(b.child_id ? b.children?.name : b.profiles?.name)}
+                                    </span>
+                                    <span className="truncate">
+                                      {b.child_id
+                                        ? <>{b.children?.name ?? "Child"} <span className="text-muted-foreground">· child of {b.profiles?.name ?? "member"}</span></>
+                                        : (b.profiles?.name ?? "Member")}
+                                    </span>
+                                  </div>
+                                  {view === "upcoming" && (
+                                    <button onClick={()=>removeAttendee.mutate(b.id)} className="shrink-0 text-[10px] font-semibold uppercase tracking-widest text-destructive hover:underline">Remove</button>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <div className="flex flex-row gap-2 md:flex-col">
+                          {view === "upcoming" && (
+                            <>
+                              <button onClick={()=>openEdit(c)} className="flex-1 rounded-pill border hairline bg-card px-3 py-2 text-[11px] font-semibold uppercase tracking-widest">Edit</button>
+                              <button
+                                onClick={() => { if (confirm(`Cancel this class? ${booked} booking${booked===1?"":"s"} will be cancelled and credits refunded.`)) cancelClass.mutate(c.id); }}
+                                className="flex-1 rounded-pill border border-destructive/30 bg-destructive/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-destructive"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
+                          {view === "cancelled" && (
+                            <>
+                              <button onClick={()=>restoreClass.mutate(c.id)} className="flex-1 rounded-pill border border-primary/30 bg-primary/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-primary">Restore</button>
+                              <button onClick={()=>{ if (confirm("Delete this class permanently?")) deleteClass.mutate(c.id); }} className="flex-1 rounded-pill border border-destructive/30 bg-destructive/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-destructive">Delete</button>
+                            </>
+                          )}
+                          {view === "past" && (
+                            <button onClick={()=>{ if (confirm("Delete this past class record permanently?")) deleteClass.mutate(c.id); }} className="flex-1 rounded-pill border border-destructive/30 bg-destructive/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-destructive">Delete</button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Add class modal */}
+      {addOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center" onClick={()=>setAddOpen(false)}>
+          <div className="w-full max-w-md space-y-2 rounded-2xl bg-card p-4 shadow-xl" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-xl">New class</h3>
+              <button onClick={()=>setAddOpen(false)} className="text-xs text-muted-foreground">Close</button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <select value={type} onChange={(e)=>setType(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                {typeDefs.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
+              </select>
+              <select value={coachId} onChange={(e)=>setCoachId(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                <option value="">Coach…</option>
+                {coaches.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <input placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} className="w-full rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            <div className="grid grid-cols-2 gap-2">
+              <input type="datetime-local" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+              <input type="number" placeholder="Capacity" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+            </div>
+            <label className="flex items-center gap-2 px-1 pt-1 text-xs font-medium">
+              <input type="checkbox" checked={recurring} onChange={(e)=>setRecurring(e.target.checked)} className="h-4 w-4 accent-primary"/>
+              Recurring class
+            </label>
+            {recurring && (
+              <div className="grid grid-cols-2 gap-2">
+                <select value={frequency} onChange={(e)=>setFrequency(e.target.value as any)} className="rounded-xl border hairline bg-card px-3 py-2 text-sm">
+                  <option value="weekly">Weekly</option>
+                  <option value="daily">Daily</option>
+                </select>
+                <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} placeholder="End date" className="rounded-xl border hairline bg-card px-3 py-2 text-sm"/>
+              </div>
+            )}
+            <button onClick={()=>{ create.mutate(undefined, { onSuccess: () => setAddOpen(false) }); }} disabled={!title || !startsAt || (recurring && !endDate) || create.isPending}
+              className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60">
+              <Plus size={14} className="inline"/> {recurring ? "Add recurring classes" : "Add class"}
+            </button>
           </div>
         </div>
-      </div>
+      )}
 
       {editId && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" onClick={()=>setEditId(null)}>
@@ -863,26 +945,16 @@ function ClassesAdmin() {
         </div>
       )}
 
-      {/* Class Types — collapsible, separated from schedule */}
-      <div className="border-t hairline pt-5">
-        <button
-          onClick={() => setTypesOpen(v => !v)}
-          className="flex w-full items-center justify-between gap-3 rounded-2xl border hairline bg-card px-4 py-3 text-left"
-        >
-          <div className="flex items-center gap-2">
-            <Tags size={16} className="text-primary"/>
-            <div>
-              <p className="font-display text-base leading-none">Class Types</p>
-              <p className="mt-1 text-[11px] text-muted-foreground">Rules that power booking eligibility and credit consumption</p>
-            </div>
-          </div>
-          {typesOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground"/> : <ChevronDown className="h-4 w-4 text-muted-foreground"/>}
-        </button>
-        {typesOpen && <div className="mt-3"><ClassTypesAdmin /></div>}
-      </div>
+      {/* Class Types manager — revealed by sidebar "Manage" link */}
+      {typesOpen && (
+        <div>
+          <ClassTypesAdmin />
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 
