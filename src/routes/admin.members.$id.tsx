@@ -75,7 +75,7 @@ function MemberDetailPage() {
   const [ptOpen, setPtOpen] = useState(false);
 
   const [ptAdjSessions, setPtAdjSessions] = useState(1);
-  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("debit");
+  const [ptAdjType, setPtAdjType] = useState<"credit" | "debit">("credit");
   const [ptAdjNote, setPtAdjNote] = useState("");
   const [ptAdjChildId, setPtAdjChildId] = useState("");
 
@@ -117,7 +117,7 @@ function MemberDetailPage() {
     },
     onSuccess: () => {
       toast.success("PT sessions updated");
-      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("debit"); setPtAdjChildId(""); setPtOpen(false);
+      setPtAdjSessions(1); setPtAdjNote(""); setPtAdjType("credit"); setPtAdjChildId(""); setPtOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-member", id] });
       qc.invalidateQueries({ queryKey: ["admin-member-txns", id] });
       qc.invalidateQueries({ queryKey: ["admin-members"] });
