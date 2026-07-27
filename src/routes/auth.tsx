@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 
@@ -36,8 +35,7 @@ function AuthPage() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
       <div className="mb-8 flex flex-col items-center">
-        <Logo size={110} />
-        <h1 className="font-display mt-4 text-3xl">{t.appName}</h1>
+        <h1 className="font-display text-3xl">{t.appName}</h1>
         <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{t.tagline}</p>
       </div>
       <form onSubmit={submit} className="space-y-3">
