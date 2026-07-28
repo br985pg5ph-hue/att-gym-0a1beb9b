@@ -22,6 +22,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
     if (!isStaff) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { resolveGymId } = await import("@/lib/gym.server");
+    const gymId = await resolveGymId();
+
+    const { data: callerProfile } = await context.supabase
+      .from("profiles").select("gym_id").eq("id", context.userId).maybeSingle();
+    if (callerProfile?.gym_id !== gymId) throw new Error("Forbidden");
+
     const now = ammanNow();
     const todayStart = startOfDayInAmman(now).toISOString();
     const todayEnd = endOfDayInAmman(now).toISOString();
@@ -55,6 +62,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("classes")
         .select("id, title, starts_at, capacity, type, coaches(name), bookings(id, status, child_id, member_id)")
+        .eq("gym_id", gymId)
         .gte("starts_at", todayStart)
         .lte("starts_at", todayEnd)
         .is("cancelled_at", null)
@@ -62,34 +70,42 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("classes")
         .select("id")
+        .eq("gym_id", gymId)
         .gte("starts_at", tomorrowStart)
         .lte("starts_at", tomorrowEnd)
         .is("cancelled_at", null),
       supabaseAdmin
         .from("profiles")
         .select("id")
+        .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
       supabaseAdmin
         .from("children")
         .select("id")
+        .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
       supabaseAdmin
         .from("profiles")
-        .select("pt_sessions_remaining"),
+        .select("pt_sessions_remaining")
+        .eq("gym_id", gymId),
       supabaseAdmin
         .from("children")
-        .select("pt_sessions_remaining"),
+        .select("pt_sessions_remaining")
+        .eq("gym_id", gymId),
       supabaseAdmin
         .from("profiles")
         .select("id")
+        .eq("gym_id", gymId)
         .gte("created_at", weekAgo.toISOString()),
       supabaseAdmin
         .from("profiles")
         .select("id")
+        .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString()),
       supabaseAdmin
         .from("profiles")
         .select("id, name, group_subscription_until")
+        .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString())
         .lte("group_subscription_until", weekFromNow.toISOString())
         .order("group_subscription_until", { ascending: true })
@@ -97,11 +113,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("transactions")
         .select("id, type, service, classes, days, description, payment_method, created_at, member_id, profiles(id, name), children(id, name)")
+        .eq("gym_id", gymId)
         .order("created_at", { ascending: false })
         .limit(5),
       supabaseAdmin
         .from("transactions")
         .select("payment_method")
+        .eq("gym_id", gymId)
         .eq("type", "credit")
         .gte("created_at", todayStart)
         .lte("created_at", todayEnd)
@@ -109,6 +127,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("transactions")
         .select("payment_method")
+        .eq("gym_id", gymId)
         .eq("type", "credit")
         .gte("created_at", weekAgo.toISOString())
         .lte("created_at", todayEnd)
@@ -116,11 +135,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("profiles")
         .select("created_at")
+        .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString())
         .order("created_at", { ascending: true }),
       supabaseAdmin
         .from("profiles")
-        .select("id, group_subscription_until, pt_sessions_remaining, membership_paused_at"),
+        .select("id, group_subscription_until, pt_sessions_remaining, membership_paused_at")
+        .eq("gym_id", gymId),
     ]);
 
     const todayList = (todayClasses ?? []).map((c: any) => {

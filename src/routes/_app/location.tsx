@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
+import { useGym } from "@/lib/gym";
 import { Phone, Navigation } from "lucide-react";
 
 export const Route = createFileRoute("/_app/location")({
@@ -11,10 +12,7 @@ export const Route = createFileRoute("/_app/location")({
 
 function LocationPage() {
   const { t } = useLang();
-  const { data: gym } = useQuery({
-    queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
-  });
+  const { gym } = useGym();
 
   if (!gym) return <PageHeader title={t.ourLocation} />;
 

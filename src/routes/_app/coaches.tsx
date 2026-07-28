@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useGym } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
 import { User } from "lucide-react";
@@ -11,9 +12,10 @@ export const Route = createFileRoute("/_app/coaches")({
 
 function CoachesPage() {
   const { t } = useLang();
+  const { gymId } = useGym();
   const { data: coaches = [] } = useQuery({
     queryKey: ["coaches"],
-    queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [],
+    queryFn: async () => (await supabase.from("coaches").select("*").eq("gym_id", gymId!).order("sort_order")).data ?? [],
   });
   return (
     <div>

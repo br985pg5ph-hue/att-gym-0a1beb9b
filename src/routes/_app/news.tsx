@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useGym } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
 
@@ -36,9 +37,11 @@ const TAG_COLORS: Record<string,string> = {
 
 function NewsPage() {
   const { t } = useLang();
+  const { gymId } = useGym();
   const { data = [] } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: async () => (await supabase.from("announcements").select("*").order("created_at", { ascending: false })).data ?? [],
+    queryKey: ["announcements", gymId],
+    enabled: !!gymId,
+    queryFn: async () => (await supabase.from("announcements").select("*").eq("gym_id", gymId!).order("created_at", { ascending: false })).data ?? [],
   });
   return (
     <div>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useGym } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
 import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";
@@ -153,12 +154,14 @@ function ChildForm({ parentId, child, onClose, onSaved }: {
   const [emPhone, setEmPhone] = useState(initialPhone.rest);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { gymId } = useGym();
 
   const save = async () => {
     if (!name.trim()) return toast.error("Name is required");
     setSaving(true);
     const payload = {
       parent_id: parentId,
+      gym_id: gymId!,
       name: name.trim(),
       date_of_birth: dob || null,
       gender: gender || null,

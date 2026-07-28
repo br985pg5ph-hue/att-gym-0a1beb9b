@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
+import { fetchGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/staff-login")({
   ssr: false,
@@ -26,7 +27,7 @@ function StaffLoginPage() {
     }
     const { data: prof } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, gym_id")
       .eq("id", data.user.id)
       .maybeSingle();
     if (prof?.role !== "staff") {
@@ -35,6 +36,14 @@ function StaffLoginPage() {
       toast.error("This account doesn't have staff access");
       return;
     }
+    const gym = await fetchGym();
+    if (!gym || prof.gym_id !== gym.id) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("This account belongs to a different gym");
+      return;
+    }
+
     setLoading(false);
     nav({ to: "/admin" });
   };
