@@ -18,6 +18,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlatformIndexRouteImport } from './routes/platform/index'
+import { Route as PlatformSignupRouteImport } from './routes/platform/signup'
+import { Route as PlatformSetupRouteImport } from './routes/platform/setup'
+import { Route as PlatformLoginRouteImport } from './routes/platform/login'
+import { Route as PlatformDashboardRouteImport } from './routes/platform/dashboard'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppNewsRouteImport } from './routes/_app/news'
 import { Route as AppMembershipRouteImport } from './routes/_app/membership'
@@ -75,6 +80,31 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformIndexRoute = PlatformIndexRouteImport.update({
+  id: '/platform/',
+  path: '/platform/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformSignupRoute = PlatformSignupRouteImport.update({
+  id: '/platform/signup',
+  path: '/platform/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformSetupRoute = PlatformSetupRouteImport.update({
+  id: '/platform/setup',
+  path: '/platform/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformLoginRoute = PlatformLoginRouteImport.update({
+  id: '/platform/login',
+  path: '/platform/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformDashboardRoute = PlatformDashboardRouteImport.update({
+  id: '/platform/dashboard',
+  path: '/platform/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -164,6 +194,11 @@ export interface FileRoutesByFullPath {
   '/membership': typeof AppMembershipRoute
   '/news': typeof AppNewsRoute
   '/profile': typeof AppProfileRouteWithChildren
+  '/platform/dashboard': typeof PlatformDashboardRoute
+  '/platform/login': typeof PlatformLoginRoute
+  '/platform/setup': typeof PlatformSetupRoute
+  '/platform/signup': typeof PlatformSignupRoute
+  '/platform/': typeof PlatformIndexRoute
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/children': typeof AppProfileChildrenRoute
   '/profile/edit': typeof AppProfileEditRoute
@@ -187,6 +222,11 @@ export interface FileRoutesByTo {
   '/location': typeof AppLocationRoute
   '/membership': typeof AppMembershipRoute
   '/news': typeof AppNewsRoute
+  '/platform/dashboard': typeof PlatformDashboardRoute
+  '/platform/login': typeof PlatformLoginRoute
+  '/platform/setup': typeof PlatformSetupRoute
+  '/platform/signup': typeof PlatformSignupRoute
+  '/platform': typeof PlatformIndexRoute
   '/profile/bookings': typeof AppProfileBookingsRoute
   '/profile/children': typeof AppProfileChildrenRoute
   '/profile/edit': typeof AppProfileEditRoute
@@ -213,6 +253,11 @@ export interface FileRoutesById {
   '/_app/membership': typeof AppMembershipRoute
   '/_app/news': typeof AppNewsRoute
   '/_app/profile': typeof AppProfileRouteWithChildren
+  '/platform/dashboard': typeof PlatformDashboardRoute
+  '/platform/login': typeof PlatformLoginRoute
+  '/platform/setup': typeof PlatformSetupRoute
+  '/platform/signup': typeof PlatformSignupRoute
+  '/platform/': typeof PlatformIndexRoute
   '/_app/profile/bookings': typeof AppProfileBookingsRoute
   '/_app/profile/children': typeof AppProfileChildrenRoute
   '/_app/profile/edit': typeof AppProfileEditRoute
@@ -239,6 +284,11 @@ export interface FileRouteTypes {
     | '/membership'
     | '/news'
     | '/profile'
+    | '/platform/dashboard'
+    | '/platform/login'
+    | '/platform/setup'
+    | '/platform/signup'
+    | '/platform/'
     | '/profile/bookings'
     | '/profile/children'
     | '/profile/edit'
@@ -262,6 +312,11 @@ export interface FileRouteTypes {
     | '/location'
     | '/membership'
     | '/news'
+    | '/platform/dashboard'
+    | '/platform/login'
+    | '/platform/setup'
+    | '/platform/signup'
+    | '/platform'
     | '/profile/bookings'
     | '/profile/children'
     | '/profile/edit'
@@ -287,6 +342,11 @@ export interface FileRouteTypes {
     | '/_app/membership'
     | '/_app/news'
     | '/_app/profile'
+    | '/platform/dashboard'
+    | '/platform/login'
+    | '/platform/setup'
+    | '/platform/signup'
+    | '/platform/'
     | '/_app/profile/bookings'
     | '/_app/profile/children'
     | '/_app/profile/edit'
@@ -306,6 +366,11 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   StaffLoginRoute: typeof StaffLoginRoute
+  PlatformDashboardRoute: typeof PlatformDashboardRoute
+  PlatformLoginRoute: typeof PlatformLoginRoute
+  PlatformSetupRoute: typeof PlatformSetupRoute
+  PlatformSignupRoute: typeof PlatformSignupRoute
+  PlatformIndexRoute: typeof PlatformIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -371,6 +436,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/': {
+      id: '/platform/'
+      path: '/platform'
+      fullPath: '/platform/'
+      preLoaderRoute: typeof PlatformIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/signup': {
+      id: '/platform/signup'
+      path: '/platform/signup'
+      fullPath: '/platform/signup'
+      preLoaderRoute: typeof PlatformSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/setup': {
+      id: '/platform/setup'
+      path: '/platform/setup'
+      fullPath: '/platform/setup'
+      preLoaderRoute: typeof PlatformSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/login': {
+      id: '/platform/login'
+      path: '/platform/login'
+      fullPath: '/platform/login'
+      preLoaderRoute: typeof PlatformLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/dashboard': {
+      id: '/platform/dashboard'
+      path: '/platform/dashboard'
+      fullPath: '/platform/dashboard'
+      preLoaderRoute: typeof PlatformDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/profile': {
@@ -538,6 +638,11 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   StaffLoginRoute: StaffLoginRoute,
+  PlatformDashboardRoute: PlatformDashboardRoute,
+  PlatformLoginRoute: PlatformLoginRoute,
+  PlatformSetupRoute: PlatformSetupRoute,
+  PlatformSignupRoute: PlatformSignupRoute,
+  PlatformIndexRoute: PlatformIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

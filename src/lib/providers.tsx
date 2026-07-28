@@ -21,6 +21,7 @@ type Profile = {
   membership_paused_at: string | null;
   tour_completed_at: string | null;
   gender: "male" | "female" | null;
+  is_platform_admin: boolean;
 };
 
 export type Child = {

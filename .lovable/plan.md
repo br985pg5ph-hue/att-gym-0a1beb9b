@@ -1,75 +1,152 @@
-# Multi-tenant foundation for ATT Gym Hub
+# Platform Portal for Gym Onboarding & Management
 
-Structural migration only. No feature changes, no removals. ATT Academy must behave identically when finished.
+## Current state
 
-## Decisions locked in
+The app has member auth (`/auth`, `/signup`) and gym-staff auth (`/staff-login` → `/admin`). The multi-tenant foundation exists (`gyms` table, `gym_id` on all tenant tables, `is_platform_admin` flag and RLS helpers). There is **no surface for a gym owner to apply to the platform** and **no UI for a platform admin to review/approve gyms**.
 
-- Member codes restart per gym (each gym starts at 1001).
-- Class types are per-gym rows; `key` unique within a gym.
-- New signups go through a server function that stamps `gym_id` from the deployment's resolved gym.
-- `is_platform_admin` bypasses gym RLS immediately (no UI).
+## Goal
 
-## Step 1 — `gyms` table and data move
+Create a separate `/platform` portal:
+1. Gym owners can apply (`/platform/signup`).
+2. You (platform admin) can review, approve, or suspend gyms from `/platform/dashboard`.
+3. Approved gym owners complete a setup wizard (`/platform/setup`) to configure branding, location, hours, and social links.
+4. While pending, gym owners see a "pending approval" banner and have limited access.
 
-Migration 1:
-- Create `public.gyms`: `id`, `slug` (unique), `name`, `status` default `'active'`, `logo_url`, `primary_color`, `secondary_color`, `theme jsonb`, plus every `gym_info` field (`address`, `lat`, `lng`, `phone`, `hours`, `instagram_url`, `whatsapp_number`, `maps_url`), `created_at`.
-- Grants: `SELECT` to `authenticated`; `ALL` to `service_role`. Update restricted to staff of that gym.
-- Insert the ATT Academy row (`slug = 'att-academy'`) copying the existing `gym_info` row inside the migration.
-- `gym_info` stays in place until step 6.
+## Out of scope for this pass
 
-## Step 2 — `gym_id` everywhere + platform admin flag
+- Payment/subscription plans for gyms.
+- Automated email notifications to applicants (can be added later).
+- Staff role tiers inside a gym.
 
-Migration 2:
-- Add nullable `gym_id uuid references public.gyms(id)` to `profiles`, `children`, `classes`, `class_type_defs`, `bookings`, `coaches`, `announcements`, `transactions`.
-- Backfill all rows with the ATT Academy id, then set `NOT NULL` on all 8.
-- Add index on `gym_id` for each table (and composite indexes where queries filter by gym + time, e.g. `classes(gym_id, starts_at)`).
-- Add `is_platform_admin boolean not null default false` to `profiles`.
+## Ambiguities I'm flagging
 
-## Step 3 — Per-gym keys and sequences
+1. **First platform admin creation**: No self-service "sign up as platform admin" will be built. The first platform admin must be seeded manually (migration or one-time SQL). I'll include the seed SQL in the plan.
+2. **Deployment model**: The platform portal should run as its own deployment with `VITE_GYM_SLUG=platform` (or equivalent server env). Running it under a gym slug will still work for platform admins because `is_platform_admin()` bypasses RLS, but the public landing copy should be neutral.
+3. **Gym owner access after approval**: Once approved, the owner is expected to use the gym's own deployment URL (`https://<gym-slug>.lovable.app` or the slug-configured preview). The setup wizard will show them a "Go to your gym admin" link after approval.
 
-Migration 3:
-- `class_type_defs`: primary key becomes `(gym_id, key)`. Every trigger that joins `class_type_defs d ON d.key = c.type` must also match `d.gym_id = c.gym_id` — this touches `consume_class_credit`, `enforce_kids_class_child`, and `refund_class_credit`.
-- `member_code`: replace the single global sequence with a per-gym counter. `assign_member_code` computes the next code as `max(member_code) + 1` within the new row's gym (starting at 1001) under a row lock on the gyms row, so two gyms can both hold 1001. `member_code` uniqueness becomes `(gym_id, member_code)`.
-- `referral_code` and the referral lookup in `handle_new_user` become gym-scoped (a code only resolves within the same gym).
-- The partial unique index on bookings and other constraints get `gym_id` added where they must not collide across gyms.
+## Step 1 — Database: seed platform gym and platform admin policy
 
-## Step 4 — Tenant-aware functions and RLS
+Migration:
+- Insert a single platform gym row: `slug = 'platform'`, `name = 'ATT Gym Hub Platform'`, `status = 'active'`.
+- This row is only used so platform-admin profiles can have a non-null `gym_id` without belonging to an operational gym.
+- No table schema changes are required; `gyms.status` already supports text values and `profiles.is_platform_admin` already exists.
 
-Migration 4:
-- New `public.current_gym_id()` — `SECURITY DEFINER`, `STABLE`, `SET search_path = public` — returns the signed-in user's `profiles.gym_id`.
-- New `public.is_platform_admin()` — same pattern.
-- New `public.same_gym(_gym_id uuid)` returning `is_platform_admin() OR _gym_id = current_gym_id()`.
-- `has_role` extended so a staff role only counts within the caller's own gym.
-- Rewrite every policy on the 8 tables to AND in `same_gym(gym_id)` alongside the existing role/ownership check. Insert/update `WITH CHECK` clauses also force `gym_id = current_gym_id()` so a user cannot write a row into another gym.
-- `gyms` policies: a user reads only their own gym (platform admins read all); staff of that gym update it.
-- Triggers that write rows (`consume_class_credit`, `refund_class_credit`, `grant_referral_reward`, `sync_classes_remaining`) propagate `gym_id` onto the transactions they create.
+One-time seed (to be run manually after deployment):
+- Create a platform admin auth user and set their `profiles.gym_id` to the platform gym id and `is_platform_admin = true`.
+- I'll provide the SQL/script, but it will not be auto-run on every deploy.
 
-## Step 5 — App-side tenant resolution
+## Step 2 — Platform portal routes
 
-- `VITE_GYM_SLUG` (client) / `GYM_SLUG` (server), defaulting to `att-academy`.
-- `src/lib/gym.ts`: exports the resolved slug plus a `useGym()` hook backed by a cached React Query fetch of the `gyms` row (id, name, branding, address, hours, socials).
-- Server side: a small helper used by `dashboard.functions.ts` and other server functions to resolve the gym id once per request.
-- Branding: `Logo`, theme colors and app title read from the resolved gym record, falling back to today's ATT values so nothing shifts visually.
+Create route files under `src/routes/platform/`:
 
-## Step 6 — Repoint every query, then drop `gym_info`
+- `src/routes/platform/index.tsx` — public landing page with CTAs:
+  - "Sign up your gym" → `/platform/signup`
+  - "Platform admin login" → `/platform/login`
+  - "Member/staff login" → `/auth`
 
-- Replace all three `gym_info ... .eq("id", 1)` reads (`admin.tsx` GymInfoAdmin, `_app/home.tsx`, `_app/location.tsx`, `_app/profile.index.tsx`) and the GymInfoAdmin update with `gyms` scoped by the resolved gym id.
-- Add `.eq("gym_id", gymId)` to every read and `gym_id` to every insert across: `src/routes/admin.tsx` (announcements, classes, bookings, coaches, members, class types), `src/routes/admin.members.$id.tsx` (profile, bookings, transactions, booking-on-behalf), `src/lib/dashboard.functions.ts` (all 14 admin queries), `src/lib/classTypes.ts`, and every route under `src/routes/_app/` (home, book, news, coaches, location, profile.*), plus `src/lib/providers.tsx` and `src/lib/account.functions.ts`.
-- Signup moves to a server function that creates the auth user and stamps `gym_id` from the server-resolved slug; the client form keeps its current fields and behaviour.
-- Guards: `_app.tsx` and `admin.tsx` `beforeLoad`, plus staff login, reject a signed-in user whose `gym_id` doesn't match the deployment's gym (signed out with a clear message).
-- Drop `gym_info` in the final migration and regenerate types.
+- `src/routes/platform/signup.tsx` — gym owner application form:
+  - Gym name
+  - Desired slug (validated: lowercase, hyphenated, unique)
+  - Owner name, email, phone, password
+  - Submit creates:
+    - A `gyms` row with `status = 'pending'`, slug/name filled
+    - An auth user
+    - A `profiles` row with `role = 'staff'`, `gym_id = <new gym id>`
+  - Redirects to `/platform/setup`.
 
-## Step 7 — Verification
+- `src/routes/platform/login.tsx` — platform admin login:
+  - Email + password only (same Supabase auth).
+  - After login, checks `profiles.is_platform_admin = true` and `gym_id` matches platform gym; otherwise signs out with an error.
+  - Redirects to `/platform/dashboard`.
 
-- Walk the whole ATT flow in a headless browser: member login, book, cancel, pause/resume, PT credits, children/parent mode, referrals, announcements, coaches, admin dashboard, member detail, class type management.
-- Seed a second gym (`demo-gym`) and run the app with `VITE_GYM_SLUG=demo-gym` to confirm an empty, isolated dataset.
-- Prove isolation at the database level, not just in queries: query gym A's tables using a gym B user's token and confirm zero rows come back.
-- Run the security linter after the RLS migration.
+- `src/routes/platform/dashboard.tsx` — platform admin dashboard (protected by platform-admin guard):
+  - Lists all gyms with status, name, slug, created date.
+  - Filter tabs: Pending, Active, Suspended, All.
+  - Actions per gym: Approve (set `status = 'active'`), Suspend, Activate.
+  - Shows owner contact info (looked up from `profiles` where `role = 'staff'` and `gym_id = gym.id`).
+  - Basic stats: total gyms, pending count, active count.
 
-## Ambiguities I'm flagging rather than guessing
+- `src/routes/platform/setup.tsx` — gym setup wizard for the logged-in gym owner (protected by staff + pending/active gym guard):
+  - Step 1: Gym basics (name, slug locked, phone, address).
+  - Step 2: Location & hours (lat/lng, maps URL, hours JSON editor).
+  - Step 3: Branding (primary/secondary colors, logo upload to a new `logos` storage bucket, theme JSON).
+  - Step 4: Social links (instagram, whatsapp).
+  - Persistent "Pending approval" notification bar if `gyms.status = 'pending'`.
+  - Once status becomes `active`, show a "Go to Admin Dashboard" CTA linking to `/admin`.
 
-1. **`classes.type` has no foreign key** to `class_type_defs` today. I'll keep it that way (adding a composite FK could reject existing rows); the gym match is enforced in the triggers instead. Say the word if you want a real FK.
-2. **The `avatars` storage bucket is shared** across gyms. Files stay in one bucket keyed by user id; per-gym path prefixes and storage policies aren't in this pass.
-3. **Auth users are shared across gyms.** One email = one account platform-wide, belonging to exactly one gym. A person joining two gyms would need two emails. Changing that means a `gym_members` join table — a much larger redesign, out of scope here.
-4. **Existing member codes are preserved as-is**; the per-gym counter continues from ATT's current maximum rather than renumbering anyone.
-5. **`handle_new_user` can't see the deployment env var**, which is exactly why signup moves to a server function. Social/OAuth signups follow the same path; a user created outside it would land without a gym and be blocked by the guards — I'll add a safe fallback to the deployment's gym for that case.
+- `src/routes/platform/_platform.tsx` — optional layout route for the protected platform-admin pages (`dashboard`) with a `beforeLoad` guard that calls `supabase.auth.getUser()` and verifies `is_platform_admin()` via a server function or direct profile read.
+
+## Step 3 — Auth guards
+
+- Platform admin guard (`/platform/dashboard`):
+  - `beforeLoad` checks session, then profile `is_platform_admin = true` and `gym_id` matches the platform gym id.
+  - Uses a server function `getPlatformAdminContext` that returns `{ isPlatformAdmin, platformGymId }` to avoid leaking logic into the client.
+
+- Gym owner setup guard (`/platform/setup`):
+  - `beforeLoad` checks session, profile `role = 'staff'`, and the user's `gym_id` exists.
+  - If the gym is `suspended`, redirect to `/platform` with an error.
+
+- Existing `/admin` guard stays unchanged: it continues to require `role = 'staff'` and matching deployment gym.
+
+## Step 4 — Server functions
+
+Create `src/lib/platform.functions.ts`:
+
+- `applyForGym({ gymName, slug, ownerName, ownerEmail, ownerPhone, password })`
+  - Server-side validation (unique slug, valid email, strong password).
+  - Creates auth user with `supabaseAdmin`.
+  - Creates pending gym row.
+  - Creates staff profile linked to the new gym.
+  - Returns `{ success, gymId }` or error.
+
+- `getPlatformAdminContext()`
+  - Returns whether the caller is a platform admin and the platform gym id.
+  - Used by dashboard guard and dashboard data loader.
+
+- `listGymsForPlatform({ status? })`
+  - Returns all gyms (platform admin bypasses RLS).
+  - Includes owner profile info via a join.
+
+- `updateGymStatus({ gymId, status })`
+  - Platform admin only: sets `gyms.status` to `active`, `suspended`, or `trial`.
+
+- `getGymSetupContext()`
+  - For the logged-in gym owner: returns their gym row and approval status.
+
+- `updateGymSetup({ ...fields })`
+  - For the logged-in gym owner: updates their own gym's branding/location/hours/socials.
+  - Slug is immutable after creation.
+
+## Step 5 — Storage
+
+- Create a `logos` storage bucket (public or signed URLs).
+- Add RLS/policy so a gym owner can upload only to their own gym's folder (e.g. `logos/<gym_id>/logo.png`).
+- Update `Logo` component to read from `gym.logo_url` when available, falling back to the existing ATT assets.
+
+## Step 6 — Client-side type updates
+
+- Update `src/lib/providers.tsx` `Profile` type to include `is_platform_admin: boolean`.
+- Update `src/lib/gym.ts` `Gym` type to include all platform-relevant fields (already present).
+- No generated type edits; `supabase--migration` will regenerate `types.ts` if any schema changes are made (only the platform gym seed is data, not schema).
+
+## Step 7 — Root route / landing decision
+
+- Keep `/` redirecting to `/auth` for now so existing member/staff flows are unchanged.
+- Add a small, unobtrusive footer link on `/auth` and `/staff-login`: "Are you a gym owner? Sign up your gym" → `/platform/signup`.
+- The platform portal landing (`/platform`) will be the main entry point for gym owners and platform admins.
+
+## Step 8 — Verification
+
+- Seed the platform gym and one platform admin in the preview environment.
+- Walk through:
+  1. Gym owner applies at `/platform/signup`.
+  2. Platform admin logs in at `/platform/login` and sees the pending gym.
+  3. Platform admin approves the gym.
+  4. Gym owner refreshes `/platform/setup`, sees approval banner removed, and can click through to `/admin`.
+  5. Confirm the approved gym's data is isolated: no other gym's members/classes are visible.
+
+## What I'll need from you
+
+- Confirm the platform portal should live at `/platform` routes in the same codebase (deployed separately with `VITE_GYM_SLUG=platform`), rather than a wholly separate project.
+- Confirm the first platform admin can be created via a one-time SQL seed (I'll provide the exact script).
+- Any specific fields you want on the gym application form beyond gym name, slug, owner name, email, phone, and password.

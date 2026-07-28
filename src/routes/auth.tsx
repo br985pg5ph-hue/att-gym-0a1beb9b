@@ -64,6 +64,9 @@ function AuthPage() {
       <p className="mt-8 text-center text-xs text-muted-foreground">
         {t.dontHaveAccount} <Link to="/signup" className="font-semibold text-primary">{t.signUp}</Link>
       </p>
+      <p className="mt-3 text-center text-[10px] text-muted-foreground">
+        Are you a gym owner? <Link to="/platform/signup" className="font-semibold text-primary">Sign up your gym</Link>
+      </p>
     </div>
   );
 }
