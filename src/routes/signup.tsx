@@ -8,6 +8,7 @@ import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
+import { GYM_SLUG } from "@/lib/gym";
 
 const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),
@@ -41,7 +42,7 @@ function SignUpPage() {
     if (password !== confirm) return toast.error("Passwords do not match");
     if (!gender) return toast.error("Please select your gender");
     setLoading(true);
-    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender };
+    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender, gym_slug: GYM_SLUG };
     const trimmedRef = referral.trim();
     if (trimmedRef) meta.referral_code = trimmedRef;
     const { data, error } = await supabase.auth.signUp({
