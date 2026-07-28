@@ -9,6 +9,7 @@ import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, 
 import { useServerFn } from "@tanstack/react-start";
 import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
 import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
+import { useGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/admin/members/$id")({
   ssr: false,
@@ -34,13 +35,15 @@ function MemberDetailPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { gymId } = useGym();
 
   const { data: member } = useQuery({
-    queryKey: ["admin-member", id],
+    queryKey: ["admin-member", id, gymId],
+    enabled: !!gymId,
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles")
         .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, group_track, group_subscription_started_at, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, avatar_url, children(id, name, group_subscription_until, group_track, group_subscription_started_at, pt_sessions_remaining, avatar_url)")
-        .eq("id", id).maybeSingle();
+        .eq("id", id).eq("gym_id", gymId!).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -109,6 +112,7 @@ function MemberDetailPage() {
         classes: ptAdjSessions,
         type: ptAdjType,
         source: "admin_adjustment",
+        gym_id: gymId!,
         payment_method: ptAdjType === "credit" ? "cash" : null,
         description: ptAdjNote || (ptAdjType === "debit" ? "Admin removed PT sessions" : "Admin added PT sessions"),
         created_by: user!.id,
@@ -135,6 +139,7 @@ function MemberDetailPage() {
         days: grpAdjDays,
         type: grpAdjType,
         source: "admin_adjustment",
+        gym_id: gymId!,
         payment_method: grpAdjType === "credit" ? "cash" : null,
         description: grpAdjNote || (grpAdjType === "debit" ? "Admin removed membership days" : "Admin added membership days"),
         created_by: user!.id,
@@ -685,13 +690,16 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [pendingId, setPendingId] = useState<string | null>(null);
 
+  const { gymId } = useGym();
   const dayStart = new Date(`${date}T00:00:00`).toISOString();
   const dayEnd = new Date(new Date(`${date}T00:00:00`).getTime() + 24 * 60 * 60 * 1000).toISOString();
 
   const { data: dayClasses = [], isLoading } = useQuery({
-    queryKey: ["admin-book-day", date],
+    queryKey: ["admin-book-day", date, gymId],
+    enabled: !!gymId,
     queryFn: async () => (await supabase.from("classes")
       .select("id, type, title, starts_at, capacity, coaches(name), bookings(id, status)")
+      .eq("gym_id", gymId!)
       .gte("starts_at", dayStart)
       .lt("starts_at", dayEnd)
       .is("cancelled_at", null)
@@ -720,6 +728,7 @@ function BookClassModal({ memberId, memberName, memberBalance, kids, existingUpc
       class_id: classId,
       child_id: childId || null,
       status: "upcoming",
+      gym_id: gymId!,
     });
     setPendingId(null);
     if (error) return toast.error(error.message);
