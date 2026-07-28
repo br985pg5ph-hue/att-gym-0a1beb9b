@@ -172,6 +172,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
           <h2 className="font-display text-3xl leading-none">{todayLabel}</h2>
         </div>
+        {isGymAdmin && (
         <div className="flex items-center gap-2">
           <button
             onClick={() => setTab("coaches")}
@@ -186,6 +187,8 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
             <Settings size={14} /> Gym Info
           </button>
         </div>
+        )}
+
       </div>
 
       {/* KPI grid */}
