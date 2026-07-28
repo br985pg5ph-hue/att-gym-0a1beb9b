@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/platform/")({
   ssr: false,
@@ -10,10 +9,11 @@ function PlatformLanding() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
       <div className="mb-10 flex flex-col items-center text-center">
-        <Logo size={100} />
-        <h1 className="font-display mt-5 text-4xl">ATT Gym Hub</h1>
+        <h1 className="font-display text-5xl tracking-tight">
+          Nuvo<span className="text-primary">.</span>
+        </h1>
         <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-          The multi-tenant platform for Muay Thai & MMA gyms.
+          The platform for Muay Thai, MMA & functional training gyms.
         </p>
       </div>
 
@@ -32,7 +32,7 @@ function PlatformLanding() {
         </Link>
         <div className="pt-4 text-center">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
-            ← Back to ATT Gym Hub
+            ← Back to Nuvo
           </Link>
         </div>
       </div>

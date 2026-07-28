@@ -59,7 +59,7 @@ function PlatformSignup() {
       <div className="mb-8 flex flex-col items-center text-center">
         <Logo size={80} />
         <h1 className="font-display mt-4 text-3xl">Sign up your gym</h1>
-        <p className="mt-2 text-xs text-muted-foreground">Apply to join the ATT Gym Hub platform</p>
+        <p className="mt-2 text-xs text-muted-foreground">Apply to join the Nuvo platform</p>
       </div>
 
       <form onSubmit={submit} className="space-y-3">
