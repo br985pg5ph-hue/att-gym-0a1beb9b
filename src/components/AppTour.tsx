@@ -40,7 +40,7 @@ export function AppTour() {
 
   const shouldOffer =
     !!profile &&
-    profile.role !== "staff" &&
+    profile.role === "member" &&
     !profile.tour_completed_at &&
     typeof window !== "undefined" &&
     sessionStorage.getItem(START_KEY) === "1";

@@ -418,7 +418,6 @@ export type Database = {
           injuries: string | null
           interests: string[]
           is_parent: boolean
-          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -452,7 +451,6 @@ export type Database = {
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
-          is_platform_admin?: boolean
           member_code: string
           membership_pause_days_used?: number
           membership_paused_at?: string | null
@@ -486,7 +484,6 @@ export type Database = {
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
-          is_platform_admin?: boolean
           member_code?: string
           membership_pause_days_used?: number
           membership_paused_at?: string | null
@@ -623,7 +620,6 @@ export type Database = {
           injuries: string | null
           interests: string[]
           is_parent: boolean
-          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -666,7 +662,6 @@ export type Database = {
           injuries: string | null
           interests: string[]
           is_parent: boolean
-          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -697,7 +692,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "member" | "staff"
+      app_role: "member" | "staff" | "admin" | "owner"
       booking_status: "upcoming" | "completed" | "cancelled"
       payment_method: "cash" | "card"
       txn_type: "credit" | "debit"
@@ -828,7 +823,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["member", "staff"],
+      app_role: ["member", "staff", "admin", "owner"],
       booking_status: ["upcoming", "completed", "cancelled"],
       payment_method: ["cash", "card"],
       txn_type: ["credit", "debit"],

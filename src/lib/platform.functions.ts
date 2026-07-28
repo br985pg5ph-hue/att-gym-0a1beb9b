@@ -98,8 +98,7 @@ export const applyForGym = createServerFn({ method: "POST" })
         name: data.ownerName,
         phone: data.ownerPhone,
         gym_id: gymId,
-        role: "staff",
-        is_platform_admin: false,
+        role: "admin",
       })
       .eq("id", userId);
     if (profErr) {
@@ -120,12 +119,12 @@ export const getPlatformAdminContext = createServerFn({ method: "GET" })
 
     const { data: prof, error } = await context.supabase
       .from("profiles")
-      .select("id, is_platform_admin, gym_id")
+      .select("id, role, gym_id")
       .eq("id", context.userId)
       .maybeSingle();
     if (error) throw error;
 
-    const isPlatformAdmin = !!prof?.is_platform_admin && prof.gym_id === platformGymId;
+    const isPlatformAdmin = prof?.role === "owner" && prof.gym_id === platformGymId;
     return { isPlatformAdmin, platformGymId };
   });
 
@@ -140,11 +139,11 @@ export const listGymsForPlatform = createServerFn({ method: "POST" })
 
     const { data: prof, error: profErr } = await context.supabase
       .from("profiles")
-      .select("is_platform_admin, gym_id")
+      .select("role, gym_id")
       .eq("id", context.userId)
       .maybeSingle();
     if (profErr) throw profErr;
-    if (!prof?.is_platform_admin || prof.gym_id !== platformGymId) {
+    if (prof?.role !== "owner" || prof.gym_id !== platformGymId) {
       throw new Error("Forbidden");
     }
 
@@ -160,7 +159,7 @@ export const listGymsForPlatform = createServerFn({ method: "POST" })
     const { data: owners, error: ownersErr } = await supabaseAdmin
       .from("profiles")
       .select("gym_id, name, phone")
-      .eq("role", "staff")
+      .in("role", ["admin", "staff"])
       .in("gym_id", gymIds);
     if (ownersErr) throw ownersErr;
 
@@ -184,11 +183,11 @@ export const updateGymStatus = createServerFn({ method: "POST" })
 
     const { data: prof, error: profErr } = await context.supabase
       .from("profiles")
-      .select("is_platform_admin, gym_id")
+      .select("role, gym_id")
       .eq("id", context.userId)
       .maybeSingle();
     if (profErr) throw profErr;
-    if (!prof?.is_platform_admin || prof.gym_id !== platformGymId) {
+    if (prof?.role !== "owner" || prof.gym_id !== platformGymId) {
       throw new Error("Forbidden");
     }
 
@@ -206,7 +205,7 @@ export const getGymSetupContext = createServerFn({ method: "GET" })
       .eq("id", context.userId)
       .maybeSingle();
     if (profErr) throw profErr;
-    if (!prof || prof.role !== "staff" || !prof.gym_id) {
+    if (!prof || (prof.role !== "admin" && prof.role !== "owner") || !prof.gym_id) {
       throw new Error("Forbidden");
     }
 
@@ -226,7 +225,7 @@ export const updateGymSetup = createServerFn({ method: "POST" })
       .eq("id", context.userId)
       .maybeSingle();
     if (profErr) throw profErr;
-    if (!prof || prof.role !== "staff" || !prof.gym_id) {
+    if (!prof || (prof.role !== "admin" && prof.role !== "owner") || !prof.gym_id) {
       throw new Error("Forbidden");
     }
 

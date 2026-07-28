@@ -19,7 +19,7 @@ export const Route = createFileRoute("/g/$gymSlug/admin")({
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
     const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
-    if (prof?.role !== "staff") throw redirect({ to: gp("/home") });
+    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) throw redirect({ to: gp("/home") });
     const gym = await fetchGym(params.gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();
@@ -123,6 +123,9 @@ function AdminPage() {
 
 function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const { t } = useLang();
+  const { profile } = useAuth();
+  const isGymAdmin = profile?.role === "admin" || profile?.role === "owner";
+
   const fetchStats = useServerFn(getAdminDashboardStats);
   const { data: stats } = useQuery({
     queryKey: ["admin-dashboard"],
@@ -172,6 +175,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{t.todaySnapshot}</p>
           <h2 className="font-display text-3xl leading-none">{todayLabel}</h2>
         </div>
+        {isGymAdmin && (
         <div className="flex items-center gap-2">
           <button
             onClick={() => setTab("coaches")}
@@ -186,6 +190,8 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
             <Settings size={14} /> Gym Info
           </button>
         </div>
+        )}
+
       </div>
 
       {/* KPI grid */}
