@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
+import { fetchGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/staff-login")({
   ssr: false,
