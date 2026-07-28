@@ -65,7 +65,7 @@ const included = [
 
 function NuvoHome() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="nuvo-site min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b hairline bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Wordmark className="text-2xl" />
