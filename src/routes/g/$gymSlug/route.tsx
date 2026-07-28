@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, notFound, Link } from "@tanstack/react-router";
-import { fetchGym, gymQueryKey, GymSlugProvider } from "@/lib/gym";
+import { fetchGym, gymQueryKey, GymSlugProvider, gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug")({
   ssr: false,
@@ -23,7 +23,7 @@ function UnknownGym() {
       <p className="mt-2 max-w-xs text-sm text-muted-foreground">
         This gym link isn't valid, or the gym is no longer on the platform.
       </p>
-      <Link to={gp("/")} className="mt-6 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+      <Link to="/" className="mt-6 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
         Go to ATT Gym Hub
       </Link>
     </div>

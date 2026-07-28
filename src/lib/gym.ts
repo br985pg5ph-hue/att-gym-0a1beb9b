@@ -29,6 +29,18 @@ export type Gym = {
   maps_url: string | null;
 };
 
+let currentSlug = DEFAULT_GYM_SLUG;
+
+/** Set by the tenant layout's beforeLoad, before any child route runs. */
+export function setCurrentGymSlug(slug: string) {
+  currentSlug = slug;
+}
+
+/** Absolute in-app path for the active tenant. gp("/home") -> "/g/att-academy/home" */
+export function gp(path: string) {
+  return (`/g/${currentSlug}${path === "/" ? "" : path}`) as any;
+}
+
 const GymSlugCtx = createContext<string>(DEFAULT_GYM_SLUG);
 
 export function GymSlugProvider({ slug, children }: { slug: string; children: ReactNode }) {

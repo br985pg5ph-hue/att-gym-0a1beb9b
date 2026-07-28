@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useChildren } from "@/lib/providers";
 import { ChevronLeft, Plus, Trash2, User, Ticket, Flame } from "lucide-react";

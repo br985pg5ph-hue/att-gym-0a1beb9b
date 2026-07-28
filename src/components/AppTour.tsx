@@ -5,6 +5,7 @@ import "driver.js/dist/driver.css";
 import "./AppTour.css";
 import { useAuth, useLang } from "@/lib/providers";
 import { supabase } from "@/integrations/supabase/client";
+import { gp } from "@/lib/gym";
 
 const START_KEY = "att.startTour";
 

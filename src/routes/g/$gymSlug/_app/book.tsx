@@ -9,7 +9,7 @@ import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { ammanNow, toAmmanDateKey } from "@/lib/time";
 import { toast } from "sonner";
 import { useClassTypeDefs, defsByKey } from "@/lib/classTypes";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug/_app/book")({
   component: BookPage,

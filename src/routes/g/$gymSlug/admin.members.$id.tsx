@@ -9,7 +9,7 @@ import { ArrowLeft, Minus, Plus, X, Phone, CalendarPlus, User, Dumbbell, Users, 
 import { useServerFn } from "@tanstack/react-start";
 import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
 import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug/admin/members/$id")({
   ssr: false,

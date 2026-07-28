@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

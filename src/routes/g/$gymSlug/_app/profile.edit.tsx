@@ -30,6 +30,7 @@ const AVATAR_SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 5; // 5 years
 
 import { COUNTRIES } from "@/lib/countries";
 import { CountrySelect } from "@/components/CountrySelect";
+import { gp } from "@/lib/gym";
 
 
 export const Route = createFileRoute("/g/$gymSlug/_app/profile/edit")({

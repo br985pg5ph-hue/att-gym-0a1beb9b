@@ -8,7 +8,7 @@ import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
-import { GYM_SLUG } from "@/lib/gym";
+import { GYM_SLUG, gp } from "@/lib/gym";
 
 const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),

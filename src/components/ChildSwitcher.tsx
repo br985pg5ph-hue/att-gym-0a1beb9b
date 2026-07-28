@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, Plus, User } from "lucide-react";
 import { useAuth, useChildren } from "@/lib/providers";
+import { gp } from "@/lib/gym";
 
 /** Header pill that lets a parent switch which child the screen is scoped to. Renders nothing unless the user is a parent. */
 export function ChildSwitcher() {

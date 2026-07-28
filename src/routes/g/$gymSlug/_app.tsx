@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { AppTour } from "@/components/AppTour";
+import { gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug/_app")({
   ssr: false,

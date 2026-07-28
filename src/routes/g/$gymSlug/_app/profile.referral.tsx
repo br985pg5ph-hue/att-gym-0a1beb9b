@@ -5,6 +5,7 @@ import { useAuth, useLang } from "@/lib/providers";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Gift, Copy, ChevronLeft, MessageSquare, Share2 } from "lucide-react";
+import { gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug/_app/profile/referral")({
   component: ReferralPage,

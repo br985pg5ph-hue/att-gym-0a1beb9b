@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { gp } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug/forgot")({
   ssr: false,

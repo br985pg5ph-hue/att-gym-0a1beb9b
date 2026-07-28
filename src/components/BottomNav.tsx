@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, CalendarDays, User, CreditCard } from "lucide-react";
 import { useLang } from "@/lib/providers";
+import { gp } from "@/lib/gym";
 
 export function BottomNav() {
   const { t } = useLang();

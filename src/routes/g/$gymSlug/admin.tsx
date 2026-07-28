@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
-import { useGym, fetchGym } from "@/lib/gym";
+import { useGym, fetchGym, gp } from "@/lib/gym";
 import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
@@ -320,8 +320,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
                 {stats?.expiringSoonList.map((m) => (
                   <Link
                     key={m.id}
-                    to={gp("/admin/members/$id")}
-                    params={{ id: m.id }}
+                    to={gp(`/admin/members/${m.id}`)}
                     className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2 transition-colors hover:border-primary/40"
                   >
                     <p className="truncate text-sm font-semibold">{m.name}</p>
@@ -1153,8 +1152,7 @@ function MembersAdmin() {
                 </div>
               </div>
               <Link
-                to={gp("/admin/members/$id")}
-                params={{ id: m.id }}
+                to={gp(`/admin/members/${m.id}`)}
                 className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary"
               >
                 View
