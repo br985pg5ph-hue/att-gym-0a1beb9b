@@ -79,7 +79,7 @@ export function AppTour() {
     setWelcomeOpen(false);
     // Ensure we start from /home
     if (path !== "/home") {
-      await navigate({ to: "/home" });
+      await navigate({ to: gp("/home") });
       await new Promise((r) => setTimeout(r, 250));
     }
 

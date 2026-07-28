@@ -11,7 +11,7 @@ import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
 import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
 import { useGym } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/admin/members/$id")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/admin/members/$id")({
   ssr: false,
   component: MemberDetailPage,
 });
@@ -98,7 +98,7 @@ function MemberDetailPage() {
     onSuccess: () => {
       toast.success("Client account deleted");
       qc.invalidateQueries({ queryKey: ["admin-members"] });
-      nav({ to: "/admin" });
+      nav({ to: gp("/admin") });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -194,7 +194,7 @@ function MemberDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
-        <button onClick={()=>nav({ to: "/admin" })} className="rounded-pill border hairline p-2"><ArrowLeft size={16}/></button>
+        <button onClick={()=>nav({ to: gp("/admin") })} className="rounded-pill border hairline p-2"><ArrowLeft size={16}/></button>
         <div className="min-w-0 flex-1">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Member</p>
           <h1 className="font-display text-2xl leading-none truncate">{member?.name || "—"}</h1>

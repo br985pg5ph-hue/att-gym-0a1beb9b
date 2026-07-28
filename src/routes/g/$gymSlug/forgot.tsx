@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/g/$gymSlug/forgot")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/forgot")({
   ssr: false,
   component: ForgotPage,
 });
@@ -28,7 +28,7 @@ function ForgotPage() {
           <button className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">Send reset link</button>
         </form>
       )}
-      <Link to="/auth" className="mt-6 text-center text-xs text-muted-foreground">← Back to sign in</Link>
+      <Link to={gp("/auth")} className="mt-6 text-center text-xs text-muted-foreground">← Back to sign in</Link>
     </div>
   );
 }

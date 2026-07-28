@@ -12,7 +12,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/settings")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/settings")({
   component: SettingsPage,
 });
 
@@ -47,7 +47,7 @@ function SettingsPage() {
       await supabase.auth.signOut();
       toast.success("Your account has been deleted.");
       setConfirmOpen(false);
-      nav({ to: "/auth" });
+      nav({ to: gp("/auth") });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to delete account");
       setDeleting(false);
@@ -57,7 +57,7 @@ function SettingsPage() {
   return (
     <div>
       <div className="flex items-center gap-2 px-3 pt-4">
-        <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
+        <Link to={gp("/profile")} className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
       </div>
       <PageHeader title={t.settings} />
       <div className="space-y-4 px-5">
@@ -105,7 +105,7 @@ function SettingsPage() {
               if (user) await supabase.from("profiles").update({ tour_completed_at: null }).eq("id", user.id);
               try { sessionStorage.setItem("att.startTour", "1"); } catch {}
               await refresh();
-              nav({ to: "/home" });
+              nav({ to: gp("/home") });
             }}
             className="flex w-full items-center gap-3 p-4 text-start"
           >

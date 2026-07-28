@@ -32,7 +32,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { CountrySelect } from "@/components/CountrySelect";
 
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/edit")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/edit")({
   component: EditProfilePage,
 });
 
@@ -157,7 +157,7 @@ function EditProfilePage() {
   return (
     <div>
       <div className="flex items-center gap-2 px-3 pt-4">
-        <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
+        <Link to={gp("/profile")} className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
       </div>
       <PageHeader title="Edit Profile" />
 

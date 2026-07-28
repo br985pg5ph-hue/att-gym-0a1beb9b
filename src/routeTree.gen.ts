@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlatformIndexRouteImport } from './routes/platform/index'
 import { Route as PlatformSignupRouteImport } from './routes/platform/signup'
@@ -40,6 +41,11 @@ import { Route as GGymSlugAppProfileEditRouteImport } from './routes/g/$gymSlug/
 import { Route as GGymSlugAppProfileChildrenRouteImport } from './routes/g/$gymSlug/_app/profile.children'
 import { Route as GGymSlugAppProfileBookingsRouteImport } from './routes/g/$gymSlug/_app/profile.bookings'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -196,6 +202,7 @@ const GGymSlugAppProfileBookingsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$'
     | '/g/$gymSlug'
     | '/platform/dashboard'
     | '/platform/login'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/$'
     | '/g/$gymSlug'
     | '/platform/dashboard'
     | '/platform/login'
@@ -384,6 +396,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
   GGymSlugRouteRoute: typeof GGymSlugRouteRouteWithChildren
   PlatformDashboardRoute: typeof PlatformDashboardRoute
   PlatformLoginRoute: typeof PlatformLoginRoute
@@ -394,6 +407,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -694,6 +714,7 @@ const GGymSlugRouteRouteWithChildren = GGymSlugRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
   GGymSlugRouteRoute: GGymSlugRouteRouteWithChildren,
   PlatformDashboardRoute: PlatformDashboardRoute,
   PlatformLoginRoute: PlatformLoginRoute,

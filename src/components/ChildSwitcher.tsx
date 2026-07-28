@@ -66,7 +66,7 @@ export function ChildSwitcher() {
             ))}
           </div>
           <Link
-            to="/profile/children"
+            to={gp("/profile/children")}
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 border-t hairline px-3 py-3 text-sm font-semibold text-primary hover:bg-muted"
           >

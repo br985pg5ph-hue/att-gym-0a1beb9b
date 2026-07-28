@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
 import { User } from "lucide-react";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/coaches")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/coaches")({
   component: CoachesPage,
 });
 

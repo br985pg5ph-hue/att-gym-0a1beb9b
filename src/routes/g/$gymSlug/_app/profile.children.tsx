@@ -19,7 +19,7 @@ function splitPhone(raw: string): { cc: string; rest: string } {
   return { cc: "+962", rest: raw };
 }
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/children")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/children")({
   validateSearch: (s: Record<string, unknown>) => ({
     new: s.new ? 1 : undefined,
     welcome: s.welcome ? 1 : undefined,
@@ -50,7 +50,7 @@ function ChildrenPage() {
     <div>
       <div className="flex items-center gap-2 px-3 pt-4">
         {!search.welcome && (
-          <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted">
+          <Link to={gp("/profile")} className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted">
             <ChevronLeft size={20} className="flip-rtl" />
           </Link>
         )}
@@ -103,7 +103,7 @@ function ChildrenPage() {
 
         {search.welcome && children.length > 0 && (
           <button
-            onClick={() => nav({ to: "/home" })}
+            onClick={() => nav({ to: gp("/home") })}
             className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground"
           >
             Continue to app

@@ -5,7 +5,7 @@ import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { fetchGym } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/staff-login")({
+export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/staff-login")({
   ssr: false,
   component: StaffLoginPage,
 });
@@ -45,7 +45,7 @@ function StaffLoginPage() {
     }
 
     setLoading(false);
-    nav({ to: "/admin" });
+    nav({ to: gp("/admin") });
   };
 
   return (
@@ -75,7 +75,7 @@ function StaffLoginPage() {
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
         <div className="text-end">
-          <Link to="/forgot" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link to={gp("/forgot")} className="text-xs text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
         </div>
@@ -86,7 +86,7 @@ function StaffLoginPage() {
           {loading ? "…" : "Sign In"}
         </button>
       </form>
-      <Link to="/auth" className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
+      <Link to={gp("/auth")} className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
         ← Back
       </Link>
       <p className="mt-3 text-center text-[10px] text-muted-foreground">
