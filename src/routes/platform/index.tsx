@@ -28,7 +28,7 @@ function PlatformLanding() {
           to="/platform/login"
           className="flex w-full items-center justify-center rounded-pill border hairline bg-card py-3.5 text-sm font-semibold"
         >
-          Platform admin login
+          Gym owner login
         </Link>
         <div className="pt-4 text-center">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
