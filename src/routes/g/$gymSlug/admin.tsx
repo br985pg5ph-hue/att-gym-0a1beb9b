@@ -123,6 +123,9 @@ function AdminPage() {
 
 function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const { t } = useLang();
+  const { profile } = useAuth();
+  const isGymAdmin = profile?.role === "admin" || profile?.role === "owner";
+
   const fetchStats = useServerFn(getAdminDashboardStats);
   const { data: stats } = useQuery({
     queryKey: ["admin-dashboard"],
