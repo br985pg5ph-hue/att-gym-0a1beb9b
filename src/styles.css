@@ -130,3 +130,24 @@
 
 
 [dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+
+/* Nuvo marketing site scope: always light, cobalt accent */
+.nuvo-site,
+.dark .nuvo-site {
+  --background: #ffffff;
+  --foreground: #10131a;
+  --card: #f7f8fa;
+  --card-foreground: #10131a;
+  --muted: #f2f4f7;
+  --muted-foreground: #626b7a;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --accent: #e8eeff;
+  --accent-foreground: #1d4ed8;
+  --border: rgba(16,19,26,0.10);
+  --hairline: rgba(16,19,26,0.10);
+  --input: rgba(16,19,26,0.14);
+  --ring: #1d4ed8;
+  background-color: var(--background);
+  color: var(--foreground);
+}
