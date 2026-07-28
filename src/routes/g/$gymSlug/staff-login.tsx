@@ -12,6 +12,7 @@ export const Route = createFileRoute("/g/$gymSlug/staff-login")({
 
 function StaffLoginPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

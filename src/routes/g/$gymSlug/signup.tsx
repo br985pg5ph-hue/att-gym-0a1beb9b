@@ -25,6 +25,7 @@ export const Route = createFileRoute("/g/$gymSlug/signup")({
 
 function SignUpPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const { t } = useLang();
   const { ref } = Route.useSearch();
   const [name, setName] = useState("");
