@@ -5,7 +5,7 @@ import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { fetchGym } from "@/lib/gym";
 
-export const Route = createFileRoute("/staff-login")({
+export const Route = createFileRoute("/g/$gymSlug/staff-login")({
   ssr: false,
   component: StaffLoginPage,
 });

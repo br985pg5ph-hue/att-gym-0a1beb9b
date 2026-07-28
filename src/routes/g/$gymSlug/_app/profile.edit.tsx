@@ -32,7 +32,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { CountrySelect } from "@/components/CountrySelect";
 
 
-export const Route = createFileRoute("/_app/profile/edit")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/edit")({
   component: EditProfilePage,
 });
 

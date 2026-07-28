@@ -6,7 +6,7 @@ import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { toast } from "sonner";
 import { ChevronLeft, User } from "lucide-react";
 
-export const Route = createFileRoute("/_app/profile/bookings")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/bookings")({
   component: BookingsPage,
 });
 

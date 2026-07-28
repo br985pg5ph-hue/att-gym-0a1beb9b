@@ -7,7 +7,7 @@ import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { useGym } from "@/lib/gym";
 import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User, Users, ShieldCheck, ShieldAlert } from "lucide-react";
 
-export const Route = createFileRoute("/_app/home")({
+export const Route = createFileRoute("/g/$gymSlug/_app/home")({
   component: HomePage,
 });
 

@@ -11,7 +11,7 @@ import { getMemberEmail, deleteMemberByStaff } from "@/lib/account.functions";
 import { useClassTypeDefs, defsByKey, labelOf } from "@/lib/classTypes";
 import { useGym } from "@/lib/gym";
 
-export const Route = createFileRoute("/admin/members/$id")({
+export const Route = createFileRoute("/g/$gymSlug/admin/members/$id")({
   ssr: false,
   component: MemberDetailPage,
 });

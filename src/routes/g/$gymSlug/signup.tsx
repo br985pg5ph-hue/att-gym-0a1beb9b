@@ -14,7 +14,7 @@ const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),
 });
 
-export const Route = createFileRoute("/signup")({
+export const Route = createFileRoute("/g/$gymSlug/signup")({
   ssr: false,
   validateSearch: zodValidator(searchSchema),
   component: SignUpPage,

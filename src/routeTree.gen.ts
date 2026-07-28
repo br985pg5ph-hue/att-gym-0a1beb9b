@@ -9,74 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StaffLoginRouteImport } from './routes/staff-login'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as ForgotRouteImport } from './routes/forgot'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlatformIndexRouteImport } from './routes/platform/index'
 import { Route as PlatformSignupRouteImport } from './routes/platform/signup'
 import { Route as PlatformSetupRouteImport } from './routes/platform/setup'
 import { Route as PlatformLoginRouteImport } from './routes/platform/login'
 import { Route as PlatformDashboardRouteImport } from './routes/platform/dashboard'
-import { Route as AppProfileRouteImport } from './routes/_app/profile'
-import { Route as AppNewsRouteImport } from './routes/_app/news'
-import { Route as AppMembershipRouteImport } from './routes/_app/membership'
-import { Route as AppLocationRouteImport } from './routes/_app/location'
-import { Route as AppHomeRouteImport } from './routes/_app/home'
-import { Route as AppCoachesRouteImport } from './routes/_app/coaches'
-import { Route as AppBookRouteImport } from './routes/_app/book'
-import { Route as AppProfileIndexRouteImport } from './routes/_app/profile.index'
-import { Route as AdminMembersIdRouteImport } from './routes/admin.members.$id'
-import { Route as AppProfileSettingsRouteImport } from './routes/_app/profile.settings'
-import { Route as AppProfileReferralRouteImport } from './routes/_app/profile.referral'
-import { Route as AppProfileEditRouteImport } from './routes/_app/profile.edit'
-import { Route as AppProfileChildrenRouteImport } from './routes/_app/profile.children'
-import { Route as AppProfileBookingsRouteImport } from './routes/_app/profile.bookings'
+import { Route as GGymSlugStaffLoginRouteImport } from './routes/g/$gymSlug/staff-login'
+import { Route as GGymSlugSignupRouteImport } from './routes/g/$gymSlug/signup'
+import { Route as GGymSlugResetPasswordRouteImport } from './routes/g/$gymSlug/reset-password'
+import { Route as GGymSlugOnboardingRouteImport } from './routes/g/$gymSlug/onboarding'
+import { Route as GGymSlugForgotRouteImport } from './routes/g/$gymSlug/forgot'
+import { Route as GGymSlugAuthRouteImport } from './routes/g/$gymSlug/auth'
+import { Route as GGymSlugAdminRouteImport } from './routes/g/$gymSlug/admin'
+import { Route as GGymSlugAppRouteImport } from './routes/g/$gymSlug/_app'
+import { Route as GGymSlugAppProfileRouteImport } from './routes/g/$gymSlug/_app/profile'
+import { Route as GGymSlugAppNewsRouteImport } from './routes/g/$gymSlug/_app/news'
+import { Route as GGymSlugAppMembershipRouteImport } from './routes/g/$gymSlug/_app/membership'
+import { Route as GGymSlugAppLocationRouteImport } from './routes/g/$gymSlug/_app/location'
+import { Route as GGymSlugAppHomeRouteImport } from './routes/g/$gymSlug/_app/home'
+import { Route as GGymSlugAppCoachesRouteImport } from './routes/g/$gymSlug/_app/coaches'
+import { Route as GGymSlugAppBookRouteImport } from './routes/g/$gymSlug/_app/book'
+import { Route as GGymSlugAppProfileIndexRouteImport } from './routes/g/$gymSlug/_app/profile.index'
+import { Route as GGymSlugAdminMembersIdRouteImport } from './routes/g/$gymSlug/admin.members.$id'
+import { Route as GGymSlugAppProfileSettingsRouteImport } from './routes/g/$gymSlug/_app/profile.settings'
+import { Route as GGymSlugAppProfileReferralRouteImport } from './routes/g/$gymSlug/_app/profile.referral'
+import { Route as GGymSlugAppProfileEditRouteImport } from './routes/g/$gymSlug/_app/profile.edit'
+import { Route as GGymSlugAppProfileChildrenRouteImport } from './routes/g/$gymSlug/_app/profile.children'
+import { Route as GGymSlugAppProfileBookingsRouteImport } from './routes/g/$gymSlug/_app/profile.bookings'
 
-const StaffLoginRoute = StaffLoginRouteImport.update({
-  id: '/staff-login',
-  path: '/staff-login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotRoute = ForgotRouteImport.update({
-  id: '/forgot',
-  path: '/forgot',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -107,330 +68,322 @@ const PlatformDashboardRoute = PlatformDashboardRouteImport.update({
   path: '/platform/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppProfileRoute = AppProfileRouteImport.update({
+const GGymSlugStaffLoginRoute = GGymSlugStaffLoginRouteImport.update({
+  id: '/g/$gymSlug/staff-login',
+  path: '/g/$gymSlug/staff-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugSignupRoute = GGymSlugSignupRouteImport.update({
+  id: '/g/$gymSlug/signup',
+  path: '/g/$gymSlug/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugResetPasswordRoute = GGymSlugResetPasswordRouteImport.update({
+  id: '/g/$gymSlug/reset-password',
+  path: '/g/$gymSlug/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugOnboardingRoute = GGymSlugOnboardingRouteImport.update({
+  id: '/g/$gymSlug/onboarding',
+  path: '/g/$gymSlug/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugForgotRoute = GGymSlugForgotRouteImport.update({
+  id: '/g/$gymSlug/forgot',
+  path: '/g/$gymSlug/forgot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugAuthRoute = GGymSlugAuthRouteImport.update({
+  id: '/g/$gymSlug/auth',
+  path: '/g/$gymSlug/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugAdminRoute = GGymSlugAdminRouteImport.update({
+  id: '/g/$gymSlug/admin',
+  path: '/g/$gymSlug/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugAppRoute = GGymSlugAppRouteImport.update({
+  id: '/g/$gymSlug/_app',
+  path: '/g/$gymSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugAppProfileRoute = GGymSlugAppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppNewsRoute = AppNewsRouteImport.update({
+const GGymSlugAppNewsRoute = GGymSlugAppNewsRouteImport.update({
   id: '/news',
   path: '/news',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppMembershipRoute = AppMembershipRouteImport.update({
+const GGymSlugAppMembershipRoute = GGymSlugAppMembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppLocationRoute = AppLocationRouteImport.update({
+const GGymSlugAppLocationRoute = GGymSlugAppLocationRouteImport.update({
   id: '/location',
   path: '/location',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppHomeRoute = AppHomeRouteImport.update({
+const GGymSlugAppHomeRoute = GGymSlugAppHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppCoachesRoute = AppCoachesRouteImport.update({
+const GGymSlugAppCoachesRoute = GGymSlugAppCoachesRouteImport.update({
   id: '/coaches',
   path: '/coaches',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppBookRoute = AppBookRouteImport.update({
+const GGymSlugAppBookRoute = GGymSlugAppBookRouteImport.update({
   id: '/book',
   path: '/book',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => GGymSlugAppRoute,
 } as any)
-const AppProfileIndexRoute = AppProfileIndexRouteImport.update({
+const GGymSlugAppProfileIndexRoute = GGymSlugAppProfileIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppProfileRoute,
+  getParentRoute: () => GGymSlugAppProfileRoute,
 } as any)
-const AdminMembersIdRoute = AdminMembersIdRouteImport.update({
+const GGymSlugAdminMembersIdRoute = GGymSlugAdminMembersIdRouteImport.update({
   id: '/members/$id',
   path: '/members/$id',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => GGymSlugAdminRoute,
 } as any)
-const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppProfileRoute,
-} as any)
-const AppProfileReferralRoute = AppProfileReferralRouteImport.update({
-  id: '/referral',
-  path: '/referral',
-  getParentRoute: () => AppProfileRoute,
-} as any)
-const AppProfileEditRoute = AppProfileEditRouteImport.update({
+const GGymSlugAppProfileSettingsRoute =
+  GGymSlugAppProfileSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => GGymSlugAppProfileRoute,
+  } as any)
+const GGymSlugAppProfileReferralRoute =
+  GGymSlugAppProfileReferralRouteImport.update({
+    id: '/referral',
+    path: '/referral',
+    getParentRoute: () => GGymSlugAppProfileRoute,
+  } as any)
+const GGymSlugAppProfileEditRoute = GGymSlugAppProfileEditRouteImport.update({
   id: '/edit',
   path: '/edit',
-  getParentRoute: () => AppProfileRoute,
+  getParentRoute: () => GGymSlugAppProfileRoute,
 } as any)
-const AppProfileChildrenRoute = AppProfileChildrenRouteImport.update({
-  id: '/children',
-  path: '/children',
-  getParentRoute: () => AppProfileRoute,
-} as any)
-const AppProfileBookingsRoute = AppProfileBookingsRouteImport.update({
-  id: '/bookings',
-  path: '/bookings',
-  getParentRoute: () => AppProfileRoute,
-} as any)
+const GGymSlugAppProfileChildrenRoute =
+  GGymSlugAppProfileChildrenRouteImport.update({
+    id: '/children',
+    path: '/children',
+    getParentRoute: () => GGymSlugAppProfileRoute,
+  } as any)
+const GGymSlugAppProfileBookingsRoute =
+  GGymSlugAppProfileBookingsRouteImport.update({
+    id: '/bookings',
+    path: '/bookings',
+    getParentRoute: () => GGymSlugAppProfileRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/forgot': typeof ForgotRoute
-  '/onboarding': typeof OnboardingRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/staff-login': typeof StaffLoginRoute
-  '/book': typeof AppBookRoute
-  '/coaches': typeof AppCoachesRoute
-  '/home': typeof AppHomeRoute
-  '/location': typeof AppLocationRoute
-  '/membership': typeof AppMembershipRoute
-  '/news': typeof AppNewsRoute
-  '/profile': typeof AppProfileRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
   '/platform/signup': typeof PlatformSignupRoute
   '/platform/': typeof PlatformIndexRoute
-  '/profile/bookings': typeof AppProfileBookingsRoute
-  '/profile/children': typeof AppProfileChildrenRoute
-  '/profile/edit': typeof AppProfileEditRoute
-  '/profile/referral': typeof AppProfileReferralRoute
-  '/profile/settings': typeof AppProfileSettingsRoute
-  '/admin/members/$id': typeof AdminMembersIdRoute
-  '/profile/': typeof AppProfileIndexRoute
+  '/g/$gymSlug': typeof GGymSlugAppRouteWithChildren
+  '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
+  '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
+  '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
+  '/g/$gymSlug/onboarding': typeof GGymSlugOnboardingRoute
+  '/g/$gymSlug/reset-password': typeof GGymSlugResetPasswordRoute
+  '/g/$gymSlug/signup': typeof GGymSlugSignupRoute
+  '/g/$gymSlug/staff-login': typeof GGymSlugStaffLoginRoute
+  '/g/$gymSlug/book': typeof GGymSlugAppBookRoute
+  '/g/$gymSlug/coaches': typeof GGymSlugAppCoachesRoute
+  '/g/$gymSlug/home': typeof GGymSlugAppHomeRoute
+  '/g/$gymSlug/location': typeof GGymSlugAppLocationRoute
+  '/g/$gymSlug/membership': typeof GGymSlugAppMembershipRoute
+  '/g/$gymSlug/news': typeof GGymSlugAppNewsRoute
+  '/g/$gymSlug/profile': typeof GGymSlugAppProfileRouteWithChildren
+  '/g/$gymSlug/profile/bookings': typeof GGymSlugAppProfileBookingsRoute
+  '/g/$gymSlug/profile/children': typeof GGymSlugAppProfileChildrenRoute
+  '/g/$gymSlug/profile/edit': typeof GGymSlugAppProfileEditRoute
+  '/g/$gymSlug/profile/referral': typeof GGymSlugAppProfileReferralRoute
+  '/g/$gymSlug/profile/settings': typeof GGymSlugAppProfileSettingsRoute
+  '/g/$gymSlug/admin/members/$id': typeof GGymSlugAdminMembersIdRoute
+  '/g/$gymSlug/profile/': typeof GGymSlugAppProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/forgot': typeof ForgotRoute
-  '/onboarding': typeof OnboardingRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/staff-login': typeof StaffLoginRoute
-  '/book': typeof AppBookRoute
-  '/coaches': typeof AppCoachesRoute
-  '/home': typeof AppHomeRoute
-  '/location': typeof AppLocationRoute
-  '/membership': typeof AppMembershipRoute
-  '/news': typeof AppNewsRoute
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
   '/platform/signup': typeof PlatformSignupRoute
   '/platform': typeof PlatformIndexRoute
-  '/profile/bookings': typeof AppProfileBookingsRoute
-  '/profile/children': typeof AppProfileChildrenRoute
-  '/profile/edit': typeof AppProfileEditRoute
-  '/profile/referral': typeof AppProfileReferralRoute
-  '/profile/settings': typeof AppProfileSettingsRoute
-  '/admin/members/$id': typeof AdminMembersIdRoute
-  '/profile': typeof AppProfileIndexRoute
+  '/g/$gymSlug': typeof GGymSlugAppRouteWithChildren
+  '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
+  '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
+  '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
+  '/g/$gymSlug/onboarding': typeof GGymSlugOnboardingRoute
+  '/g/$gymSlug/reset-password': typeof GGymSlugResetPasswordRoute
+  '/g/$gymSlug/signup': typeof GGymSlugSignupRoute
+  '/g/$gymSlug/staff-login': typeof GGymSlugStaffLoginRoute
+  '/g/$gymSlug/book': typeof GGymSlugAppBookRoute
+  '/g/$gymSlug/coaches': typeof GGymSlugAppCoachesRoute
+  '/g/$gymSlug/home': typeof GGymSlugAppHomeRoute
+  '/g/$gymSlug/location': typeof GGymSlugAppLocationRoute
+  '/g/$gymSlug/membership': typeof GGymSlugAppMembershipRoute
+  '/g/$gymSlug/news': typeof GGymSlugAppNewsRoute
+  '/g/$gymSlug/profile/bookings': typeof GGymSlugAppProfileBookingsRoute
+  '/g/$gymSlug/profile/children': typeof GGymSlugAppProfileChildrenRoute
+  '/g/$gymSlug/profile/edit': typeof GGymSlugAppProfileEditRoute
+  '/g/$gymSlug/profile/referral': typeof GGymSlugAppProfileReferralRoute
+  '/g/$gymSlug/profile/settings': typeof GGymSlugAppProfileSettingsRoute
+  '/g/$gymSlug/admin/members/$id': typeof GGymSlugAdminMembersIdRoute
+  '/g/$gymSlug/profile': typeof GGymSlugAppProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_app': typeof AppRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/forgot': typeof ForgotRoute
-  '/onboarding': typeof OnboardingRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/staff-login': typeof StaffLoginRoute
-  '/_app/book': typeof AppBookRoute
-  '/_app/coaches': typeof AppCoachesRoute
-  '/_app/home': typeof AppHomeRoute
-  '/_app/location': typeof AppLocationRoute
-  '/_app/membership': typeof AppMembershipRoute
-  '/_app/news': typeof AppNewsRoute
-  '/_app/profile': typeof AppProfileRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
   '/platform/signup': typeof PlatformSignupRoute
   '/platform/': typeof PlatformIndexRoute
-  '/_app/profile/bookings': typeof AppProfileBookingsRoute
-  '/_app/profile/children': typeof AppProfileChildrenRoute
-  '/_app/profile/edit': typeof AppProfileEditRoute
-  '/_app/profile/referral': typeof AppProfileReferralRoute
-  '/_app/profile/settings': typeof AppProfileSettingsRoute
-  '/admin/members/$id': typeof AdminMembersIdRoute
-  '/_app/profile/': typeof AppProfileIndexRoute
+  '/g/$gymSlug/_app': typeof GGymSlugAppRouteWithChildren
+  '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
+  '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
+  '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
+  '/g/$gymSlug/onboarding': typeof GGymSlugOnboardingRoute
+  '/g/$gymSlug/reset-password': typeof GGymSlugResetPasswordRoute
+  '/g/$gymSlug/signup': typeof GGymSlugSignupRoute
+  '/g/$gymSlug/staff-login': typeof GGymSlugStaffLoginRoute
+  '/g/$gymSlug/_app/book': typeof GGymSlugAppBookRoute
+  '/g/$gymSlug/_app/coaches': typeof GGymSlugAppCoachesRoute
+  '/g/$gymSlug/_app/home': typeof GGymSlugAppHomeRoute
+  '/g/$gymSlug/_app/location': typeof GGymSlugAppLocationRoute
+  '/g/$gymSlug/_app/membership': typeof GGymSlugAppMembershipRoute
+  '/g/$gymSlug/_app/news': typeof GGymSlugAppNewsRoute
+  '/g/$gymSlug/_app/profile': typeof GGymSlugAppProfileRouteWithChildren
+  '/g/$gymSlug/_app/profile/bookings': typeof GGymSlugAppProfileBookingsRoute
+  '/g/$gymSlug/_app/profile/children': typeof GGymSlugAppProfileChildrenRoute
+  '/g/$gymSlug/_app/profile/edit': typeof GGymSlugAppProfileEditRoute
+  '/g/$gymSlug/_app/profile/referral': typeof GGymSlugAppProfileReferralRoute
+  '/g/$gymSlug/_app/profile/settings': typeof GGymSlugAppProfileSettingsRoute
+  '/g/$gymSlug/admin/members/$id': typeof GGymSlugAdminMembersIdRoute
+  '/g/$gymSlug/_app/profile/': typeof GGymSlugAppProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
-    | '/auth'
-    | '/forgot'
-    | '/onboarding'
-    | '/reset-password'
-    | '/signup'
-    | '/staff-login'
-    | '/book'
-    | '/coaches'
-    | '/home'
-    | '/location'
-    | '/membership'
-    | '/news'
-    | '/profile'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
     | '/platform/signup'
     | '/platform/'
-    | '/profile/bookings'
-    | '/profile/children'
-    | '/profile/edit'
-    | '/profile/referral'
-    | '/profile/settings'
-    | '/admin/members/$id'
-    | '/profile/'
+    | '/g/$gymSlug'
+    | '/g/$gymSlug/admin'
+    | '/g/$gymSlug/auth'
+    | '/g/$gymSlug/forgot'
+    | '/g/$gymSlug/onboarding'
+    | '/g/$gymSlug/reset-password'
+    | '/g/$gymSlug/signup'
+    | '/g/$gymSlug/staff-login'
+    | '/g/$gymSlug/book'
+    | '/g/$gymSlug/coaches'
+    | '/g/$gymSlug/home'
+    | '/g/$gymSlug/location'
+    | '/g/$gymSlug/membership'
+    | '/g/$gymSlug/news'
+    | '/g/$gymSlug/profile'
+    | '/g/$gymSlug/profile/bookings'
+    | '/g/$gymSlug/profile/children'
+    | '/g/$gymSlug/profile/edit'
+    | '/g/$gymSlug/profile/referral'
+    | '/g/$gymSlug/profile/settings'
+    | '/g/$gymSlug/admin/members/$id'
+    | '/g/$gymSlug/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
-    | '/auth'
-    | '/forgot'
-    | '/onboarding'
-    | '/reset-password'
-    | '/signup'
-    | '/staff-login'
-    | '/book'
-    | '/coaches'
-    | '/home'
-    | '/location'
-    | '/membership'
-    | '/news'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
     | '/platform/signup'
     | '/platform'
-    | '/profile/bookings'
-    | '/profile/children'
-    | '/profile/edit'
-    | '/profile/referral'
-    | '/profile/settings'
-    | '/admin/members/$id'
-    | '/profile'
+    | '/g/$gymSlug'
+    | '/g/$gymSlug/admin'
+    | '/g/$gymSlug/auth'
+    | '/g/$gymSlug/forgot'
+    | '/g/$gymSlug/onboarding'
+    | '/g/$gymSlug/reset-password'
+    | '/g/$gymSlug/signup'
+    | '/g/$gymSlug/staff-login'
+    | '/g/$gymSlug/book'
+    | '/g/$gymSlug/coaches'
+    | '/g/$gymSlug/home'
+    | '/g/$gymSlug/location'
+    | '/g/$gymSlug/membership'
+    | '/g/$gymSlug/news'
+    | '/g/$gymSlug/profile/bookings'
+    | '/g/$gymSlug/profile/children'
+    | '/g/$gymSlug/profile/edit'
+    | '/g/$gymSlug/profile/referral'
+    | '/g/$gymSlug/profile/settings'
+    | '/g/$gymSlug/admin/members/$id'
+    | '/g/$gymSlug/profile'
   id:
     | '__root__'
     | '/'
-    | '/_app'
-    | '/admin'
-    | '/auth'
-    | '/forgot'
-    | '/onboarding'
-    | '/reset-password'
-    | '/signup'
-    | '/staff-login'
-    | '/_app/book'
-    | '/_app/coaches'
-    | '/_app/home'
-    | '/_app/location'
-    | '/_app/membership'
-    | '/_app/news'
-    | '/_app/profile'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
     | '/platform/signup'
     | '/platform/'
-    | '/_app/profile/bookings'
-    | '/_app/profile/children'
-    | '/_app/profile/edit'
-    | '/_app/profile/referral'
-    | '/_app/profile/settings'
-    | '/admin/members/$id'
-    | '/_app/profile/'
+    | '/g/$gymSlug/_app'
+    | '/g/$gymSlug/admin'
+    | '/g/$gymSlug/auth'
+    | '/g/$gymSlug/forgot'
+    | '/g/$gymSlug/onboarding'
+    | '/g/$gymSlug/reset-password'
+    | '/g/$gymSlug/signup'
+    | '/g/$gymSlug/staff-login'
+    | '/g/$gymSlug/_app/book'
+    | '/g/$gymSlug/_app/coaches'
+    | '/g/$gymSlug/_app/home'
+    | '/g/$gymSlug/_app/location'
+    | '/g/$gymSlug/_app/membership'
+    | '/g/$gymSlug/_app/news'
+    | '/g/$gymSlug/_app/profile'
+    | '/g/$gymSlug/_app/profile/bookings'
+    | '/g/$gymSlug/_app/profile/children'
+    | '/g/$gymSlug/_app/profile/edit'
+    | '/g/$gymSlug/_app/profile/referral'
+    | '/g/$gymSlug/_app/profile/settings'
+    | '/g/$gymSlug/admin/members/$id'
+    | '/g/$gymSlug/_app/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRouteWithChildren
-  AdminRoute: typeof AdminRouteWithChildren
-  AuthRoute: typeof AuthRoute
-  ForgotRoute: typeof ForgotRoute
-  OnboardingRoute: typeof OnboardingRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  SignupRoute: typeof SignupRoute
-  StaffLoginRoute: typeof StaffLoginRoute
   PlatformDashboardRoute: typeof PlatformDashboardRoute
   PlatformLoginRoute: typeof PlatformLoginRoute
   PlatformSetupRoute: typeof PlatformSetupRoute
   PlatformSignupRoute: typeof PlatformSignupRoute
   PlatformIndexRoute: typeof PlatformIndexRoute
+  GGymSlugAppRoute: typeof GGymSlugAppRouteWithChildren
+  GGymSlugAdminRoute: typeof GGymSlugAdminRouteWithChildren
+  GGymSlugAuthRoute: typeof GGymSlugAuthRoute
+  GGymSlugForgotRoute: typeof GGymSlugForgotRoute
+  GGymSlugOnboardingRoute: typeof GGymSlugOnboardingRoute
+  GGymSlugResetPasswordRoute: typeof GGymSlugResetPasswordRoute
+  GGymSlugSignupRoute: typeof GGymSlugSignupRoute
+  GGymSlugStaffLoginRoute: typeof GGymSlugStaffLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/staff-login': {
-      id: '/staff-login'
-      path: '/staff-login'
-      fullPath: '/staff-login'
-      preLoaderRoute: typeof StaffLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot': {
-      id: '/forgot'
-      path: '/forgot'
-      fullPath: '/forgot'
-      preLoaderRoute: typeof ForgotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -473,176 +426,235 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlatformDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/profile': {
-      id: '/_app/profile'
+    '/g/$gymSlug/staff-login': {
+      id: '/g/$gymSlug/staff-login'
+      path: '/g/$gymSlug/staff-login'
+      fullPath: '/g/$gymSlug/staff-login'
+      preLoaderRoute: typeof GGymSlugStaffLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/signup': {
+      id: '/g/$gymSlug/signup'
+      path: '/g/$gymSlug/signup'
+      fullPath: '/g/$gymSlug/signup'
+      preLoaderRoute: typeof GGymSlugSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/reset-password': {
+      id: '/g/$gymSlug/reset-password'
+      path: '/g/$gymSlug/reset-password'
+      fullPath: '/g/$gymSlug/reset-password'
+      preLoaderRoute: typeof GGymSlugResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/onboarding': {
+      id: '/g/$gymSlug/onboarding'
+      path: '/g/$gymSlug/onboarding'
+      fullPath: '/g/$gymSlug/onboarding'
+      preLoaderRoute: typeof GGymSlugOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/forgot': {
+      id: '/g/$gymSlug/forgot'
+      path: '/g/$gymSlug/forgot'
+      fullPath: '/g/$gymSlug/forgot'
+      preLoaderRoute: typeof GGymSlugForgotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/auth': {
+      id: '/g/$gymSlug/auth'
+      path: '/g/$gymSlug/auth'
+      fullPath: '/g/$gymSlug/auth'
+      preLoaderRoute: typeof GGymSlugAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/admin': {
+      id: '/g/$gymSlug/admin'
+      path: '/g/$gymSlug/admin'
+      fullPath: '/g/$gymSlug/admin'
+      preLoaderRoute: typeof GGymSlugAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/_app': {
+      id: '/g/$gymSlug/_app'
+      path: '/g/$gymSlug'
+      fullPath: '/g/$gymSlug'
+      preLoaderRoute: typeof GGymSlugAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$gymSlug/_app/profile': {
+      id: '/g/$gymSlug/_app/profile'
       path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/profile'
+      preLoaderRoute: typeof GGymSlugAppProfileRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/news': {
-      id: '/_app/news'
+    '/g/$gymSlug/_app/news': {
+      id: '/g/$gymSlug/_app/news'
       path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof AppNewsRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/news'
+      preLoaderRoute: typeof GGymSlugAppNewsRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/membership': {
-      id: '/_app/membership'
+    '/g/$gymSlug/_app/membership': {
+      id: '/g/$gymSlug/_app/membership'
       path: '/membership'
-      fullPath: '/membership'
-      preLoaderRoute: typeof AppMembershipRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/membership'
+      preLoaderRoute: typeof GGymSlugAppMembershipRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/location': {
-      id: '/_app/location'
+    '/g/$gymSlug/_app/location': {
+      id: '/g/$gymSlug/_app/location'
       path: '/location'
-      fullPath: '/location'
-      preLoaderRoute: typeof AppLocationRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/location'
+      preLoaderRoute: typeof GGymSlugAppLocationRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/home': {
-      id: '/_app/home'
+    '/g/$gymSlug/_app/home': {
+      id: '/g/$gymSlug/_app/home'
       path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof AppHomeRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/home'
+      preLoaderRoute: typeof GGymSlugAppHomeRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/coaches': {
-      id: '/_app/coaches'
+    '/g/$gymSlug/_app/coaches': {
+      id: '/g/$gymSlug/_app/coaches'
       path: '/coaches'
-      fullPath: '/coaches'
-      preLoaderRoute: typeof AppCoachesRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/coaches'
+      preLoaderRoute: typeof GGymSlugAppCoachesRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/book': {
-      id: '/_app/book'
+    '/g/$gymSlug/_app/book': {
+      id: '/g/$gymSlug/_app/book'
       path: '/book'
-      fullPath: '/book'
-      preLoaderRoute: typeof AppBookRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/g/$gymSlug/book'
+      preLoaderRoute: typeof GGymSlugAppBookRouteImport
+      parentRoute: typeof GGymSlugAppRoute
     }
-    '/_app/profile/': {
-      id: '/_app/profile/'
+    '/g/$gymSlug/_app/profile/': {
+      id: '/g/$gymSlug/_app/profile/'
       path: '/'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof AppProfileIndexRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/'
+      preLoaderRoute: typeof GGymSlugAppProfileIndexRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
-    '/admin/members/$id': {
-      id: '/admin/members/$id'
+    '/g/$gymSlug/admin/members/$id': {
+      id: '/g/$gymSlug/admin/members/$id'
       path: '/members/$id'
-      fullPath: '/admin/members/$id'
-      preLoaderRoute: typeof AdminMembersIdRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/g/$gymSlug/admin/members/$id'
+      preLoaderRoute: typeof GGymSlugAdminMembersIdRouteImport
+      parentRoute: typeof GGymSlugAdminRoute
     }
-    '/_app/profile/settings': {
-      id: '/_app/profile/settings'
+    '/g/$gymSlug/_app/profile/settings': {
+      id: '/g/$gymSlug/_app/profile/settings'
       path: '/settings'
-      fullPath: '/profile/settings'
-      preLoaderRoute: typeof AppProfileSettingsRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/settings'
+      preLoaderRoute: typeof GGymSlugAppProfileSettingsRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
-    '/_app/profile/referral': {
-      id: '/_app/profile/referral'
+    '/g/$gymSlug/_app/profile/referral': {
+      id: '/g/$gymSlug/_app/profile/referral'
       path: '/referral'
-      fullPath: '/profile/referral'
-      preLoaderRoute: typeof AppProfileReferralRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/referral'
+      preLoaderRoute: typeof GGymSlugAppProfileReferralRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
-    '/_app/profile/edit': {
-      id: '/_app/profile/edit'
+    '/g/$gymSlug/_app/profile/edit': {
+      id: '/g/$gymSlug/_app/profile/edit'
       path: '/edit'
-      fullPath: '/profile/edit'
-      preLoaderRoute: typeof AppProfileEditRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/edit'
+      preLoaderRoute: typeof GGymSlugAppProfileEditRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
-    '/_app/profile/children': {
-      id: '/_app/profile/children'
+    '/g/$gymSlug/_app/profile/children': {
+      id: '/g/$gymSlug/_app/profile/children'
       path: '/children'
-      fullPath: '/profile/children'
-      preLoaderRoute: typeof AppProfileChildrenRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/children'
+      preLoaderRoute: typeof GGymSlugAppProfileChildrenRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
-    '/_app/profile/bookings': {
-      id: '/_app/profile/bookings'
+    '/g/$gymSlug/_app/profile/bookings': {
+      id: '/g/$gymSlug/_app/profile/bookings'
       path: '/bookings'
-      fullPath: '/profile/bookings'
-      preLoaderRoute: typeof AppProfileBookingsRouteImport
-      parentRoute: typeof AppProfileRoute
+      fullPath: '/g/$gymSlug/profile/bookings'
+      preLoaderRoute: typeof GGymSlugAppProfileBookingsRouteImport
+      parentRoute: typeof GGymSlugAppProfileRoute
     }
   }
 }
 
-interface AppProfileRouteChildren {
-  AppProfileBookingsRoute: typeof AppProfileBookingsRoute
-  AppProfileChildrenRoute: typeof AppProfileChildrenRoute
-  AppProfileEditRoute: typeof AppProfileEditRoute
-  AppProfileReferralRoute: typeof AppProfileReferralRoute
-  AppProfileSettingsRoute: typeof AppProfileSettingsRoute
-  AppProfileIndexRoute: typeof AppProfileIndexRoute
+interface GGymSlugAppProfileRouteChildren {
+  GGymSlugAppProfileBookingsRoute: typeof GGymSlugAppProfileBookingsRoute
+  GGymSlugAppProfileChildrenRoute: typeof GGymSlugAppProfileChildrenRoute
+  GGymSlugAppProfileEditRoute: typeof GGymSlugAppProfileEditRoute
+  GGymSlugAppProfileReferralRoute: typeof GGymSlugAppProfileReferralRoute
+  GGymSlugAppProfileSettingsRoute: typeof GGymSlugAppProfileSettingsRoute
+  GGymSlugAppProfileIndexRoute: typeof GGymSlugAppProfileIndexRoute
 }
 
-const AppProfileRouteChildren: AppProfileRouteChildren = {
-  AppProfileBookingsRoute: AppProfileBookingsRoute,
-  AppProfileChildrenRoute: AppProfileChildrenRoute,
-  AppProfileEditRoute: AppProfileEditRoute,
-  AppProfileReferralRoute: AppProfileReferralRoute,
-  AppProfileSettingsRoute: AppProfileSettingsRoute,
-  AppProfileIndexRoute: AppProfileIndexRoute,
+const GGymSlugAppProfileRouteChildren: GGymSlugAppProfileRouteChildren = {
+  GGymSlugAppProfileBookingsRoute: GGymSlugAppProfileBookingsRoute,
+  GGymSlugAppProfileChildrenRoute: GGymSlugAppProfileChildrenRoute,
+  GGymSlugAppProfileEditRoute: GGymSlugAppProfileEditRoute,
+  GGymSlugAppProfileReferralRoute: GGymSlugAppProfileReferralRoute,
+  GGymSlugAppProfileSettingsRoute: GGymSlugAppProfileSettingsRoute,
+  GGymSlugAppProfileIndexRoute: GGymSlugAppProfileIndexRoute,
 }
 
-const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
-  AppProfileRouteChildren,
+const GGymSlugAppProfileRouteWithChildren =
+  GGymSlugAppProfileRoute._addFileChildren(GGymSlugAppProfileRouteChildren)
+
+interface GGymSlugAppRouteChildren {
+  GGymSlugAppBookRoute: typeof GGymSlugAppBookRoute
+  GGymSlugAppCoachesRoute: typeof GGymSlugAppCoachesRoute
+  GGymSlugAppHomeRoute: typeof GGymSlugAppHomeRoute
+  GGymSlugAppLocationRoute: typeof GGymSlugAppLocationRoute
+  GGymSlugAppMembershipRoute: typeof GGymSlugAppMembershipRoute
+  GGymSlugAppNewsRoute: typeof GGymSlugAppNewsRoute
+  GGymSlugAppProfileRoute: typeof GGymSlugAppProfileRouteWithChildren
+}
+
+const GGymSlugAppRouteChildren: GGymSlugAppRouteChildren = {
+  GGymSlugAppBookRoute: GGymSlugAppBookRoute,
+  GGymSlugAppCoachesRoute: GGymSlugAppCoachesRoute,
+  GGymSlugAppHomeRoute: GGymSlugAppHomeRoute,
+  GGymSlugAppLocationRoute: GGymSlugAppLocationRoute,
+  GGymSlugAppMembershipRoute: GGymSlugAppMembershipRoute,
+  GGymSlugAppNewsRoute: GGymSlugAppNewsRoute,
+  GGymSlugAppProfileRoute: GGymSlugAppProfileRouteWithChildren,
+}
+
+const GGymSlugAppRouteWithChildren = GGymSlugAppRoute._addFileChildren(
+  GGymSlugAppRouteChildren,
 )
 
-interface AppRouteChildren {
-  AppBookRoute: typeof AppBookRoute
-  AppCoachesRoute: typeof AppCoachesRoute
-  AppHomeRoute: typeof AppHomeRoute
-  AppLocationRoute: typeof AppLocationRoute
-  AppMembershipRoute: typeof AppMembershipRoute
-  AppNewsRoute: typeof AppNewsRoute
-  AppProfileRoute: typeof AppProfileRouteWithChildren
+interface GGymSlugAdminRouteChildren {
+  GGymSlugAdminMembersIdRoute: typeof GGymSlugAdminMembersIdRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
-  AppBookRoute: AppBookRoute,
-  AppCoachesRoute: AppCoachesRoute,
-  AppHomeRoute: AppHomeRoute,
-  AppLocationRoute: AppLocationRoute,
-  AppMembershipRoute: AppMembershipRoute,
-  AppNewsRoute: AppNewsRoute,
-  AppProfileRoute: AppProfileRouteWithChildren,
+const GGymSlugAdminRouteChildren: GGymSlugAdminRouteChildren = {
+  GGymSlugAdminMembersIdRoute: GGymSlugAdminMembersIdRoute,
 }
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
-
-interface AdminRouteChildren {
-  AdminMembersIdRoute: typeof AdminMembersIdRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminMembersIdRoute: AdminMembersIdRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const GGymSlugAdminRouteWithChildren = GGymSlugAdminRoute._addFileChildren(
+  GGymSlugAdminRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRouteWithChildren,
-  AdminRoute: AdminRouteWithChildren,
-  AuthRoute: AuthRoute,
-  ForgotRoute: ForgotRoute,
-  OnboardingRoute: OnboardingRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  SignupRoute: SignupRoute,
-  StaffLoginRoute: StaffLoginRoute,
   PlatformDashboardRoute: PlatformDashboardRoute,
   PlatformLoginRoute: PlatformLoginRoute,
   PlatformSetupRoute: PlatformSetupRoute,
   PlatformSignupRoute: PlatformSignupRoute,
   PlatformIndexRoute: PlatformIndexRoute,
+  GGymSlugAppRoute: GGymSlugAppRouteWithChildren,
+  GGymSlugAdminRoute: GGymSlugAdminRouteWithChildren,
+  GGymSlugAuthRoute: GGymSlugAuthRoute,
+  GGymSlugForgotRoute: GGymSlugForgotRoute,
+  GGymSlugOnboardingRoute: GGymSlugOnboardingRoute,
+  GGymSlugResetPasswordRoute: GGymSlugResetPasswordRoute,
+  GGymSlugSignupRoute: GGymSlugSignupRoute,
+  GGymSlugStaffLoginRoute: GGymSlugStaffLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
