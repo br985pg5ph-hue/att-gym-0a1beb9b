@@ -5,7 +5,7 @@ import { useGym } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useLang } from "@/lib/providers";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/news")({
+export const Route = createFileRoute("/g/$gymSlug/_app/news")({
   component: NewsPage,
 });
 

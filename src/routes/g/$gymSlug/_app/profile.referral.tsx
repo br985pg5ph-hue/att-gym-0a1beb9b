@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Gift, Copy, ChevronLeft, MessageSquare, Share2 } from "lucide-react";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/referral")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/referral")({
   component: ReferralPage,
 });
 

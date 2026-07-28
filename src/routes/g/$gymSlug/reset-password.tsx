@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/reset-password")({
+export const Route = createFileRoute("/g/$gymSlug/reset-password")({
   ssr: false,
   component: ResetPage,
 });

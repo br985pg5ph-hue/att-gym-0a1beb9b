@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/onboarding")({
+export const Route = createFileRoute("/g/$gymSlug/onboarding")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();

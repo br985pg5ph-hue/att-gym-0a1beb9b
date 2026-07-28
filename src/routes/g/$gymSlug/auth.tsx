@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/auth")({
+export const Route = createFileRoute("/g/$gymSlug/auth")({
   ssr: false,
   component: AuthPage,
 });

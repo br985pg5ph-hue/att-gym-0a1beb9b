@@ -19,7 +19,7 @@ function splitPhone(raw: string): { cc: string; rest: string } {
   return { cc: "+962", rest: raw };
 }
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/children")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/children")({
   validateSearch: (s: Record<string, unknown>) => ({
     new: s.new ? 1 : undefined,
     welcome: s.welcome ? 1 : undefined,

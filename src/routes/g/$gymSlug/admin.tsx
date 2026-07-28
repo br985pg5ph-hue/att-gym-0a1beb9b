@@ -13,7 +13,7 @@ import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut
 import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/admin")({
+export const Route = createFileRoute("/g/$gymSlug/admin")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();

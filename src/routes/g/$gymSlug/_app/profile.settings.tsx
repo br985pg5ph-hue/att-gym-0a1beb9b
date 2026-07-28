@@ -12,7 +12,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/profile/settings")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/settings")({
   component: SettingsPage,
 });
 

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useClassTypeDefs, defsByKey } from "@/lib/classTypes";
 import { useGym } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/g/$gymSlug/_app/book")({
+export const Route = createFileRoute("/g/$gymSlug/_app/book")({
   component: BookPage,
 });
 
