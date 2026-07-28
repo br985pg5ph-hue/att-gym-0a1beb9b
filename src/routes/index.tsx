@@ -1,72 +1,215 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Logo } from "@/components/Logo";
-import { Building2, Users, ShieldCheck } from "lucide-react";
+import {
+  Users,
+  Building2,
+  ShieldCheck,
+  CalendarCheck,
+  CreditCard,
+  BarChart3,
+  Smartphone,
+  Check,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ATT Gym Hub — Gym Management Software" },
-      { name: "description", content: "Booking, memberships and member management for Muay Thai and MMA gyms. One platform, branded for your gym." },
-      { property: "og:title", content: "ATT Gym Hub — Gym Management Software" },
-      { property: "og:description", content: "Booking, memberships and member management for Muay Thai and MMA gyms." },
+      { title: "Nuvo — Gym Management Software for Combat Sports" },
+      {
+        name: "description",
+        content:
+          "Nuvo gives Muay Thai, MMA and functional training gyms a branded member app, class booking, memberships and a full admin dashboard.",
+      },
+      { property: "og:title", content: "Nuvo — Gym Management Software" },
+      {
+        property: "og:description",
+        content: "A branded member app, class booking, memberships and an admin dashboard for your gym.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PlatformHome,
+  component: NuvoHome,
 });
 
+function Wordmark({ className = "" }: { className?: string }) {
+  return (
+    <span className={`font-display tracking-tight ${className}`}>
+      Nuvo<span className="text-primary">.</span>
+    </span>
+  );
+}
+
 const features = [
-  { icon: Users, title: "Member app", body: "Your members book classes, manage memberships and add their kids." },
-  { icon: Building2, title: "Gym dashboard", body: "Timetables, coaches, announcements and member credits in one place." },
-  { icon: ShieldCheck, title: "Your branding", body: "Your logo and colours, your own gym URL, fully isolated data." },
+  { icon: Smartphone, title: "Branded member app", body: "Your logo, your colours, your own gym URL — members book and manage everything from their phone." },
+  { icon: CalendarCheck, title: "Class booking", body: "Capacity-aware timetables, recurring classes, tracks and cancellation rules handled for you." },
+  { icon: CreditCard, title: "Memberships & credits", body: "Group subscriptions, PT session credits, pauses and renewals — managed by your front desk." },
+  { icon: Users, title: "Members & kids", body: "Full member profiles, parent mode for children, referrals and member IDs out of the box." },
+  { icon: BarChart3, title: "Owner dashboard", body: "Daily snapshots, revenue, occupancy, signups and expiring memberships at a glance." },
+  { icon: ShieldCheck, title: "Isolated & secure", body: "Every gym's data is fully separated, with staff and member access enforced at the database." },
 ];
 
-function PlatformHome() {
+const steps = [
+  { n: "01", title: "Sign up your gym", body: "Tell us about your academy and apply for a workspace." },
+  { n: "02", title: "Brand it", body: "Add your logo, colours, hours, location and social links in the setup wizard." },
+  { n: "03", title: "Invite your members", body: "Share your gym link — members sign up, book classes and manage memberships." },
+];
+
+const included = [
+  "Unlimited members",
+  "Unlimited classes & coaches",
+  "Branded member app",
+  "Admin dashboard & reporting",
+  "Kids & parent accounts",
+  "Referral programme",
+];
+
+function NuvoHome() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-6 py-16">
-        <div className="flex flex-col items-center text-center">
-          <Logo size={96} />
-          <h1 className="font-display mt-6 text-5xl leading-none">ATT Gym Hub</h1>
-          <p className="mt-3 max-w-md text-sm text-muted-foreground">
-            Gym management software for Muay Thai and MMA academies — bookings, memberships,
-            coaches and members, branded for your gym.
-          </p>
-          <div className="mt-8 flex w-full max-w-sm flex-col gap-3">
+      <header className="sticky top-0 z-30 border-b hairline bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Wordmark className="text-2xl" />
+          <nav className="hidden items-center gap-6 text-xs font-semibold text-muted-foreground sm:flex">
+            <a href="#features" className="hover:text-foreground">Features</a>
+            <a href="#how" className="hover:text-foreground">How it works</a>
+            <a href="#pricing" className="hover:text-foreground">Pricing</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/platform/login"
+              className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
+            >
+              Access portal
+            </Link>
             <Link
               to="/platform/signup"
-              className="flex w-full items-center justify-center rounded-pill bg-primary py-3.5 text-sm font-semibold text-primary-foreground"
+              className="hidden rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:block"
+            >
+              Sign up your gym
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        {/* Hero */}
+        <section className="mx-auto max-w-6xl px-6 pt-20 pb-16 text-center">
+          <span className="inline-flex items-center rounded-pill border hairline bg-card px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Gym management platform
+          </span>
+          <h1 className="font-display mx-auto mt-6 max-w-3xl text-5xl leading-[0.95] sm:text-7xl">
+            Run your gym. <span className="text-primary">Nuvo</span> runs everything else.
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-sm text-muted-foreground sm:text-base">
+            Nuvo is the all-in-one platform for Muay Thai, MMA and functional training academies —
+            a branded app for your members and a powerful dashboard for your team.
+          </p>
+          <div className="mx-auto mt-9 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              to="/platform/signup"
+              className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
               Sign up your gym
             </Link>
             <Link
-              to="/platform"
-              className="flex w-full items-center justify-center rounded-pill border hairline bg-card py-3.5 text-sm font-semibold"
+              to="/platform/login"
+              className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
-              Platform portal
+              Access portal
             </Link>
           </div>
-        </div>
+        </section>
 
-        <div className="mt-16 grid gap-4 sm:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="card-surface p-5">
-              <f.icon size={20} className="text-primary" />
-              <h2 className="font-display mt-3 text-xl">{f.title}</h2>
-              <p className="mt-1 text-xs text-muted-foreground">{f.body}</p>
+        {/* Features */}
+        <section id="features" className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="font-display text-3xl sm:text-4xl">Everything a modern academy needs</h2>
+          <p className="mt-2 max-w-lg text-sm text-muted-foreground">
+            One platform for bookings, memberships, coaches, members and insights.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f) => (
+              <div key={f.title} className="card-surface p-6">
+                <f.icon size={20} className="text-primary" />
+                <h3 className="font-display mt-4 text-xl">{f.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how" className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="font-display text-3xl sm:text-4xl">Live in three steps</h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {steps.map((s) => (
+              <div key={s.n} className="card-surface p-6">
+                <span className="font-display text-3xl text-primary">{s.n}</span>
+                <h3 className="font-display mt-3 text-xl">{s.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Pricing / included */}
+        <section id="pricing" className="mx-auto max-w-6xl px-6 py-16">
+          <div className="card-surface grid gap-8 p-8 sm:p-10 lg:grid-cols-2">
+            <div>
+              <h2 className="font-display text-3xl sm:text-4xl">One plan, everything included</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No per-feature upsells. Every gym on Nuvo gets the full platform, branded as their own.
+              </p>
+              <Link
+                to="/platform/signup"
+                className="mt-7 inline-flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
+              >
+                Sign up your gym
+              </Link>
             </div>
-          ))}
-        </div>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:content-center">
+              {included.map((i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <Check size={16} className="shrink-0 text-primary" />
+                  {i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
 
-        <p className="mt-16 text-center text-xs text-muted-foreground">
-          Already a member of a gym? Open the link your gym gave you, or{" "}
-          <Link to="/g/$gymSlug" params={{ gymSlug: "att-academy" }} className="font-semibold text-primary">
-            go to ATT Academy
-          </Link>
-          .
-        </p>
-      </div>
+        {/* Final CTA */}
+        <section className="mx-auto max-w-6xl px-6 py-16 text-center">
+          <Building2 size={22} className="mx-auto text-primary" />
+          <h2 className="font-display mt-4 text-4xl sm:text-5xl">Ready to move your gym to Nuvo?</h2>
+          <div className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              to="/platform/signup"
+              className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
+            >
+              Sign up your gym
+            </Link>
+            <Link
+              to="/platform/login"
+              className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
+            >
+              Access portal
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t hairline">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
+          <Wordmark className="text-xl text-foreground" />
+          <p>
+            Already a member of a gym? Open the link your gym gave you, or{" "}
+            <Link to="/g/$gymSlug" params={{ gymSlug: "att-academy" }} className="font-semibold text-primary">
+              go to ATT Academy
+            </Link>
+            .
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

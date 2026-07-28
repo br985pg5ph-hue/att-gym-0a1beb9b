@@ -29,7 +29,7 @@ function UnknownGym() {
         This gym link isn't valid, or the gym is no longer on the platform.
       </p>
       <Link to="/" className="mt-6 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
-        Go to ATT Gym Hub
+        Go to Nuvo
       </Link>
     </div>
   );
