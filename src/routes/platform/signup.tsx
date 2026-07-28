@@ -138,7 +138,7 @@ function PlatformSignup() {
       </form>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Already have an account? <Link to="/platform/login" className="font-semibold text-primary">Gym owner login</Link>
+        Already have an account? <Link to="/platform/login" className="font-semibold text-primary">portal login</Link>
       </p>
       <p className="mt-2 text-center text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">← Back</Link>
