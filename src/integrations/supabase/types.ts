@@ -19,6 +19,7 @@ export type Database = {
           author_id: string | null
           body: string
           created_at: string
+          gym_id: string
           id: string
           tag: string
           title: string
@@ -27,6 +28,7 @@ export type Database = {
           author_id?: string | null
           body: string
           created_at?: string
+          gym_id: string
           id?: string
           tag?: string
           title: string
@@ -35,17 +37,27 @@ export type Database = {
           author_id?: string | null
           body?: string
           created_at?: string
+          gym_id?: string
           id?: string
           tag?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "announcements_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookings: {
         Row: {
           child_id: string | null
           class_id: string
           created_at: string
+          gym_id: string
           id: string
           member_id: string
           status: Database["public"]["Enums"]["booking_status"]
@@ -54,6 +66,7 @@ export type Database = {
           child_id?: string | null
           class_id: string
           created_at?: string
+          gym_id: string
           id?: string
           member_id: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -62,6 +75,7 @@ export type Database = {
           child_id?: string | null
           class_id?: string
           created_at?: string
+          gym_id?: string
           id?: string
           member_id?: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -81,6 +95,13 @@ export type Database = {
             referencedRelation: "classes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "bookings_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
         ]
       }
       children: {
@@ -96,6 +117,7 @@ export type Database = {
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
+          gym_id: string
           id: string
           injuries_notes: string | null
           name: string
@@ -116,6 +138,7 @@ export type Database = {
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
           group_track?: string | null
+          gym_id: string
           id?: string
           injuries_notes?: string | null
           name: string
@@ -136,6 +159,7 @@ export type Database = {
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
           group_track?: string | null
+          gym_id?: string
           id?: string
           injuries_notes?: string | null
           name?: string
@@ -145,6 +169,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "children_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "children_parent_id_fkey"
             columns: ["parent_id"]
@@ -160,6 +191,7 @@ export type Database = {
           created_at: string
           credit_source: string
           gender_restriction: string
+          gym_id: string
           is_builtin: boolean
           key: string
           kids_only: boolean
@@ -173,6 +205,7 @@ export type Database = {
           created_at?: string
           credit_source?: string
           gender_restriction?: string
+          gym_id: string
           is_builtin?: boolean
           key: string
           kids_only?: boolean
@@ -186,6 +219,7 @@ export type Database = {
           created_at?: string
           credit_source?: string
           gender_restriction?: string
+          gym_id?: string
           is_builtin?: boolean
           key?: string
           kids_only?: boolean
@@ -194,7 +228,15 @@ export type Database = {
           track_restricted?: boolean
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "class_type_defs_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       classes: {
         Row: {
@@ -203,6 +245,7 @@ export type Database = {
           coach_id: string | null
           created_at: string
           duration_min: number
+          gym_id: string
           id: string
           starts_at: string
           title: string | null
@@ -214,6 +257,7 @@ export type Database = {
           coach_id?: string | null
           created_at?: string
           duration_min?: number
+          gym_id: string
           id?: string
           starts_at: string
           title?: string | null
@@ -225,6 +269,7 @@ export type Database = {
           coach_id?: string | null
           created_at?: string
           duration_min?: number
+          gym_id?: string
           id?: string
           starts_at?: string
           title?: string | null
@@ -239,11 +284,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "classes_type_fkey"
-            columns: ["type"]
+            foreignKeyName: "classes_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_gym_type_fkey"
+            columns: ["gym_id", "type"]
             isOneToOne: false
             referencedRelation: "class_type_defs"
-            referencedColumns: ["key"]
+            referencedColumns: ["gym_id", "key"]
           },
         ]
       }
@@ -251,6 +303,7 @@ export type Database = {
         Row: {
           bio: string
           created_at: string
+          gym_id: string
           id: string
           name: string
           photo_url: string | null
@@ -260,6 +313,7 @@ export type Database = {
         Insert: {
           bio?: string
           created_at?: string
+          gym_id: string
           id?: string
           name: string
           photo_url?: string | null
@@ -269,13 +323,22 @@ export type Database = {
         Update: {
           bio?: string
           created_at?: string
+          gym_id?: string
           id?: string
           name?: string
           photo_url?: string | null
           sort_order?: number
           specialty?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coaches_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gym_info: {
         Row: {
@@ -316,6 +379,66 @@ export type Database = {
         }
         Relationships: []
       }
+      gyms: {
+        Row: {
+          address: string
+          created_at: string
+          hours: Json
+          id: string
+          instagram_url: string | null
+          lat: number
+          lng: number
+          logo_url: string | null
+          maps_url: string | null
+          name: string
+          phone: string
+          primary_color: string | null
+          secondary_color: string | null
+          slug: string
+          status: string
+          theme: Json
+          whatsapp_number: string | null
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          hours?: Json
+          id?: string
+          instagram_url?: string | null
+          lat?: number
+          lng?: number
+          logo_url?: string | null
+          maps_url?: string | null
+          name: string
+          phone?: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug: string
+          status?: string
+          theme?: Json
+          whatsapp_number?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          hours?: Json
+          id?: string
+          instagram_url?: string | null
+          lat?: number
+          lng?: number
+          logo_url?: string | null
+          maps_url?: string | null
+          name?: string
+          phone?: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string
+          status?: string
+          theme?: Json
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -329,10 +452,12 @@ export type Database = {
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
+          gym_id: string
           id: string
           injuries: string | null
           interests: string[]
           is_parent: boolean
+          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -361,10 +486,12 @@ export type Database = {
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
           group_track?: string | null
+          gym_id: string
           id: string
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
+          is_platform_admin?: boolean
           member_code: string
           membership_pause_days_used?: number
           membership_paused_at?: string | null
@@ -393,10 +520,12 @@ export type Database = {
           group_subscription_started_at?: string | null
           group_subscription_until?: string | null
           group_track?: string | null
+          gym_id?: string
           id?: string
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
+          is_platform_admin?: boolean
           member_code?: string
           membership_pause_days_used?: number
           membership_paused_at?: string | null
@@ -415,6 +544,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "profiles_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "profiles_referred_by_fkey"
             columns: ["referred_by"]
             isOneToOne: false
@@ -431,6 +567,7 @@ export type Database = {
           created_by: string | null
           days: number | null
           description: string | null
+          gym_id: string
           id: string
           member_id: string
           payment_method: Database["public"]["Enums"]["payment_method"] | null
@@ -445,6 +582,7 @@ export type Database = {
           created_by?: string | null
           days?: number | null
           description?: string | null
+          gym_id: string
           id?: string
           member_id: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
@@ -459,6 +597,7 @@ export type Database = {
           created_by?: string | null
           days?: number | null
           description?: string | null
+          gym_id?: string
           id?: string
           member_id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
@@ -474,6 +613,13 @@ export type Database = {
             referencedRelation: "children"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -481,6 +627,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_gym_id: { Args: never; Returns: string }
       get_referral_stats: {
         Args: never
         Returns: {
@@ -495,6 +642,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_platform_admin: { Args: never; Returns: boolean }
       pause_membership: {
         Args: { target_user: string }
         Returns: {
@@ -509,10 +657,12 @@ export type Database = {
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
+          gym_id: string
           id: string
           injuries: string | null
           interests: string[]
           is_parent: boolean
+          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -550,10 +700,12 @@ export type Database = {
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
+          gym_id: string
           id: string
           injuries: string | null
           interests: string[]
           is_parent: boolean
+          is_platform_admin: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
@@ -577,6 +729,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      same_gym: { Args: { _gym_id: string }; Returns: boolean }
       set_group_track: {
         Args: { target_child: string; target_user: string; track: string }
         Returns: undefined

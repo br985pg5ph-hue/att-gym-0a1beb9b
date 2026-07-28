@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useGym } from "@/lib/gym";
 
 export type ClassTypeDef = {
   key: string;
@@ -15,10 +16,17 @@ export type ClassTypeDef = {
 
 export function useClassTypeDefs(opts: { onlyActive?: boolean } = {}) {
   const { onlyActive = true } = opts;
+  const { gymId } = useGym();
   return useQuery({
-    queryKey: ["class-type-defs", { onlyActive }],
+    queryKey: ["class-type-defs", gymId, { onlyActive }],
+    enabled: !!gymId,
     queryFn: async (): Promise<ClassTypeDef[]> => {
-      let q = supabase.from("class_type_defs" as any).select("*").order("sort_order").order("label");
+      let q = supabase
+        .from("class_type_defs" as any)
+        .select("*")
+        .eq("gym_id", gymId!)
+        .order("sort_order")
+        .order("label");
       if (onlyActive) q = q.eq("active", true);
       const { data, error } = await q;
       if (error) throw error;

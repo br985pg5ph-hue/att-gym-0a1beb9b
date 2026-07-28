@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
+import { useGym } from "@/lib/gym";
 import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
@@ -420,16 +421,18 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
 function AnnouncementsAdmin() {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { gymId } = useGym();
   const [tag, setTag] = useState("News");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const { data = [] } = useQuery({
-    queryKey: ["admin-announcements"],
-    queryFn: async () => (await supabase.from("announcements").select("*").order("created_at", { ascending: false })).data ?? [],
+    queryKey: ["admin-announcements", gymId],
+    enabled: !!gymId,
+    queryFn: async () => (await supabase.from("announcements").select("*").eq("gym_id", gymId!).order("created_at", { ascending: false })).data ?? [],
   });
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("announcements").insert({ tag, title, body, author_id: user!.id });
+      const { error } = await supabase.from("announcements").insert({ tag, title, body, author_id: user!.id, gym_id: gymId! });
       if (error) throw error;
     },
     onSuccess: () => { setTitle(""); setBody(""); toast.success("Posted"); qc.invalidateQueries({ queryKey: ["admin-announcements"] }); qc.invalidateQueries({ queryKey: ["announcements"] }); },
@@ -499,11 +502,14 @@ function ClassesAdmin() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const nowIso = new Date().toISOString();
+  const { gymId } = useGym();
   const { data: classes = [], isLoading } = useQuery({
-    queryKey: ["admin-classes", view],
+    queryKey: ["admin-classes", view, gymId],
+    enabled: !!gymId,
     queryFn: async () => {
       let q = supabase.from("classes")
-        .select("id, type, title, starts_at, capacity, coach_id, cancelled_at, coaches(name), bookings(id, status, member_id, child_id, children(name))");
+        .select("id, type, title, starts_at, capacity, coach_id, cancelled_at, coaches(name), bookings(id, status, member_id, child_id, children(name))")
+        .eq("gym_id", gymId!);
       if (view === "upcoming") q = q.gte("starts_at", nowIso).is("cancelled_at", null).order("starts_at", { ascending: true });
       else if (view === "past") q = q.lt("starts_at", nowIso).is("cancelled_at", null).order("starts_at", { ascending: false });
       else q = q.not("cancelled_at", "is", null).order("cancelled_at", { ascending: false });
@@ -512,7 +518,7 @@ function ClassesAdmin() {
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
       let nameMap: Record<string, string> = {};
       if (memberIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, name").in("id", memberIds);
+        const { data: profs } = await supabase.from("profiles").select("id, name").eq("gym_id", gymId!).in("id", memberIds);
         nameMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.name]));
       }
       return list.map((c: any) => ({
@@ -522,7 +528,8 @@ function ClassesAdmin() {
     },
   });
   const { data: coaches = [] } = useQuery({
-    queryKey: ["coaches"], queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [],
+    queryKey: ["coaches", gymId], enabled: !!gymId,
+    queryFn: async () => (await supabase.from("coaches").select("*").eq("gym_id", gymId!).order("sort_order")).data ?? [],
   });
 
   const invalidateAll = () => {
@@ -552,7 +559,7 @@ function ClassesAdmin() {
         const rows: any[] = [];
         let cur = start;
         while (cur <= end && rows.length < 200) {
-          rows.push({ type, coach_id: coachId || null, title, starts_at: cur.toISOString(), capacity });
+          rows.push({ type, coach_id: coachId || null, title, starts_at: cur.toISOString(), capacity, gym_id: gymId! });
           cur = addAmmanDays(cur, stepDays);
         }
         if (rows.length === 0) throw new Error("No classes generated for the selected range");
@@ -561,7 +568,7 @@ function ClassesAdmin() {
         return rows.length;
       }
 
-      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: start.toISOString(), capacity });
+      const { error } = await supabase.from("classes").insert({ type, coach_id: coachId || null, title, starts_at: start.toISOString(), capacity, gym_id: gymId! });
       if (error) throw error;
       return 1;
     },
@@ -963,10 +970,11 @@ function CoachesAdmin() {
   const qc = useQueryClient();
   const [name, setName] = useState(""); const [specialty, setSpecialty] = useState("");
   const [bio, setBio] = useState(""); const [photoUrl, setPhotoUrl] = useState("");
-  const { data = [] } = useQuery({ queryKey: ["coaches"], queryFn: async () => (await supabase.from("coaches").select("*").order("sort_order")).data ?? [] });
+  const { gymId } = useGym();
+  const { data = [] } = useQuery({ queryKey: ["coaches", gymId], enabled: !!gymId, queryFn: async () => (await supabase.from("coaches").select("*").eq("gym_id", gymId!).order("sort_order")).data ?? [] });
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("coaches").insert({ name, specialty, bio, photo_url: photoUrl || null });
+      const { error } = await supabase.from("coaches").insert({ name, specialty, bio, photo_url: photoUrl || null, gym_id: gymId! });
       if (error) throw error;
     },
     onSuccess: () => { setName(""); setSpecialty(""); setBio(""); setPhotoUrl(""); toast.success("Added"); qc.invalidateQueries({ queryKey: ["coaches"] }); },
@@ -1019,11 +1027,14 @@ function MembersAdmin() {
   const qc = useQueryClient();
   const { user } = useAuth();
   const { t } = useLang();
+  const { gymId } = useGym();
   const { data = [] } = useQuery({
-    queryKey: ["admin-members"],
+    queryKey: ["admin-members", gymId],
+    enabled: !!gymId,
     queryFn: async () => (await supabase.from("profiles")
       .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
       .eq("role", "member")
+      .eq("gym_id", gymId!)
       .order("name")).data ?? [],
   });
   const [search, setSearch] = useState("");
@@ -1153,10 +1164,7 @@ function MembersAdmin() {
 
 function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const qc = useQueryClient();
-  const { data: gym, isLoading } = useQuery({
-    queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
-  });
+  const { gym, gymId, isLoading } = useGym();
   const [form, setForm] = useState<{ name: string; address: string; phone: string; instagram_url: string; whatsapp_number: string; maps_url: string; lat: string; lng: string }>({
     name: "", address: "", phone: "", instagram_url: "", whatsapp_number: "", maps_url: "", lat: "", lng: "",
   });
@@ -1186,7 +1194,7 @@ function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
         lat: form.lat ? Number(form.lat) : null,
         lng: form.lng ? Number(form.lng) : null,
       };
-      const { error } = await supabase.from("gym_info").update(payload).eq("id", 1);
+      const { error } = await supabase.from("gyms").update(payload).eq("id", gymId!);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Gym info updated"); qc.invalidateQueries({ queryKey: ["gym"] }); },
@@ -1245,6 +1253,7 @@ function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
 
 function ClassTypesAdmin() {
   const qc = useQueryClient();
+  const { gymId } = useGym();
   const { data: defs = [], isLoading } = useClassTypeDefs({ onlyActive: false });
   const [showForm, setShowForm] = useState(false);
   const empty = { key: "", label: "", gender_restriction: "none", credit_source: "group", kids_only: false, track_restricted: false, sort_order: 100 } as {
@@ -1271,7 +1280,7 @@ function ClassTypesAdmin() {
           kids_only: form.kids_only,
           track_restricted: form.track_restricted,
           sort_order: form.sort_order,
-        }).eq("key", editingKey);
+        }).eq("gym_id", gymId!).eq("key", editingKey);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("class_type_defs" as any).insert({
@@ -1284,6 +1293,7 @@ function ClassTypesAdmin() {
           sort_order: form.sort_order,
           is_builtin: false,
           active: true,
+          gym_id: gymId!,
         });
         if (error) throw error;
       }
@@ -1294,7 +1304,7 @@ function ClassTypesAdmin() {
 
   const toggleActive = useMutation({
     mutationFn: async (d: ClassTypeDef) => {
-      const { error } = await supabase.from("class_type_defs" as any).update({ active: !d.active }).eq("key", d.key);
+      const { error } = await supabase.from("class_type_defs" as any).update({ active: !d.active }).eq("gym_id", gymId!).eq("key", d.key);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Updated"); invalidate(); },
@@ -1304,7 +1314,7 @@ function ClassTypesAdmin() {
   const remove = useMutation({
     mutationFn: async (d: ClassTypeDef) => {
       if (!confirm(`Delete class type "${d.label}"? Existing classes using it will keep the type but new bookings will fail. Consider hiding instead.`)) return;
-      const { error } = await supabase.from("class_type_defs" as any).delete().eq("key", d.key);
+      const { error } = await supabase.from("class_type_defs" as any).delete().eq("gym_id", gymId!).eq("key", d.key);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Deleted"); invalidate(); },
