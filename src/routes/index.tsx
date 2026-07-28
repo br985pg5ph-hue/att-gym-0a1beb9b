@@ -76,10 +76,10 @@ function NuvoHome() {
           </nav>
           <div className="flex items-center gap-2">
             <Link
-              to="/platform/login"
+              to="/g/att-academy/admin"
               className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
             >
-              Access portal
+              Portal login
             </Link>
             <Link
               to="/platform/signup"
