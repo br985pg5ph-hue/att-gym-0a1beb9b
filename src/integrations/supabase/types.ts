@@ -340,45 +340,6 @@ export type Database = {
           },
         ]
       }
-      gym_info: {
-        Row: {
-          address: string
-          hours: Json
-          id: number
-          instagram_url: string | null
-          lat: number
-          lng: number
-          maps_url: string | null
-          name: string
-          phone: string
-          whatsapp_number: string | null
-        }
-        Insert: {
-          address: string
-          hours?: Json
-          id?: number
-          instagram_url?: string | null
-          lat: number
-          lng: number
-          maps_url?: string | null
-          name?: string
-          phone: string
-          whatsapp_number?: string | null
-        }
-        Update: {
-          address?: string
-          hours?: Json
-          id?: number
-          instagram_url?: string | null
-          lat?: number
-          lng?: number
-          maps_url?: string | null
-          name?: string
-          phone?: string
-          whatsapp_number?: string | null
-        }
-        Relationships: []
-      }
       gyms: {
         Row: {
           address: string
