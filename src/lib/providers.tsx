@@ -13,7 +13,7 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict 
 // ---------- AUTH ----------
 type Profile = {
   id: string; name: string; phone: string | null; avatar_url: string | null;
-  role: "member" | "staff"; membership_status: string;
+  role: "member" | "staff" | "admin" | "owner"; membership_status: string;
   referral_code: string; member_code: string; streak: number; classes_attended: number;
   pt_sessions_remaining: number; group_subscription_until: string | null;
   interests: string[];
@@ -21,7 +21,6 @@ type Profile = {
   membership_paused_at: string | null;
   tour_completed_at: string | null;
   gender: "male" | "female" | null;
-  is_platform_admin: boolean;
 };
 
 export type Child = {

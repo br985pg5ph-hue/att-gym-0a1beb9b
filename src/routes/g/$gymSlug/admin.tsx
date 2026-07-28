@@ -19,7 +19,7 @@ export const Route = createFileRoute("/g/$gymSlug/admin")({
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
     const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
-    if (prof?.role !== "staff") throw redirect({ to: gp("/home") });
+    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) throw redirect({ to: gp("/home") });
     const gym = await fetchGym(params.gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();

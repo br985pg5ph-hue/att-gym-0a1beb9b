@@ -31,7 +31,7 @@ function StaffLoginPage() {
       .select("role, gym_id")
       .eq("id", data.user.id)
       .maybeSingle();
-    if (prof?.role !== "staff") {
+    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) {
       await supabase.auth.signOut();
       setLoading(false);
       toast.error("This account doesn't have staff access");
