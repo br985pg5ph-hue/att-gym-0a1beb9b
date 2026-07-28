@@ -15,6 +15,7 @@ import { Route as PlatformSignupRouteImport } from './routes/platform/signup'
 import { Route as PlatformSetupRouteImport } from './routes/platform/setup'
 import { Route as PlatformLoginRouteImport } from './routes/platform/login'
 import { Route as PlatformDashboardRouteImport } from './routes/platform/dashboard'
+import { Route as GGymSlugRouteRouteImport } from './routes/g/$gymSlug/route'
 import { Route as GGymSlugStaffLoginRouteImport } from './routes/g/$gymSlug/staff-login'
 import { Route as GGymSlugSignupRouteImport } from './routes/g/$gymSlug/signup'
 import { Route as GGymSlugResetPasswordRouteImport } from './routes/g/$gymSlug/reset-password'
@@ -68,45 +69,49 @@ const PlatformDashboardRoute = PlatformDashboardRouteImport.update({
   path: '/platform/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GGymSlugStaffLoginRoute = GGymSlugStaffLoginRouteImport.update({
-  id: '/g/$gymSlug/staff-login',
-  path: '/g/$gymSlug/staff-login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugSignupRoute = GGymSlugSignupRouteImport.update({
-  id: '/g/$gymSlug/signup',
-  path: '/g/$gymSlug/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugResetPasswordRoute = GGymSlugResetPasswordRouteImport.update({
-  id: '/g/$gymSlug/reset-password',
-  path: '/g/$gymSlug/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugOnboardingRoute = GGymSlugOnboardingRouteImport.update({
-  id: '/g/$gymSlug/onboarding',
-  path: '/g/$gymSlug/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugForgotRoute = GGymSlugForgotRouteImport.update({
-  id: '/g/$gymSlug/forgot',
-  path: '/g/$gymSlug/forgot',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugAuthRoute = GGymSlugAuthRouteImport.update({
-  id: '/g/$gymSlug/auth',
-  path: '/g/$gymSlug/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugAdminRoute = GGymSlugAdminRouteImport.update({
-  id: '/g/$gymSlug/admin',
-  path: '/g/$gymSlug/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GGymSlugAppRoute = GGymSlugAppRouteImport.update({
-  id: '/g/$gymSlug/_app',
+const GGymSlugRouteRoute = GGymSlugRouteRouteImport.update({
+  id: '/g/$gymSlug',
   path: '/g/$gymSlug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GGymSlugStaffLoginRoute = GGymSlugStaffLoginRouteImport.update({
+  id: '/staff-login',
+  path: '/staff-login',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugSignupRoute = GGymSlugSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugResetPasswordRoute = GGymSlugResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugOnboardingRoute = GGymSlugOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugForgotRoute = GGymSlugForgotRouteImport.update({
+  id: '/forgot',
+  path: '/forgot',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugAuthRoute = GGymSlugAuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugAdminRoute = GGymSlugAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => GGymSlugRouteRoute,
+} as any)
+const GGymSlugAppRoute = GGymSlugAppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => GGymSlugRouteRoute,
 } as any)
 const GGymSlugAppProfileRoute = GGymSlugAppProfileRouteImport.update({
   id: '/profile',
@@ -185,12 +190,12 @@ const GGymSlugAppProfileBookingsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
   '/platform/signup': typeof PlatformSignupRoute
   '/platform/': typeof PlatformIndexRoute
-  '/g/$gymSlug': typeof GGymSlugAppRouteWithChildren
   '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
   '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
   '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
@@ -215,12 +220,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
   '/platform/signup': typeof PlatformSignupRoute
   '/platform': typeof PlatformIndexRoute
-  '/g/$gymSlug': typeof GGymSlugAppRouteWithChildren
   '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
   '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
   '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
@@ -245,6 +250,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
   '/platform/dashboard': typeof PlatformDashboardRoute
   '/platform/login': typeof PlatformLoginRoute
   '/platform/setup': typeof PlatformSetupRoute
@@ -277,12 +283,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/g/$gymSlug'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
     | '/platform/signup'
     | '/platform/'
-    | '/g/$gymSlug'
     | '/g/$gymSlug/admin'
     | '/g/$gymSlug/auth'
     | '/g/$gymSlug/forgot'
@@ -307,12 +313,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/g/$gymSlug'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
     | '/platform/signup'
     | '/platform'
-    | '/g/$gymSlug'
     | '/g/$gymSlug/admin'
     | '/g/$gymSlug/auth'
     | '/g/$gymSlug/forgot'
@@ -336,6 +342,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/g/$gymSlug'
     | '/platform/dashboard'
     | '/platform/login'
     | '/platform/setup'
@@ -367,19 +374,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GGymSlugRouteRoute: typeof GGymSlugRouteRouteWithChildren
   PlatformDashboardRoute: typeof PlatformDashboardRoute
   PlatformLoginRoute: typeof PlatformLoginRoute
   PlatformSetupRoute: typeof PlatformSetupRoute
   PlatformSignupRoute: typeof PlatformSignupRoute
   PlatformIndexRoute: typeof PlatformIndexRoute
-  GGymSlugAppRoute: typeof GGymSlugAppRouteWithChildren
-  GGymSlugAdminRoute: typeof GGymSlugAdminRouteWithChildren
-  GGymSlugAuthRoute: typeof GGymSlugAuthRoute
-  GGymSlugForgotRoute: typeof GGymSlugForgotRoute
-  GGymSlugOnboardingRoute: typeof GGymSlugOnboardingRoute
-  GGymSlugResetPasswordRoute: typeof GGymSlugResetPasswordRoute
-  GGymSlugSignupRoute: typeof GGymSlugSignupRoute
-  GGymSlugStaffLoginRoute: typeof GGymSlugStaffLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -426,61 +426,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlatformDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/g/$gymSlug': {
+      id: '/g/$gymSlug'
+      path: '/g/$gymSlug'
+      fullPath: '/g/$gymSlug'
+      preLoaderRoute: typeof GGymSlugRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/g/$gymSlug/staff-login': {
       id: '/g/$gymSlug/staff-login'
-      path: '/g/$gymSlug/staff-login'
+      path: '/staff-login'
       fullPath: '/g/$gymSlug/staff-login'
       preLoaderRoute: typeof GGymSlugStaffLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/signup': {
       id: '/g/$gymSlug/signup'
-      path: '/g/$gymSlug/signup'
+      path: '/signup'
       fullPath: '/g/$gymSlug/signup'
       preLoaderRoute: typeof GGymSlugSignupRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/reset-password': {
       id: '/g/$gymSlug/reset-password'
-      path: '/g/$gymSlug/reset-password'
+      path: '/reset-password'
       fullPath: '/g/$gymSlug/reset-password'
       preLoaderRoute: typeof GGymSlugResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/onboarding': {
       id: '/g/$gymSlug/onboarding'
-      path: '/g/$gymSlug/onboarding'
+      path: '/onboarding'
       fullPath: '/g/$gymSlug/onboarding'
       preLoaderRoute: typeof GGymSlugOnboardingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/forgot': {
       id: '/g/$gymSlug/forgot'
-      path: '/g/$gymSlug/forgot'
+      path: '/forgot'
       fullPath: '/g/$gymSlug/forgot'
       preLoaderRoute: typeof GGymSlugForgotRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/auth': {
       id: '/g/$gymSlug/auth'
-      path: '/g/$gymSlug/auth'
+      path: '/auth'
       fullPath: '/g/$gymSlug/auth'
       preLoaderRoute: typeof GGymSlugAuthRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/admin': {
       id: '/g/$gymSlug/admin'
-      path: '/g/$gymSlug/admin'
+      path: '/admin'
       fullPath: '/g/$gymSlug/admin'
       preLoaderRoute: typeof GGymSlugAdminRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/_app': {
       id: '/g/$gymSlug/_app'
-      path: '/g/$gymSlug'
+      path: ''
       fullPath: '/g/$gymSlug'
       preLoaderRoute: typeof GGymSlugAppRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GGymSlugRouteRoute
     }
     '/g/$gymSlug/_app/profile': {
       id: '/g/$gymSlug/_app/profile'
@@ -640,13 +647,18 @@ const GGymSlugAdminRouteWithChildren = GGymSlugAdminRoute._addFileChildren(
   GGymSlugAdminRouteChildren,
 )
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PlatformDashboardRoute: PlatformDashboardRoute,
-  PlatformLoginRoute: PlatformLoginRoute,
-  PlatformSetupRoute: PlatformSetupRoute,
-  PlatformSignupRoute: PlatformSignupRoute,
-  PlatformIndexRoute: PlatformIndexRoute,
+interface GGymSlugRouteRouteChildren {
+  GGymSlugAppRoute: typeof GGymSlugAppRouteWithChildren
+  GGymSlugAdminRoute: typeof GGymSlugAdminRouteWithChildren
+  GGymSlugAuthRoute: typeof GGymSlugAuthRoute
+  GGymSlugForgotRoute: typeof GGymSlugForgotRoute
+  GGymSlugOnboardingRoute: typeof GGymSlugOnboardingRoute
+  GGymSlugResetPasswordRoute: typeof GGymSlugResetPasswordRoute
+  GGymSlugSignupRoute: typeof GGymSlugSignupRoute
+  GGymSlugStaffLoginRoute: typeof GGymSlugStaffLoginRoute
+}
+
+const GGymSlugRouteRouteChildren: GGymSlugRouteRouteChildren = {
   GGymSlugAppRoute: GGymSlugAppRouteWithChildren,
   GGymSlugAdminRoute: GGymSlugAdminRouteWithChildren,
   GGymSlugAuthRoute: GGymSlugAuthRoute,
@@ -655,6 +667,20 @@ const rootRouteChildren: RootRouteChildren = {
   GGymSlugResetPasswordRoute: GGymSlugResetPasswordRoute,
   GGymSlugSignupRoute: GGymSlugSignupRoute,
   GGymSlugStaffLoginRoute: GGymSlugStaffLoginRoute,
+}
+
+const GGymSlugRouteRouteWithChildren = GGymSlugRouteRoute._addFileChildren(
+  GGymSlugRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  GGymSlugRouteRoute: GGymSlugRouteRouteWithChildren,
+  PlatformDashboardRoute: PlatformDashboardRoute,
+  PlatformLoginRoute: PlatformLoginRoute,
+  PlatformSetupRoute: PlatformSetupRoute,
+  PlatformSignupRoute: PlatformSignupRoute,
+  PlatformIndexRoute: PlatformIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
