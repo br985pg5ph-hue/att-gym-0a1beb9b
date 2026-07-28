@@ -22,12 +22,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
     if (!isStaff) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { resolveGymId } = await import("@/lib/gym.server");
-    const gymId = await resolveGymId();
 
+    // The caller's own gym is the tenant — never trust a client-supplied slug here.
     const { data: callerProfile } = await context.supabase
       .from("profiles").select("gym_id").eq("id", context.userId).maybeSingle();
-    if (callerProfile?.gym_id !== gymId) throw new Error("Forbidden");
+    const gymId = callerProfile?.gym_id;
+    if (!gymId) throw new Error("Forbidden");
+
 
     const now = ammanNow();
     const todayStart = startOfDayInAmman(now).toISOString();

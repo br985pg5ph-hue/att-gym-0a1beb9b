@@ -5,8 +5,9 @@ import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { toast } from "sonner";
 import { ChevronLeft, User } from "lucide-react";
+import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/_app/profile/bookings")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/bookings")({
   component: BookingsPage,
 });
 
@@ -44,7 +45,7 @@ function BookingsPage() {
   return (
     <div>
       <div className="flex items-center gap-2 px-3 pt-4">
-        <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
+        <Link to={gp("/profile")} className="grid h-9 w-9 place-items-center rounded-pill hover:bg-muted"><ChevronLeft size={20} className="flip-rtl" /></Link>
       </div>
       <PageHeader title={t.myBookings} />
 

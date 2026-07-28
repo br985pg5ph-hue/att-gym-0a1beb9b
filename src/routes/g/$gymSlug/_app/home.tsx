@@ -4,10 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User, Users, ShieldCheck, ShieldAlert } from "lucide-react";
 
-export const Route = createFileRoute("/_app/home")({
+export const Route = createFileRoute("/g/$gymSlug/_app/home")({
   component: HomePage,
 });
 
@@ -98,7 +98,7 @@ function HomePage() {
         right={
           <div className="flex items-center gap-2">
             <ChildSwitcher />
-            <Link to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
+            <Link to={gp("/profile")} className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -125,14 +125,14 @@ function HomePage() {
                 {formatWhen((nextBooking as any).classes.starts_at)}
                 {(nextBooking as any).classes.coaches?.name && ` with ${(nextBooking as any).classes.coaches.name}`}
               </p>
-              <Link to="/profile/bookings" className="mt-4 inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+              <Link to={gp("/profile/bookings")} className="mt-4 inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
                 View Details
               </Link>
             </div>
           ) : (
             <div className="mt-2">
               <p className="text-sm text-muted-foreground">{t.noUpcoming}</p>
-              <Link to="/book" className="mt-3 inline-flex items-center gap-1 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">
+              <Link to={gp("/book")} className="mt-3 inline-flex items-center gap-1 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">
                 {t.book} <ChevronRight size={14} />
               </Link>
             </div>
@@ -190,7 +190,7 @@ function HomePage() {
 
         {/* Latest news + Coaches */}
         <div className="space-y-3" data-tour="news-widget">
-          <Link to="/news" className="card-surface block p-4">
+          <Link to={gp("/news")} className="card-surface block p-4">
             <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
                 <Newspaper size={20} />
@@ -209,7 +209,7 @@ function HomePage() {
           </Link>
 
           {/* Coaches */}
-          <Link to="/coaches" className="card-surface block p-4">
+          <Link to={gp("/coaches")} className="card-surface block p-4">
             <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-pill bg-primary/15 text-primary">
                 <Users size={20} />

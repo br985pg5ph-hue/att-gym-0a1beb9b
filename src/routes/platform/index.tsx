@@ -31,8 +31,8 @@ function PlatformLanding() {
           Platform admin login
         </Link>
         <div className="pt-4 text-center">
-          <Link to="/auth" className="text-xs text-muted-foreground hover:text-foreground">
-            Member or staff login →
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
+            ← Back to ATT Gym Hub
           </Link>
         </div>
       </div>

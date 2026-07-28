@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export const Route = createFileRoute("/_app/profile/")({
+export const Route = createFileRoute("/g/$gymSlug/_app/profile/")({
   component: ProfilePage,
 });
 
@@ -39,18 +39,18 @@ function ProfilePage() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    nav({ to: "/auth", replace: true });
+    nav({ to: gp("/auth"), replace: true });
   };
 
   const { children: kids } = useChildren();
   const rows = [
-    { icon: UserCog, label: "Edit Profile", to: "/profile/edit" },
-    { icon: CalendarCheck, label: t.myBookings, to: "/profile/bookings" },
+    { icon: UserCog, label: "Edit Profile", to: gp("/profile/edit") },
+    { icon: CalendarCheck, label: t.myBookings, to: gp("/profile/bookings") },
     ...(profile?.is_parent
-      ? [{ icon: Users, label: `My Children${kids.length ? ` (${kids.length})` : ""}`, to: "/profile/children" as const }]
+      ? [{ icon: Users, label: `My Children${kids.length ? ` (${kids.length})` : ""}`, to: gp("/profile/children") }]
       : []),
-    { icon: Gift, label: t.refer, to: "/profile/referral" },
-    { icon: Settings, label: t.settings, to: "/profile/settings" },
+    { icon: Gift, label: t.refer, to: gp("/profile/referral") },
+    { icon: Settings, label: t.settings, to: gp("/profile/settings") },
   ] as const;
 
 
@@ -60,7 +60,7 @@ function ProfilePage() {
       <PageHeader title={t.profile} />
       <div className="space-y-4 px-5">
         <div className="card-surface flex items-center gap-4 p-5">
-          <Link to="/profile/edit" aria-label="Edit profile photo" className="relative shrink-0">
+          <Link to={gp("/profile/edit")} aria-label="Edit profile photo" className="relative shrink-0">
             <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-pill bg-primary/15 text-primary">
               {profile?.avatar_url ? <img src={profile.avatar_url} className="h-full w-full object-cover" alt="" /> : <User size={28} />}
             </div>

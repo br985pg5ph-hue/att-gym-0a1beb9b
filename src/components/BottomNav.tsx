@@ -1,16 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, CalendarDays, User, CreditCard } from "lucide-react";
 import { useLang } from "@/lib/providers";
+import { gp } from "@/lib/gym";
 
 export function BottomNav() {
   const { t } = useLang();
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
-    { to: "/home", label: t.home, icon: Home, exact: true },
-    { to: "/book", label: t.book, icon: CalendarDays },
-    { to: "/membership", label: t.membership, icon: CreditCard },
-    { to: "/profile", label: t.profile, icon: User },
+    { to: gp("/home"), label: t.home, icon: Home, exact: true },
+    { to: gp("/book"), label: t.book, icon: CalendarDays },
+    { to: gp("/membership"), label: t.membership, icon: CreditCard },
+    { to: gp("/profile"), label: t.profile, icon: User },
   ];
 
   return (

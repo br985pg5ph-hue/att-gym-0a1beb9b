@@ -8,13 +8,13 @@ import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
-import { GYM_SLUG } from "@/lib/gym";
+import { gp, useGymSlug } from "@/lib/gym";
 
 const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),
 });
 
-export const Route = createFileRoute("/signup")({
+export const Route = createFileRoute("/g/$gymSlug/signup")({
   ssr: false,
   validateSearch: zodValidator(searchSchema),
   component: SignUpPage,
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/signup")({
 
 function SignUpPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const { t } = useLang();
   const { ref } = Route.useSearch();
   const [name, setName] = useState("");
@@ -42,7 +43,7 @@ function SignUpPage() {
     if (password !== confirm) return toast.error("Passwords do not match");
     if (!gender) return toast.error("Please select your gender");
     setLoading(true);
-    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender, gym_slug: GYM_SLUG };
+    const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender, gym_slug: gymSlug };
     const trimmedRef = referral.trim();
     if (trimmedRef) meta.referral_code = trimmedRef;
     const { data, error } = await supabase.auth.signUp({
@@ -56,12 +57,12 @@ function SignUpPage() {
     setLoading(false);
     if (data.session) {
       toast.success("Account created!");
-      nav({ to: "/onboarding" });
+      nav({ to: gp("/onboarding") });
     } else {
       toast.message("Check your email", {
         description: "Confirm your account before signing in.",
       });
-      nav({ to: "/auth" });
+      nav({ to: gp("/auth") });
     }
   };
 
@@ -69,7 +70,7 @@ function SignUpPage() {
   const oauth = async (provider: "google" | "apple") => {
     const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (r.error) toast.error("Sign-in failed");
-    else if (!r.redirected) nav({ to: "/onboarding" });
+    else if (!r.redirected) nav({ to: gp("/onboarding") });
   };
 
 
@@ -124,7 +125,7 @@ function SignUpPage() {
         <button onClick={()=>oauth("apple")} className="w-full rounded-pill border hairline bg-card py-3 text-sm font-medium">{t.continueWithApple}</button>
       </div>
       <p className="mt-8 text-center text-xs text-muted-foreground">
-        {t.haveAccount} <Link to="/auth" className="font-semibold text-primary">{t.signIn}</Link>
+        {t.haveAccount} <Link to={gp("/auth")} className="font-semibold text-primary">{t.signIn}</Link>
       </p>
     </div>
   );

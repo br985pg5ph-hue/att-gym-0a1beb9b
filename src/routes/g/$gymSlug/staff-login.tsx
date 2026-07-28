@@ -3,15 +3,16 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { fetchGym } from "@/lib/gym";
+import { fetchGym, gp, useGymSlug } from "@/lib/gym";
 
-export const Route = createFileRoute("/staff-login")({
+export const Route = createFileRoute("/g/$gymSlug/staff-login")({
   ssr: false,
   component: StaffLoginPage,
 });
 
 function StaffLoginPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ function StaffLoginPage() {
       toast.error("This account doesn't have staff access");
       return;
     }
-    const gym = await fetchGym();
+    const gym = await fetchGym(gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();
       setLoading(false);
@@ -45,7 +46,7 @@ function StaffLoginPage() {
     }
 
     setLoading(false);
-    nav({ to: "/admin" });
+    nav({ to: gp("/admin") });
   };
 
   return (
@@ -75,7 +76,7 @@ function StaffLoginPage() {
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
         <div className="text-end">
-          <Link to="/forgot" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link to={gp("/forgot")} className="text-xs text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
         </div>
@@ -86,7 +87,7 @@ function StaffLoginPage() {
           {loading ? "…" : "Sign In"}
         </button>
       </form>
-      <Link to="/auth" className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
+      <Link to={gp("/auth")} className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
         ← Back
       </Link>
       <p className="mt-3 text-center text-[10px] text-muted-foreground">

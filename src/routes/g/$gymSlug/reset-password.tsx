@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/reset-password")({
+export const Route = createFileRoute("/g/$gymSlug/reset-password")({
   ssr: false,
   component: ResetPage,
 });
@@ -15,7 +16,7 @@ function ResetPage() {
     e.preventDefault();
     const { error } = await supabase.auth.updateUser({ password: pw });
     if (error) toast.error(error.message);
-    else { toast.success("Password updated"); nav({ to: "/home" }); }
+    else { toast.success("Password updated"); nav({ to: gp("/home") }); }
   };
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6">

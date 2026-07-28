@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
-import { useGym, fetchGym } from "@/lib/gym";
+import { useGym, fetchGym, gp } from "@/lib/gym";
 import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
@@ -13,17 +13,17 @@ import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut
 import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/g/$gymSlug/admin")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
+    if (!data.user) throw redirect({ to: gp("/auth") });
     const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
-    if (prof?.role !== "staff") throw redirect({ to: "/home" });
-    const gym = await fetchGym();
+    if (prof?.role !== "staff") throw redirect({ to: gp("/home") });
+    const gym = await fetchGym(params.gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();
-      throw redirect({ to: "/staff-login" });
+      throw redirect({ to: gp("/staff-login") });
     }
   },
 
@@ -51,7 +51,7 @@ function AdminPage() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    nav({ to: "/auth", replace: true });
+    nav({ to: gp("/auth"), replace: true });
   };
   const nextTheme = theme === "dark" ? "light" : "dark";
   const ThemeIcon = theme === "dark" ? Sun : Moon;
@@ -320,8 +320,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
                 {stats?.expiringSoonList.map((m) => (
                   <Link
                     key={m.id}
-                    to="/admin/members/$id"
-                    params={{ id: m.id }}
+                    to={gp(`/admin/members/${m.id}`)}
                     className="flex items-center justify-between rounded-xl border hairline bg-card px-3 py-2 transition-colors hover:border-primary/40"
                   >
                     <p className="truncate text-sm font-semibold">{m.name}</p>
@@ -1153,8 +1152,7 @@ function MembersAdmin() {
                 </div>
               </div>
               <Link
-                to="/admin/members/$id"
-                params={{ id: m.id }}
+                to={gp(`/admin/members/${m.id}`)}
                 className="shrink-0 rounded-pill border hairline px-3 py-1.5 text-[11px] font-semibold text-primary"
               >
                 View

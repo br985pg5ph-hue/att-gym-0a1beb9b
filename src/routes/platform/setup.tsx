@@ -112,7 +112,8 @@ function GymSetupWizard() {
                 Your gym is active. You can now open your admin dashboard.
               </p>
               <Link
-                to="/admin"
+                to="/g/$gymSlug/admin"
+                params={{ gymSlug: gym.slug }}
                 className="mt-2 inline-block rounded-pill bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-white"
               >
                 Go to Admin Dashboard

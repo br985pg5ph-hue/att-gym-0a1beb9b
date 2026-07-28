@@ -1,11 +1,13 @@
+import { createContext, createElement, useContext, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * One deployed instance serves exactly one gym (tenant).
- * The gym is fixed at build/deploy time through VITE_GYM_SLUG.
+ * Multi-tenant: one deployment serves every gym.
+ * The tenant is resolved from the `/g/$gymSlug` route segment.
+ * VITE_GYM_SLUG remains supported as a pin for single-gym / white-label builds.
  */
-export const GYM_SLUG: string =
+export const DEFAULT_GYM_SLUG: string =
   ((import.meta as any).env?.VITE_GYM_SLUG as string | undefined)?.trim() || "att-academy";
 
 export type Gym = {
@@ -27,23 +29,60 @@ export type Gym = {
   maps_url: string | null;
 };
 
-export const gymQueryKey = ["gym", GYM_SLUG] as const;
+let currentSlug = DEFAULT_GYM_SLUG;
 
-export async function fetchGym(): Promise<Gym | null> {
+/** Set by the tenant layout's beforeLoad, before any child route runs. */
+export function setCurrentGymSlug(slug: string) {
+  currentSlug = slug;
+}
+
+/** Absolute in-app path for the active tenant. gp("/home") -> "/g/att-academy/home" */
+export function gp(path: string) {
+  return (`/g/${currentSlug}${path === "/" ? "" : path}`) as any;
+}
+
+const GymSlugCtx = createContext<string>(DEFAULT_GYM_SLUG);
+
+export function GymSlugProvider({ slug, children }: { slug: string; children: ReactNode }) {
+  return createElement(GymSlugCtx.Provider, { value: slug }, children);
+}
+
+/** Current tenant slug (from the URL). */
+export function useGymSlug(): string {
+  return useContext(GymSlugCtx);
+}
+
+/**
+ * Builds an absolute in-app path for the current tenant.
+ * `gp("/home")` -> "/g/att-academy/home"
+ */
+export function useGymPath() {
+  const slug = useGymSlug();
+  return (path: string) => (`/g/${slug}${path === "/" ? "" : path}` as any);
+}
+
+export function gymPath(slug: string, path: string): string {
+  return `/g/${slug}${path === "/" ? "" : path}`;
+}
+
+export const gymQueryKey = (slug: string) => ["gym", slug] as const;
+
+export async function fetchGym(slug: string): Promise<Gym | null> {
   const { data, error } = await supabase
     .from("gyms")
     .select("*")
-    .eq("slug", GYM_SLUG)
+    .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
   return (data as unknown as Gym) ?? null;
 }
 
-/** Resolves the deployment's gym once and exposes its id everywhere. */
+/** Resolves the current tenant's gym row and exposes its id everywhere. */
 export function useGym() {
+  const slug = useGymSlug();
   const q = useQuery({
-    queryKey: gymQueryKey,
-    queryFn: fetchGym,
+    queryKey: gymQueryKey(slug),
+    queryFn: () => fetchGym(slug),
     staleTime: 5 * 60 * 1000,
   });
   return {

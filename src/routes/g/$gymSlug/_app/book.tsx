@@ -9,9 +9,9 @@ import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { ammanNow, toAmmanDateKey } from "@/lib/time";
 import { toast } from "sonner";
 import { useClassTypeDefs, defsByKey } from "@/lib/classTypes";
-import { useGym } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/_app/book")({
+export const Route = createFileRoute("/g/$gymSlug/_app/book")({
   component: BookPage,
 });
 
@@ -267,7 +267,7 @@ function BookPage() {
 
         {!bookingForChild && memberGender === null && (
           <Link
-            to="/profile/edit"
+            to={gp("/profile/edit")}
             className="mt-4 flex items-center justify-between rounded-2xl border hairline bg-card p-4 transition active:scale-[0.99] hover:border-primary"
           >
             <div>

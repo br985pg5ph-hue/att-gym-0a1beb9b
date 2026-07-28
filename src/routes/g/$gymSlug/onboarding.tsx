@@ -3,12 +3,13 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
+import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/onboarding")({
+export const Route = createFileRoute("/g/$gymSlug/onboarding")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
+    if (!data.user) throw redirect({ to: gp("/auth") });
     const { data: profile } = await supabase
       .from("profiles")
       .select("is_parent")
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/onboarding")({
       .maybeSingle();
     if (profile?.is_parent) {
       await supabase.from("profiles").update({ onboarded: true }).eq("id", data.user.id);
-      throw redirect({ to: "/profile/children", search: { new: 1, welcome: 1 } as any });
+      throw redirect({ to: gp("/profile/children"), search: { new: 1, welcome: 1 } as any });
     }
   },
   component: OnboardingPage,
@@ -79,14 +80,14 @@ function OnboardingPage() {
     if (error) return toast.error(error.message);
     toast.success("Welcome to ATT Academy!");
     try { sessionStorage.setItem("att.startTour", "1"); } catch {}
-    nav({ to: "/home" });
+    nav({ to: gp("/home") });
   };
 
   const skip = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (u.user) await supabase.from("profiles").update({ onboarded: true }).eq("id", u.user.id);
     try { sessionStorage.setItem("att.startTour", "1"); } catch {}
-    nav({ to: "/home" });
+    nav({ to: gp("/home") });
   };
 
   return (
