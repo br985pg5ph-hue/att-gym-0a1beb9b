@@ -37,6 +37,7 @@ const TAG_COLORS: Record<string,string> = {
 
 function NewsPage() {
   const { t } = useLang();
+  const { gymId } = useGym();
   const { data = [] } = useQuery({
     queryKey: ["announcements", gymId],
     enabled: !!gymId,

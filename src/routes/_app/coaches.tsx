@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_app/coaches")({
 
 function CoachesPage() {
   const { t } = useLang();
+  const { gymId } = useGym();
   const { data: coaches = [] } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => (await supabase.from("coaches").select("*").eq("gym_id", gymId!).order("sort_order")).data ?? [],
