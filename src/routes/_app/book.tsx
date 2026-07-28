@@ -9,6 +9,7 @@ import { useAuth, useLang, useChildren } from "@/lib/providers";
 import { ammanNow, toAmmanDateKey } from "@/lib/time";
 import { toast } from "sonner";
 import { useClassTypeDefs, defsByKey } from "@/lib/classTypes";
+import { useGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/_app/book")({
   component: BookPage,
@@ -24,6 +25,7 @@ function BookPage() {
   const parentMode = !!profile?.is_parent;
   const bookingForChild = parentMode && selectedChild ? selectedChild : null;
   const qc = useQueryClient();
+  const { gymId } = useGym();
   const [selectedDate, setSelectedDate] = useState(toAmmanDateKey(new Date()));
   const [pickedId, setPickedId] = useState<string | null>(null);
 
@@ -43,10 +45,12 @@ function BookPage() {
   const nextMonthStartIso = new Date(y, m + 1, 1).toISOString();
 
   const { data: classes = [] } = useQuery({
-    queryKey: ["classes", y, m],
+    queryKey: ["classes", y, m, gymId],
+    enabled: !!gymId,
     queryFn: async () => {
       const { data } = await supabase.from("classes")
         .select("id, type, title, starts_at, duration_min, capacity, coaches(name)")
+        .eq("gym_id", gymId!)
         .gte("starts_at", monthStartIso)
         .lt("starts_at", nextMonthStartIso)
         .is("cancelled_at", null)
@@ -165,7 +169,7 @@ function BookPage() {
 
   const book = useMutation({
     mutationFn: async (classId: string) => {
-      const payload: any = { member_id: user!.id, class_id: classId, status: "upcoming" };
+      const payload: any = { member_id: user!.id, class_id: classId, status: "upcoming", gym_id: gymId! };
       if (bookingForChild) payload.child_id = bookingForChild.id;
       const { error } = await supabase.from("bookings").insert(payload);
       if (error) throw error;

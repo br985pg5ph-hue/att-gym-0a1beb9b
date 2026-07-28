@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useGym } from "@/lib/gym";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth, useLang } from "@/lib/providers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -31,10 +32,7 @@ function ProfilePage() {
   const { t } = useLang();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const { data: gym } = useQuery({
-    queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
-  });
+  const { gym } = useGym();
   const gymInfo = gym as (NonNullable<typeof gym> & { instagram_url?: string | null; whatsapp_number?: string | null }) | null;
 
   const signOut = async () => {

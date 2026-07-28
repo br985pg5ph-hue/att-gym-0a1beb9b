@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { ChildSwitcher } from "@/components/ChildSwitcher";
 import { useAuth, useLang, useChildren } from "@/lib/providers";
+import { useGym } from "@/lib/gym";
 import { Flame, Trophy, ChevronRight, Ticket, Newspaper, User, Users, ShieldCheck, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
@@ -17,14 +18,12 @@ function HomePage() {
   const parentMode = !!profile?.is_parent;
   const scope = parentMode && selectedChild ? "child" : "self";
 
-  const { data: gym } = useQuery({
-    queryKey: ["gym"],
-    queryFn: async () => (await supabase.from("gym_info").select("*").eq("id", 1).single()).data,
-  });
+  const { gym, gymId } = useGym();
 
   const { data: latestNews } = useQuery({
-    queryKey: ["latest-news"],
-    queryFn: async () => (await supabase.from("announcements").select("*").order("created_at", { ascending: false }).limit(1)).data?.[0] ?? null,
+    queryKey: ["latest-news", gymId],
+    enabled: !!gymId,
+    queryFn: async () => (await supabase.from("announcements").select("*").eq("gym_id", gymId!).order("created_at", { ascending: false }).limit(1)).data?.[0] ?? null,
   });
 
   const { data: nextBooking } = useQuery({
