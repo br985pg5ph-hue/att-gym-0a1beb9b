@@ -18,9 +18,15 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
-    const { data: prof } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+    const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
     if (prof?.role !== "staff") throw redirect({ to: "/home" });
+    const gym = await fetchGym();
+    if (!gym || prof.gym_id !== gym.id) {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/staff-login" });
+    }
   },
+
   component: AdminPage,
 });
 
