@@ -36,7 +36,7 @@ function StaffLoginPage() {
       toast.error("This account doesn't have staff access");
       return;
     }
-    const gym = await fetchGym();
+    const gym = await fetchGym(gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();
       setLoading(false);

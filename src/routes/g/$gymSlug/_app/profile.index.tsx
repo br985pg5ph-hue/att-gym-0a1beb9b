@@ -47,7 +47,7 @@ function ProfilePage() {
     { icon: UserCog, label: "Edit Profile", to: gp("/profile/edit") },
     { icon: CalendarCheck, label: t.myBookings, to: gp("/profile/bookings") },
     ...(profile?.is_parent
-      ? [{ icon: Users, label: `My Children${kids.length ? ` (${kids.length})` : ""}`, to: gp("/profile/children") as const }]
+      ? [{ icon: Users, label: `My Children${kids.length ? ` (${kids.length})` : ""}`, to: gp("/profile/children") }]
       : []),
     { icon: Gift, label: t.refer, to: gp("/profile/referral") },
     { icon: Settings, label: t.settings, to: gp("/profile/settings") },

@@ -15,12 +15,12 @@ import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 export const Route = createFileRoute("/g/$gymSlug/admin")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
     const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
     if (prof?.role !== "staff") throw redirect({ to: gp("/home") });
-    const gym = await fetchGym();
+    const gym = await fetchGym(params.gymSlug);
     if (!gym || prof.gym_id !== gym.id) {
       await supabase.auth.signOut();
       throw redirect({ to: gp("/staff-login") });
