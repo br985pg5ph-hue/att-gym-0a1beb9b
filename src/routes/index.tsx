@@ -69,11 +69,6 @@ function NuvoHome() {
       <header className="sticky top-0 z-30 border-b hairline bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Wordmark className="text-2xl" />
-          <nav className="hidden items-center gap-6 text-xs font-semibold text-muted-foreground sm:flex">
-            <a href="#features" className="hover:text-foreground">Features</a>
-            <a href="#how" className="hover:text-foreground">How it works</a>
-            <a href="#pricing" className="hover:text-foreground">Pricing</a>
-          </nav>
           <div className="flex items-center gap-2">
             <Link
               to="/g/att-academy/admin"
