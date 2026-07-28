@@ -1,9 +1,14 @@
 import { createFileRoute, Outlet, notFound, Link } from "@tanstack/react-router";
-import { fetchGym, gymQueryKey, GymSlugProvider, gp } from "@/lib/gym";
+import { fetchGym, gymQueryKey, GymSlugProvider, setCurrentGymSlug } from "@/lib/gym";
 
 export const Route = createFileRoute("/g/$gymSlug")({
   ssr: false,
+  beforeLoad: ({ params }) => {
+    // Runs before every child route's beforeLoad, so gp() is always tenant-correct.
+    setCurrentGymSlug(params.gymSlug);
+  },
   loader: async ({ context, params }) => {
+
     const gym = await context.queryClient.ensureQueryData({
       queryKey: gymQueryKey(params.gymSlug),
       queryFn: () => fetchGym(params.gymSlug),
