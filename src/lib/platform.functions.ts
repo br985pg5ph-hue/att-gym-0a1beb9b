@@ -215,6 +215,33 @@ export const getGymSetupContext = createServerFn({ method: "GET" })
     return { gym };
   });
 
+/** Portal sign-in context: allowed for gym staff, gym admins and platform owners. */
+export const getPortalContext = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: prof, error: profErr } = await context.supabase
+      .from("profiles")
+      .select("role, gym_id")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if (profErr) throw profErr;
+    const allowed = ["staff", "admin", "owner"];
+    if (!prof || !allowed.includes(prof.role) || !prof.gym_id) {
+      throw new Error("Forbidden");
+    }
+
+    const { data: gym, error } = await context.supabase
+      .from("gyms")
+      .select("id, slug, name, status")
+      .eq("id", prof.gym_id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!gym) throw new Error("Gym not found");
+    return { role: prof.role as string, gym };
+  });
+
+
+
 export const updateGymSetup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => setupUpdateSchema.parse(input))
