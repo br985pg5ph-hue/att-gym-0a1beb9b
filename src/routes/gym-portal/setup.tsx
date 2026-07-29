@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { NuvoLogo } from "@/components/NuvoLogo";
+import { CountrySelect } from "@/components/CountrySelect";
+import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
 import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock } from "lucide-react";
 
@@ -126,7 +128,7 @@ function GymSetupWizard() {
           <Section icon={MapPin} title="Gym basics">
             <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
             <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
-            <SetupField label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
+            <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
           </Section>
 
           <Section icon={Clock} title="Location & hours">
@@ -148,7 +150,7 @@ function GymSetupWizard() {
 
           <Section icon={Instagram} title="Social links">
             <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
-            <SetupField label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
+            <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
           </Section>
         </div>
       </main>
@@ -190,6 +192,61 @@ function SetupField({ label, defaultValue, onSave }: { label: string; defaultVal
     </div>
   );
 }
+
+const DEFAULT_DIAL = "+962";
+
+function splitPhone(raw: string): { dial: string; rest: string } {
+  const v = (raw || "").replace(/[\s()-]/g, "");
+  if (v.startsWith("+")) {
+    const match = COUNTRIES
+      .map((c) => c.code)
+      .filter((code) => v.startsWith(code))
+      .sort((a, b) => b.length - a.length)[0];
+    if (match) return { dial: match, rest: v.slice(match.length) };
+  }
+  return { dial: DEFAULT_DIAL, rest: v.replace(/^\+/, "") };
+}
+
+function SetupPhone({ label, defaultValue, onSave }: { label: string; defaultValue: string; onSave: (value: string) => void }) {
+  const initial = splitPhone(defaultValue);
+  const [dial, setDial] = useState(initial.dial);
+  const [number, setNumber] = useState(initial.rest);
+
+  useEffect(() => {
+    const next = splitPhone(defaultValue);
+    setDial(next.dial);
+    setNumber(next.rest);
+  }, [defaultValue]);
+
+  const handleSave = () => {
+    const digits = number.replace(/[\s()-]/g, "").replace(/^0+/, "");
+    onSave(digits ? `${dial}${digits}` : "");
+  };
+
+  return (
+    <div>
+      <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">{label}</label>
+      <div className="flex gap-2">
+        <CountrySelect value={dial} onChange={setDial} />
+        <input
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          inputMode="tel"
+          placeholder="79 123 4567"
+          className="min-w-0 flex-1 rounded-xl border hairline bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+        <button
+          onClick={handleSave}
+          className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 
 function SetupNumber({ label, defaultValue, onSave }: { label: string; defaultValue: number; onSave: (value: number) => void }) {
   const [value, setValue] = useState(defaultValue?.toString() ?? "");

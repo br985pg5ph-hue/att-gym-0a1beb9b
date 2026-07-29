@@ -1,21 +1,22 @@
-## Problem
+## Add a country code picker to the phone fields in gym setup
 
-The button in the setup wizard already links to `/g/$gymSlug/admin`, so the navigation itself fires — but the admin page renders nothing.
+Right now "Phone" (and "WhatsApp number") in the gym setup page are plain text boxes, so the gym owner has to type the full international number by hand.
 
-In `src/routes/g/$gymSlug/admin.tsx` the layout decides whether it is showing a child route with:
+### What changes
 
-```
-const isChild = pathname !== "/admin" && pathname !== "/admin/";
-if (isChild) return <Outlet />;
-```
+- Add a new phone field variant on the setup page that pairs the existing flag + dial-code dropdown (the same one members already use at signup) with the number box.
+- Default the dial code to **+962 (Jordan)**, matching the rest of the app.
+- Use it for both **Phone** and **WhatsApp number** in the Location & Contact section.
 
-Since multi-tenancy moved the URL to `/g/att-academy/admin`, that comparison is always true, so the dashboard body is skipped and an empty `<Outlet />` is rendered.
+### Behaviour
 
-## Fix
+- When the page loads, an existing saved number like `+962791234567` is split: `+962` selects the flag, `791234567` fills the input.
+- If a saved number has no recognised dial code, it stays in the number box and the picker shows the default.
+- Saving joins them back into one string (`+962791234567`), so the stored format and everything reading gym phone/WhatsApp is unchanged.
+- Typing a leading `0` or spaces is cleaned up before saving.
 
-1. In `admin.tsx`, replace the hardcoded pathname comparison with a tenant-aware check — compare against the current gym's admin base path (`/g/{gymSlug}/admin`, with or without trailing slash) using the route's `gymSlug` param, so child routes like `/g/{slug}/admin/members/{id}` still render via `<Outlet />` while the base path renders the dashboard.
-2. Keep the setup wizard button as-is (it points at the right route) and verify the flow: from `/platform/setup`, clicking "Go to Admin Dashboard" loads the gym admin dashboard, and the member-detail child route still works.
+### Technical details
 
-## Note
-
-Access is still gated by the existing `beforeLoad` guard (staff/admin/owner role and matching gym), so an owner whose profile belongs to that gym will land on the dashboard; anyone else is redirected as before.
+- New `SetupPhone` component inside `src/routes/gym-portal/setup.tsx`, modelled on the existing `SetupField` (local state, `Save` button, same styling), rendering `<CountrySelect />` from `src/components/CountrySelect.tsx` to the left of the input.
+- Splitting logic matches against `COUNTRIES` dial codes from `src/lib/countries.ts`, longest-prefix first.
+- No schema or server changes — `gyms.phone` / `gyms.whatsapp_number` stay single text columns.
