@@ -116,8 +116,8 @@ export function AppTour() {
           },
           onHighlightStarted: async () => {
             const currentPath = window.location.pathname;
-            if (s.route && currentPath !== s.route) {
-              await navigate({ to: s.route });
+            if (s.route && currentPath !== gp(s.route)) {
+              await navigate({ to: gp(s.route) });
               await new Promise((r) => setTimeout(r, 400));
             }
             if (s.selector) await waitForEl(s.selector, 3000);

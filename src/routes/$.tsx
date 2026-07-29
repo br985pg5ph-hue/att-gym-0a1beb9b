@@ -16,7 +16,7 @@ export const Route = createFileRoute("/$")({
     const splat = (params._splat ?? "").replace(/^\/+/, "");
     const head = splat.split("/")[0];
     if (LEGACY.includes(head)) {
-      throw redirect({ to: `/g/${DEFAULT_GYM_SLUG}/${splat}` as any });
+      throw redirect({ to: `/gym/${DEFAULT_GYM_SLUG}/${splat}` as any });
     }
   },
   component: NotFoundPage,
