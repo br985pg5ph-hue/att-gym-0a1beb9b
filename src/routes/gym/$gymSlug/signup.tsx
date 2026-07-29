@@ -76,8 +76,10 @@ function SignUpPage() {
 
 
   return (
-    <div className="mx-auto w-full max-w-md px-6 py-10">
+    <div className="nuvo-site min-h-screen w-full bg-background">
+      <div className="mx-auto w-full max-w-md px-6 py-10">
       <AuthBrand subtitle={t.createAccount} size={56} />
+
 
 
 
