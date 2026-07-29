@@ -16,6 +16,9 @@ import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 export const Route = createFileRoute("/gym/$gymSlug/admin")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: typeof search.tab === "string" ? (search.tab as Tab) : undefined,
+  }),
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
@@ -30,24 +33,31 @@ export const Route = createFileRoute("/gym/$gymSlug/admin")({
 
 type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members" | "settings";
 
+/** Tabs that stay locked until the gym is approved by the platform. */
+const RESTRICTED_TABS: Tab[] = ["announcements", "classes", "coaches", "members"];
+
 function AdminPage() {
   const { t } = useLang();
   const { theme, setTheme } = useTheme();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const search = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
   const { gymSlug } = Route.useParams();
   const { gym } = useGym();
   const pathname = useRouterState({ select: s => s.location.pathname });
   const base = `/gym/${gymSlug}/admin`;
   const isChild = pathname !== base && pathname !== `${base}/`;
   if (isChild) return <Outlet />;
+  const isPendingGym = gym?.status === "pending";
+  const locked = isPendingGym && RESTRICTED_TABS.includes(tab);
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
     { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "members", label: t.membersList, icon: Users },
   ];
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
