@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { gp } from "@/lib/gym";
+import { gp, useGymSlug } from "@/lib/gym";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
