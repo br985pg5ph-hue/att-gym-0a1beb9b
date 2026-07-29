@@ -196,13 +196,6 @@ function NuvoHome() {
       <footer className="border-t hairline">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
           <Wordmark className="text-xl text-foreground" />
-          <p>
-            Already a member of a gym? Open the link your gym gave you, or{" "}
-            <Link to="/gym/$gymSlug" params={{ gymSlug: "att-academy" }} className="font-semibold text-primary">
-              go to ATT Academy
-            </Link>
-            .
-          </p>
         </div>
       </footer>
     </div>
