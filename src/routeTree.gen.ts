@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as OwnerRouteRouteImport } from './routes/owner/route'
 import { Route as GymPortalRouteRouteImport } from './routes/gym-portal/route'
@@ -43,6 +44,11 @@ import { Route as GymGymSlugAppProfileEditRouteImport } from './routes/gym/$gymS
 import { Route as GymGymSlugAppProfileChildrenRouteImport } from './routes/gym/$gymSlug/_app/profile.children'
 import { Route as GymGymSlugAppProfileBookingsRouteImport } from './routes/gym/$gymSlug/_app/profile.bookings'
 
+const PreviewRoute = PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/gym-portal': typeof GymPortalRouteRouteWithChildren
   '/owner': typeof OwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/preview': typeof PreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-portal/login': typeof GymPortalLoginRoute
   '/gym-portal/setup': typeof GymPortalSetupRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/gym-portal': typeof GymPortalRouteRouteWithChildren
   '/owner': typeof OwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/preview': typeof PreviewRoute
   '/gym-portal/login': typeof GymPortalLoginRoute
   '/gym-portal/setup': typeof GymPortalSetupRoute
   '/gym-portal/signup': typeof GymPortalSignupRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/gym-portal': typeof GymPortalRouteRouteWithChildren
   '/owner': typeof OwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/preview': typeof PreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-portal/login': typeof GymPortalLoginRoute
   '/gym-portal/setup': typeof GymPortalSetupRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/gym-portal'
     | '/owner'
     | '/$'
+    | '/preview'
     | '/gym/$gymSlug'
     | '/gym-portal/login'
     | '/gym-portal/setup'
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/gym-portal'
     | '/owner'
     | '/$'
+    | '/preview'
     | '/gym-portal/login'
     | '/gym-portal/setup'
     | '/gym-portal/signup'
@@ -390,6 +401,7 @@ export interface FileRouteTypes {
     | '/gym-portal'
     | '/owner'
     | '/$'
+    | '/preview'
     | '/gym/$gymSlug'
     | '/gym-portal/login'
     | '/gym-portal/setup'
@@ -426,11 +438,19 @@ export interface RootRouteChildren {
   GymPortalRouteRoute: typeof GymPortalRouteRouteWithChildren
   OwnerRouteRoute: typeof OwnerRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
+  PreviewRoute: typeof PreviewRoute
   GymGymSlugRouteRoute: typeof GymGymSlugRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/preview': {
+      id: '/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -785,8 +805,19 @@ const rootRouteChildren: RootRouteChildren = {
   GymPortalRouteRoute: GymPortalRouteRouteWithChildren,
   OwnerRouteRoute: OwnerRouteRouteWithChildren,
   SplatRoute: SplatRoute,
+  PreviewRoute: PreviewRoute,
   GymGymSlugRouteRoute: GymGymSlugRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
