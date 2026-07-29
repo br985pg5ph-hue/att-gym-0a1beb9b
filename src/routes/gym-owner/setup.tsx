@@ -335,6 +335,17 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
     }));
   };
 
+  const copyToAll = (day: string) => {
+    const src = state[day] ?? { open: "", close: "", closed: false };
+    setState(() => {
+      const next: Record<string, DayHours> = {};
+      for (const d of days) next[d] = { ...src };
+      return next;
+    });
+  };
+
+
+
   return (
     <div>
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Opening hours</label>
