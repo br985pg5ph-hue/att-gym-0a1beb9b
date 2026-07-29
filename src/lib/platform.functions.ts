@@ -31,6 +31,21 @@ const setupUpdateSchema = z.object({
   secondary_color: z.string().trim().max(50).optional(),
   hours: z.array(z.object({ day: z.string(), open: z.string(), close: z.string() })).optional(),
   logo_url: z.string().trim().max(500).optional(),
+  theme: z
+    .object({
+      colors: z
+        .array(
+          z.object({
+            key: z.string().trim().min(1).max(40),
+            label: z.string().trim().min(1).max(60),
+            value: z.string().trim().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/),
+          }),
+        )
+        .max(20)
+        .optional(),
+    })
+    .passthrough()
+    .optional(),
 });
 
 /** Resolve the platform gym id (the non-operational gym that owns platform admins). */
