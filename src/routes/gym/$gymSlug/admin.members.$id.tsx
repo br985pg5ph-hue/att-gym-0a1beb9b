@@ -41,13 +41,32 @@ function MemberDetailPage() {
     queryKey: ["admin-member", id, gymId],
     enabled: !!gymId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles")
-        .select("id, name, member_code, phone, membership_status, pt_sessions_remaining, group_subscription_until, group_track, group_subscription_started_at, streak, classes_attended, is_parent, created_at, date_of_birth, membership_paused_at, membership_pause_days_used, avatar_url, children(id, name, group_subscription_until, group_track, group_subscription_started_at, pt_sessions_remaining, avatar_url)")
-        .eq("id", id).eq("gym_id", gymId!).maybeSingle();
-      if (error) throw error;
-      return data;
+      // Identity lives on profiles; everything gym-specific on gym_members.
+      const [{ data: prof, error: profErr }, { data: mem, error: memErr }, { data: kids }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, name, phone, is_parent, created_at, date_of_birth, avatar_url")
+          .eq("id", id)
+          .maybeSingle(),
+        supabase
+          .from("gym_members")
+          .select("member_code, membership_status, pt_sessions_remaining, group_subscription_until, group_track, group_subscription_started_at, streak, classes_attended, membership_paused_at, membership_pause_days_used")
+          .eq("user_id", id)
+          .eq("gym_id", gymId!)
+          .maybeSingle(),
+        supabase
+          .from("children")
+          .select("id, name, group_subscription_until, group_track, group_subscription_started_at, pt_sessions_remaining, avatar_url")
+          .eq("parent_id", id)
+          .eq("gym_id", gymId!),
+      ]);
+      if (profErr) throw profErr;
+      if (memErr) throw memErr;
+      if (!prof || !mem) return null;
+      return { ...prof, ...mem, children: kids ?? [] };
     },
   });
+
 
   const fetchEmail = useServerFn(getMemberEmail);
   const { data: emailData } = useQuery({
