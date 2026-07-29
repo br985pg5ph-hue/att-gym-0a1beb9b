@@ -26,24 +26,21 @@ function StaffLoginPage() {
       toast.error(error?.message ?? "Sign-in failed");
       return;
     }
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", data.user.id)
-      .maybeSingle();
-    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) {
+    const membership = await fetchMembershipBySlug(data.user.id, gymSlug);
+    if (!membership) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("This account isn't linked to this gym");
+      return;
+    }
+    if (!isStaffRole(membership.role)) {
       await supabase.auth.signOut();
       setLoading(false);
       toast.error("This account doesn't have staff access");
       return;
     }
-    const gym = await fetchGym(gymSlug);
-    if (!gym || prof.gym_id !== gym.id) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("This account belongs to a different gym");
-      return;
-    }
+    await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", data.user.id);
+
 
     setLoading(false);
     nav({ to: gp("/admin") });
