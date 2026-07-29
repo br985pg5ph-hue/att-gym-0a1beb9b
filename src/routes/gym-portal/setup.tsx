@@ -141,10 +141,12 @@ function GymSetupWizard() {
           </Section>
 
           <Section icon={ImageIcon} title="Branding">
-            <div className="grid grid-cols-2 gap-3">
-              <SetupField label="Primary color" defaultValue={gym.primary_color ?? ""} onSave={(primary_color) => saveMutation.mutate({ primary_color })} />
-              <SetupField label="Secondary color" defaultValue={gym.secondary_color ?? ""} onSave={(secondary_color) => saveMutation.mutate({ secondary_color })} />
-            </div>
+            <BrandColors
+              primary={gym.primary_color ?? ""}
+              secondary={gym.secondary_color ?? ""}
+              theme={(gym.theme as any) ?? {}}
+              onSave={(payload) => saveMutation.mutate(payload)}
+            />
             <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
           </Section>
 
