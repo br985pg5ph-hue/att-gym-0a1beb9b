@@ -31,15 +31,13 @@ function AuthPage() {
       .eq("id", data.user!.id)
       .maybeSingle();
 
-    const allowed = ["staff", "admin", "owner"];
-    if (!prof || !allowed.includes(prof.role)) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("This portal is for gym staff and admins only.");
-      return;
-    }
+    const staffRoles = ["staff", "admin", "owner"];
     setLoading(false);
-    nav({ to: gp("/admin") });
+    if (prof && staffRoles.includes(prof.role)) {
+      nav({ to: gp("/admin") });
+    } else {
+      nav({ to: gp("/home") });
+    }
   };
 
   return (
@@ -52,7 +50,7 @@ function AuthPage() {
               Nuvo<span className="text-primary">.</span>
             </h1>
             <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
-              Gym portal login
+              Gym sign in
             </p>
           </div>
 
@@ -87,12 +85,12 @@ function AuthPage() {
           </form>
 
           <p className="mt-8 text-center text-xs text-muted-foreground">
-            This portal is for gym staff and owners. Members sign in through their gym's own app.
+            Members and gym staff sign in here — you'll land on the right place automatically.
           </p>
           <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            Don't have a gym on Nuvo?{" "}
-            <Link to="/gym-portal/signup" className="font-semibold text-primary">
-              Sign up your gym
+            New member?{" "}
+            <Link to={gp("/signup")} className="font-semibold text-primary">
+              Create an account
             </Link>
           </p>
         </div>
