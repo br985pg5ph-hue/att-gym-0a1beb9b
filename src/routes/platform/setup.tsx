@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Logo } from "@/components/Logo";
+import { NuvoLogo } from "@/components/NuvoLogo";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
 import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock } from "lucide-react";
 
@@ -78,7 +78,7 @@ function GymSetupWizard() {
       <header className="border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <Logo size={36} />
+            <NuvoLogo size={36} />
             <div>
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Gym setup</p>
               <h1 className="font-display text-2xl leading-none">{gym.name}</h1>
