@@ -136,13 +136,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .lte("created_at", todayEnd)
         .not("payment_method", "is", null),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("created_at")
         .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString())
         .order("created_at", { ascending: true }),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id, group_subscription_until, pt_sessions_remaining, membership_paused_at")
         .eq("gym_id", gymId),
     ]);
