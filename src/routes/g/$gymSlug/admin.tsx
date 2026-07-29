@@ -38,8 +38,10 @@ function AdminPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("dashboard");
+  const { gymSlug } = Route.useParams();
   const pathname = useRouterState({ select: s => s.location.pathname });
-  const isChild = pathname !== "/admin" && pathname !== "/admin/";
+  const base = `/g/${gymSlug}/admin`;
+  const isChild = pathname !== base && pathname !== `${base}/`;
   if (isChild) return <Outlet />;
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
     { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
