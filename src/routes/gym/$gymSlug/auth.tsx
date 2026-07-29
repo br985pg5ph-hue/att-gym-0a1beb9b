@@ -13,6 +13,7 @@ export const Route = createFileRoute("/gym/$gymSlug/auth")({
 
 function AuthPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
