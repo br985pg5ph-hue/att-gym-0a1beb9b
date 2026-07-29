@@ -80,7 +80,7 @@ function AdminPage() {
             </button>
           ) : (
             <>
-              <Logo size={36} />
+              <Logo size={36} logoUrl={gym?.logo_url} />
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
                 <h1 className="font-display text-2xl leading-none">{t.admin}</h1>

@@ -35,7 +35,7 @@ function MemberDetailPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
-  const { gymId } = useGym();
+  const { gymId, gym } = useGym();
 
   const { data: member } = useQuery({
     queryKey: ["admin-member", id, gymId],
@@ -218,7 +218,7 @@ function MemberDetailPage() {
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Member</p>
           <h1 className="font-display text-2xl leading-none truncate">{member?.name || "—"}</h1>
         </div>
-        <Logo size={32} />
+        <Logo size={32} logoUrl={gym?.logo_url} />
       </header>
 
       <main className="mx-auto max-w-6xl space-y-5 px-4 py-5 pb-[max(env(safe-area-inset-bottom),40px)] md:px-6 lg:px-8">

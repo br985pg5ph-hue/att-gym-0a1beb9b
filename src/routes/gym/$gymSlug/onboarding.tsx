@@ -94,7 +94,7 @@ function OnboardingPage() {
   return (
     <div className="mx-auto w-full max-w-md px-6 py-8 pb-32">
       <div className="mb-6 flex flex-col items-center">
-        <Logo size={56} />
+        <Logo size={56} logoUrl={gym?.logo_url} />
         <h1 className="font-display mt-3 text-2xl">Tell us about you</h1>
         <p className="text-xs text-muted-foreground">Helps us tailor your training</p>
       </div>
