@@ -18,14 +18,11 @@ export const Route = createFileRoute("/gym/$gymSlug/admin")({
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
-    const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
-    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) throw redirect({ to: gp("/home") });
-    const gym = await fetchGym(params.gymSlug);
-    if (!gym || prof.gym_id !== gym.id) {
-      await supabase.auth.signOut();
-      throw redirect({ to: gp("/staff-login") });
-    }
+    const membership = await fetchMembershipBySlug(data.user.id, params.gymSlug);
+    if (!membership) throw redirect({ to: gp("/staff-login") });
+    if (!isStaffRole(membership.role)) throw redirect({ to: gp("/home") });
   },
+
 
   component: AdminPage,
 });
