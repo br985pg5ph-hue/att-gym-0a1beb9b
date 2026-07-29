@@ -20,7 +20,7 @@ function ResetPage() {
     else { toast.success("Password updated"); nav({ to: gp("/home") }); }
   };
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6">
+    <div className="nuvo-site mx-auto flex min-h-screen w-full max-w-md flex-col justify-center bg-background px-6">
       <AuthBrand subtitle="New password" size={56} />
       <form onSubmit={submit} className="mt-6 space-y-3">
         <input required minLength={6} type="password" placeholder="New password" value={pw} onChange={(e)=>setPw(e.target.value)}

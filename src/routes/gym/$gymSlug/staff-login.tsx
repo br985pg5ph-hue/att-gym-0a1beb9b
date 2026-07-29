@@ -50,7 +50,7 @@ function StaffLoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
+    <div className="nuvo-site mx-auto flex min-h-screen w-full max-w-md flex-col justify-center bg-background px-6 py-10">
       <AuthBrand subtitle="Staff sign in — authorized personnel only" />
       <form onSubmit={submit} className="space-y-3">
         <input

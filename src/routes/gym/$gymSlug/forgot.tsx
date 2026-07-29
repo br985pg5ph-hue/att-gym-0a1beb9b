@@ -19,7 +19,7 @@ function ForgotPage() {
     if (error) toast.error(error.message); else setSent(true);
   };
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6">
+    <div className="nuvo-site mx-auto flex min-h-screen w-full max-w-md flex-col justify-center bg-background px-6">
       <AuthBrand subtitle="Reset password" size={56} />
       {sent ? (
         <p className="mt-4 text-sm text-muted-foreground">Check your email for a reset link.</p>
