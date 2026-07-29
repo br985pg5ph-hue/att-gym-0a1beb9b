@@ -331,7 +331,7 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
   const update = (day: string, patch: Partial<DayHours>) => {
     setState((prev) => ({
       ...prev,
-      [day]: { open: "", close: "", closed: false, ...prev[day], ...patch },
+      [day]: { ...{ open: "", close: "", closed: false }, ...prev[day], ...patch },
     }));
   };
 
