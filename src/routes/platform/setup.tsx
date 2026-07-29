@@ -64,7 +64,7 @@ function GymSetupWizard() {
       <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
         <h1 className="font-display text-2xl">Access denied</h1>
         <p className="mt-2 text-sm text-muted-foreground">You must be a gym owner to view this page.</p>
-        <Link to="/platform" className="mt-6 text-sm text-primary">Go back</Link>
+        <Link to="/" className="mt-6 text-sm text-primary">Go back</Link>
       </div>
     );
   }
@@ -84,7 +84,7 @@ function GymSetupWizard() {
               <h1 className="font-display text-2xl leading-none">{gym.name}</h1>
             </div>
           </div>
-          <Link to="/platform" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
             Back
           </Link>
         </div>
