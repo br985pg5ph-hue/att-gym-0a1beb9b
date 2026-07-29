@@ -37,7 +37,7 @@ const EXPERIENCE = [
 function ChildrenPage() {
   const { user, profile, refresh } = useAuth();
   const { children, refreshChildren, setSelectedChildId } = useChildren();
-  const search = useSearch({ from: "/_app/profile/children" });
+  const search = useSearch({ from: "/gym/$gymSlug/_app/profile/children" });
   const nav = useNavigate();
   const [editing, setEditing] = useState<string | "new" | null>(null);
 
