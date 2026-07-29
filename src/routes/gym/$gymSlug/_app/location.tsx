@@ -10,6 +10,15 @@ export const Route = createFileRoute("/gym/$gymSlug/_app/location")({
   component: LocationPage,
 });
 
+function fmt12(value: string) {
+  if (!value) return "";
+  const [h, m = "00"] = value.split(":");
+  const hn = Number(h);
+  const meridiem = hn >= 12 ? "PM" : "AM";
+  const hour12 = hn % 12 === 0 ? 12 : hn % 12;
+  return `${hour12}:${m} ${meridiem}`;
+}
+
 function LocationPage() {
   const { t } = useLang();
   const { gym } = useGym();
