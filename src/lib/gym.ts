@@ -23,7 +23,7 @@ export type Gym = {
   lat: number;
   lng: number;
   phone: string;
-  hours: Array<{ day: string; open: string; close: string }>;
+  hours: Array<{ day: string; open: string; close: string; closed?: boolean }>;
   instagram_url: string | null;
   whatsapp_number: string | null;
   maps_url: string | null;

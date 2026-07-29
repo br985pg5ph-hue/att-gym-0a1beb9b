@@ -29,7 +29,7 @@ const setupUpdateSchema = z.object({
   whatsapp_number: z.string().trim().max(50).optional(),
   primary_color: z.string().trim().max(50).optional(),
   secondary_color: z.string().trim().max(50).optional(),
-  hours: z.array(z.object({ day: z.string(), open: z.string(), close: z.string() })).optional(),
+  hours: z.array(z.object({ day: z.string(), open: z.string(), close: z.string(), closed: z.boolean().optional().default(false) })).optional(),
   logo_url: z.string().trim().max(500).optional(),
   theme: z
     .object({

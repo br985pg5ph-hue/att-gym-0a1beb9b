@@ -253,13 +253,18 @@ function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) 
 
 function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const [state, setState] = useState<Record<string, DayHours>>(() => {
+  const buildState = (list: any[]) => {
     const map: Record<string, DayHours> = {};
-    for (const h of hours) {
+    for (const h of list ?? []) {
       if (h.day) map[h.day] = { open: h.open ?? "", close: h.close ?? "", closed: !!h.closed };
     }
     return map;
-  });
+  };
+  const [state, setState] = useState<Record<string, DayHours>>(() => buildState(hours));
+
+  useEffect(() => {
+    setState(buildState(hours));
+  }, [JSON.stringify(hours)]);
 
   const update = (day: string, patch: Partial<DayHours>) => {
     setState((prev) => ({
