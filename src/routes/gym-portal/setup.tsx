@@ -8,7 +8,7 @@ import { NuvoLogo } from "@/components/NuvoLogo";
 import { CountrySelect } from "@/components/CountrySelect";
 import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
-import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock } from "lucide-react";
+import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock, Plus, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/gym-portal/setup")({
   ssr: false,
@@ -368,6 +368,155 @@ function LogoUploader({ gymId, currentUrl, onUploaded }: { gymId: string; curren
           {uploading ? "Uploading…" : currentUrl ? "Change logo" : "Upload logo"}
           <input type="file" accept="image/*" className="hidden" onChange={upload} disabled={uploading} />
         </label>
+      </div>
+    </div>
+  );
+}
+
+type ExtraColor = { key: string; label: string; value: string };
+
+const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+function normalizeHex(v: string): string {
+  const s = (v || "").trim();
+  if (!s) return "";
+  return s.startsWith("#") ? s : `#${s}`;
+}
+
+function ColorRow({
+  label,
+  value,
+  onChange,
+  onRemove,
+  onLabelChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onRemove?: () => void;
+  onLabelChange?: (v: string) => void;
+}) {
+  const valid = HEX_RE.test(value);
+  return (
+    <div className="flex items-center gap-2 rounded-xl border hairline bg-background p-2">
+      <label className="relative h-9 w-9 shrink-0 cursor-pointer overflow-hidden rounded-lg border hairline">
+        <span className="block h-full w-full" style={{ background: valid ? value : "transparent" }} />
+        <input
+          type="color"
+          value={valid ? (value.length === 4 ? `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}` : value) : "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          aria-label={`${label} color wheel`}
+        />
+      </label>
+      <div className="min-w-0 flex-1">
+        {onLabelChange ? (
+          <input
+            value={label}
+            onChange={(e) => onLabelChange(e.target.value)}
+            placeholder="Color name"
+            className="w-full bg-transparent text-[10px] uppercase tracking-wider text-muted-foreground outline-none"
+          />
+        ) : (
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+        )}
+        <input
+          value={value}
+          onChange={(e) => onChange(normalizeHex(e.target.value))}
+          placeholder="#c8102e"
+          spellCheck={false}
+          className={`w-full bg-transparent font-mono text-sm outline-none ${value && !valid ? "text-destructive" : ""}`}
+        />
+      </div>
+      {onRemove && (
+        <button onClick={onRemove} className="rounded-pill p-2 text-muted-foreground hover:text-foreground" aria-label="Remove color">
+          <Trash2 size={14} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function BrandColors({
+  primary,
+  secondary,
+  theme,
+  onSave,
+}: {
+  primary: string;
+  secondary: string;
+  theme: Record<string, any>;
+  onSave: (payload: { primary_color: string; secondary_color: string; theme: Record<string, any> }) => void;
+}) {
+  const [p, setP] = useState(primary || "#c8102e");
+  const [s, setS] = useState(secondary || "#b8bcc2");
+  const [extras, setExtras] = useState<ExtraColor[]>(() => (Array.isArray(theme?.colors) ? theme.colors : []));
+
+  useEffect(() => {
+    setP(primary || "#c8102e");
+    setS(secondary || "#b8bcc2");
+    setExtras(Array.isArray(theme?.colors) ? theme.colors : []);
+  }, [primary, secondary, theme]);
+
+  const updateExtra = (i: number, patch: Partial<ExtraColor>) =>
+    setExtras((prev) => prev.map((c, idx) => (idx === i ? { ...c, ...patch } : c)));
+
+  const handleSave = () => {
+    const all = [{ v: p }, { v: s }, ...extras.map((c) => ({ v: c.value }))];
+    if (all.some((c) => !HEX_RE.test(c.v))) {
+      toast.error("Enter valid hex colors, e.g. #c8102e");
+      return;
+    }
+    if (extras.some((c) => !c.label.trim())) {
+      toast.error("Give every custom color a name");
+      return;
+    }
+    onSave({
+      primary_color: p,
+      secondary_color: s,
+      theme: {
+        ...theme,
+        colors: extras.map((c, i) => ({
+          key: c.key || `custom_${i + 1}`,
+          label: c.label.trim(),
+          value: c.value,
+        })),
+      },
+    });
+  };
+
+  return (
+    <div>
+      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Brand colors</label>
+      <div className="space-y-2">
+        <ColorRow label="Primary color" value={p} onChange={setP} />
+        <ColorRow label="Secondary color" value={s} onChange={setS} />
+        {extras.map((c, i) => (
+          <ColorRow
+            key={c.key || i}
+            label={c.label}
+            value={c.value}
+            onLabelChange={(label) => updateExtra(i, { label })}
+            onChange={(value) => updateExtra(i, { value })}
+            onRemove={() => setExtras((prev) => prev.filter((_, idx) => idx !== i))}
+          />
+        ))}
+      </div>
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          onClick={() =>
+            setExtras((prev) => [
+              ...prev,
+              { key: `custom_${Date.now()}`, label: `Accent ${prev.length + 1}`, value: "#3b82f6" },
+            ])
+          }
+          className="flex items-center gap-1 rounded-pill border hairline px-3 py-2 text-xs font-semibold"
+        >
+          <Plus size={13} /> Add color
+        </button>
+        <button onClick={handleSave} className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">
+          Save colors
+        </button>
       </div>
     </div>
   );
