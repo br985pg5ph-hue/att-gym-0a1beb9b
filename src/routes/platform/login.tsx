@@ -1,18 +1,29 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { fetchGym, gp, useGymSlug } from "@/lib/gym";
+import { NuvoLogo } from "@/components/NuvoLogo";
+import { getPortalContext } from "@/lib/platform.functions";
+import { useServerFn } from "@tanstack/react-start";
 
-export const Route = createFileRoute("/g/$gymSlug/staff-login")({
+export const Route = createFileRoute("/platform/login")({
   ssr: false,
-  component: StaffLoginPage,
+  head: () => ({
+    meta: [
+      { title: "Gym owner login — Nuvo" },
+      { name: "description", content: "Sign in to manage your gym's Nuvo portal, branding and member app." },
+      { property: "og:title", content: "Gym owner login — Nuvo" },
+      { property: "og:description", content: "Sign in to manage your gym's Nuvo portal, branding and member app." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: GymOwnerLogin,
 });
 
-function StaffLoginPage() {
+function GymOwnerLogin() {
   const nav = useNavigate();
-  const gymSlug = useGymSlug();
+  const getPortal = useServerFn(getPortalContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,38 +37,31 @@ function StaffLoginPage() {
       toast.error(error?.message ?? "Sign-in failed");
       return;
     }
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", data.user.id)
-      .maybeSingle();
-    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("This account doesn't have staff access");
-      return;
-    }
-    const gym = await fetchGym(gymSlug);
-    if (!gym || prof.gym_id !== gym.id) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("This account belongs to a different gym");
-      return;
-    }
 
-    setLoading(false);
-    nav({ to: gp("/admin") });
+    try {
+      const { role, gym } = await getPortal();
+      toast.success("Welcome back");
+      if (role === "staff") {
+        nav({ to: `/g/${gym.slug}/admin` });
+      } else {
+        nav({ to: "/platform/setup" });
+      }
+    } catch {
+      await supabase.auth.signOut();
+      toast.error("This portal is for gym staff and admins only");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
-      <div className="mb-8 flex flex-col items-center">
-        <Logo size={110} />
-        <h1 className="font-display mt-4 text-3xl">Staff Sign In</h1>
-        <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
-          Authorized personnel only
-        </p>
+      <div className="mb-8 flex flex-col items-center text-center">
+        <NuvoLogo size={80} />
+        <h1 className="font-display mt-4 text-3xl">Gym owner portal</h1>
+        <p className="mt-2 text-xs text-muted-foreground">Staff and admin sign-in for your gym</p>
       </div>
+
       <form onSubmit={submit} className="space-y-3">
         <input
           required
@@ -75,11 +79,6 @@ function StaffLoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
-        <div className="text-end">
-          <Link to={gp("/forgot")} className="text-xs text-muted-foreground hover:text-foreground">
-            Forgot password?
-          </Link>
-        </div>
         <button
           disabled={loading}
           className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
@@ -87,11 +86,16 @@ function StaffLoginPage() {
           {loading ? "…" : "Sign In"}
         </button>
       </form>
-      <Link to={gp("/auth")} className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
-        ← Back
-      </Link>
-      <p className="mt-3 text-center text-[10px] text-muted-foreground">
-        Want to add your gym? <Link to="/platform/signup" className="font-semibold text-primary">Sign up your gym</Link>
+
+      <p className="mt-5 text-center text-xs text-muted-foreground">
+        Don't have an account?{" "}
+        <Link to="/platform/signup" className="font-semibold text-primary">
+          Sign up your gym
+        </Link>
+      </p>
+
+      <p className="mt-4 text-center text-xs text-muted-foreground">
+        <Link to="/" className="hover:text-foreground">← Back</Link>
       </p>
     </div>
   );

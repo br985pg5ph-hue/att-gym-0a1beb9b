@@ -69,12 +69,20 @@ function NuvoHome() {
       <header className="sticky top-0 z-30 border-b hairline bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Wordmark className="text-2xl" />
-          <Link
-            to="/g/att-academy/admin"
-            className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
-          >
-            Portal login
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/g/att-academy/admin"
+              className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
+            >
+              Portal login
+            </Link>
+            <Link
+              to="/platform/signup"
+              className="hidden rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:block"
+            >
+              Sign up your gym
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -93,8 +101,14 @@ function NuvoHome() {
           </p>
           <div className="mx-auto mt-9 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
-              to="/g/att-academy/admin"
+              to="/platform/signup"
               className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
+            >
+              Sign up your gym
+            </Link>
+            <Link
+              to="/platform/login"
+              className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
               Portal login
             </Link>
@@ -140,6 +154,12 @@ function NuvoHome() {
               <p className="mt-2 text-sm text-muted-foreground">
                 No per-feature upsells. Every gym on Nuvo gets the full platform, branded as their own.
               </p>
+              <Link
+                to="/platform/signup"
+                className="mt-7 inline-flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
+              >
+                Sign up your gym
+              </Link>
             </div>
             <ul className="grid gap-3 sm:grid-cols-2 lg:content-center">
               {included.map((i) => (
@@ -158,10 +178,16 @@ function NuvoHome() {
           <h2 className="font-display mt-4 text-4xl sm:text-5xl">Ready to move your gym to Nuvo?</h2>
           <div className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
-              to="/g/att-academy/admin"
+              to="/platform/signup"
               className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
-              Portal login
+              Sign up your gym
+            </Link>
+            <Link
+              to="/platform/login"
+              className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
+            >
+              Access portal
             </Link>
           </div>
         </section>
