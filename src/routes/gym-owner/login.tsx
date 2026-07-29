@@ -6,7 +6,7 @@ import { NuvoLogo } from "@/components/NuvoLogo";
 import { getPortalContext } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
-export const Route = createFileRoute("/gym-portal/login")({
+export const Route = createFileRoute("/gym-owner/login")({
   ssr: false,
   head: () => ({
     meta: [
@@ -44,7 +44,7 @@ function GymOwnerLogin() {
       if (role === "staff") {
         nav({ to: `/gym/${gym.slug}/admin` });
       } else {
-        nav({ to: "/gym-portal/setup" });
+        nav({ to: "/gym-owner/setup" });
       }
     } catch {
       await supabase.auth.signOut();
@@ -89,7 +89,7 @@ function GymOwnerLogin() {
 
       <p className="mt-5 text-center text-xs text-muted-foreground">
         Don't have an account?{" "}
-        <Link to="/gym-portal/signup" className="font-semibold text-primary">
+        <Link to="/gym-owner/signup" className="font-semibold text-primary">
           Sign up your gym
         </Link>
       </p>

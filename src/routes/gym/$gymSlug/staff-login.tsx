@@ -91,7 +91,7 @@ function StaffLoginPage() {
         ← Back
       </Link>
       <p className="mt-3 text-center text-[10px] text-muted-foreground">
-        Want to add your gym? <Link to="/gym-portal/signup" className="font-semibold text-primary">Sign up your gym</Link>
+        Want to add your gym? <Link to="/gym-owner/signup" className="font-semibold text-primary">Sign up your gym</Link>
       </p>
     </div>
   );
