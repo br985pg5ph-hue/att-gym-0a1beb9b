@@ -283,6 +283,7 @@ export const updateGymSetup = createServerFn({ method: "POST" })
       ...(data.primary_color !== undefined && { primary_color: data.primary_color }),
       ...(data.secondary_color !== undefined && { secondary_color: data.secondary_color }),
       ...(data.hours !== undefined && { hours: data.hours }),
+      ...(data.theme !== undefined && { theme: data.theme }),
       ...(data.logo_url !== undefined && { logo_url: data.logo_url }),
     };
 
