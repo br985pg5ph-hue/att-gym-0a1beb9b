@@ -39,13 +39,9 @@ function GymOwnerLogin() {
     }
 
     try {
-      const { role, gym } = await getPortal();
+      const { gym } = await getPortal();
       toast.success("Welcome back");
-      if (role === "staff") {
-        nav({ to: `/gym/${gym.slug}/admin` });
-      } else {
-        nav({ to: "/gym-owner/setup" });
-      }
+      nav({ to: `/gym/${gym.slug}/admin` });
     } catch {
       await supabase.auth.signOut();
       toast.error("This portal is for gym staff and admins only");
