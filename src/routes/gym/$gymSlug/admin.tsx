@@ -1043,11 +1043,36 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members", gymId],
     enabled: !!gymId,
-    queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
-      .eq("role", "member")
-      .eq("gym_id", gymId!)
-      .order("name")).data ?? [],
+    queryFn: async () => {
+      const [{ data: rows }, { data: kids }] = await Promise.all([
+        supabase
+          .from("gym_members")
+          .select("user_id, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, profiles(id, name, avatar_url)")
+          .eq("role", "member")
+          .eq("gym_id", gymId!),
+        supabase
+          .from("children")
+          .select("id, parent_id, name, group_subscription_until, pt_sessions_remaining, avatar_url")
+          .eq("gym_id", gymId!),
+      ]);
+      const kidsByParent: Record<string, any[]> = {};
+      for (const k of (kids ?? []) as any[]) {
+        (kidsByParent[k.parent_id] ??= []).push(k);
+      }
+      return ((rows ?? []) as any[])
+        .map((m) => ({
+          id: m.user_id,
+          name: m.profiles?.name ?? "Member",
+          avatar_url: m.profiles?.avatar_url ?? null,
+          member_code: m.member_code,
+          membership_status: m.membership_status,
+          pt_sessions_remaining: m.pt_sessions_remaining,
+          group_subscription_until: m.group_subscription_until,
+          role: m.role,
+          children: kidsByParent[m.user_id] ?? [],
+        }))
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    },
   });
   const [search, setSearch] = useState("");
   
