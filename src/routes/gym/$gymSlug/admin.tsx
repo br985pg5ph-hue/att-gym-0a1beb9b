@@ -4,7 +4,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
-import { useGym, fetchGym, gp } from "@/lib/gym";
+import { useGym, gp } from "@/lib/gym";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmmanDays, formatAmmanDateTime } from "@/lib/time";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
@@ -18,14 +19,11 @@ export const Route = createFileRoute("/gym/$gymSlug/admin")({
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
-    const { data: prof } = await supabase.from("profiles").select("role, gym_id").eq("id", data.user.id).maybeSingle();
-    if (!prof || !["staff", "admin", "owner"].includes(prof.role)) throw redirect({ to: gp("/home") });
-    const gym = await fetchGym(params.gymSlug);
-    if (!gym || prof.gym_id !== gym.id) {
-      await supabase.auth.signOut();
-      throw redirect({ to: gp("/staff-login") });
-    }
+    const membership = await fetchMembershipBySlug(data.user.id, params.gymSlug);
+    if (!membership) throw redirect({ to: gp("/staff-login") });
+    if (!isStaffRole(membership.role)) throw redirect({ to: gp("/home") });
   },
+
 
   component: AdminPage,
 });
@@ -532,7 +530,7 @@ function ClassesAdmin() {
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
       let nameMap: Record<string, string> = {};
       if (memberIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, name").eq("gym_id", gymId!).in("id", memberIds);
+        const { data: profs } = await supabase.from("profiles").select("id, name").in("id", memberIds);
         nameMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.name]));
       }
       return list.map((c: any) => ({
@@ -1045,11 +1043,36 @@ function MembersAdmin() {
   const { data = [] } = useQuery({
     queryKey: ["admin-members", gymId],
     enabled: !!gymId,
-    queryFn: async () => (await supabase.from("profiles")
-      .select("id, name, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, avatar_url, children(id, name, group_subscription_until, pt_sessions_remaining, avatar_url)")
-      .eq("role", "member")
-      .eq("gym_id", gymId!)
-      .order("name")).data ?? [],
+    queryFn: async () => {
+      const [{ data: rows }, { data: kids }] = await Promise.all([
+        supabase
+          .from("gym_members")
+          .select("user_id, member_code, membership_status, pt_sessions_remaining, group_subscription_until, role, profiles(id, name, avatar_url)")
+          .eq("role", "member")
+          .eq("gym_id", gymId!),
+        supabase
+          .from("children")
+          .select("id, parent_id, name, group_subscription_until, pt_sessions_remaining, avatar_url")
+          .eq("gym_id", gymId!),
+      ]);
+      const kidsByParent: Record<string, any[]> = {};
+      for (const k of (kids ?? []) as any[]) {
+        (kidsByParent[k.parent_id] ??= []).push(k);
+      }
+      return ((rows ?? []) as any[])
+        .map((m) => ({
+          id: m.user_id,
+          name: m.profiles?.name ?? "Member",
+          avatar_url: m.profiles?.avatar_url ?? null,
+          member_code: m.member_code,
+          membership_status: m.membership_status,
+          pt_sessions_remaining: m.pt_sessions_remaining,
+          group_subscription_until: m.group_subscription_until,
+          role: m.role,
+          children: kidsByParent[m.user_id] ?? [],
+        }))
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    },
   });
   const [search, setSearch] = useState("");
   

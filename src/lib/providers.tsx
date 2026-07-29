@@ -11,6 +11,11 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
 const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict }>({ lang: "en", setLang: () => {}, t: dict.en });
 
 // ---------- AUTH ----------
+/**
+ * The signed-in person's identity (profiles) merged with their membership at
+ * the gym they are currently using (gym_members). One account can hold several
+ * memberships; the merged shape keeps screens simple.
+ */
 type Profile = {
   id: string; name: string; phone: string | null; avatar_url: string | null;
   role: "member" | "staff" | "admin" | "owner"; membership_status: string;
@@ -18,9 +23,18 @@ type Profile = {
   pt_sessions_remaining: number; group_subscription_until: string | null;
   interests: string[];
   is_parent: boolean;
+  onboarded: boolean;
   membership_paused_at: string | null;
   tour_completed_at: string | null;
   gender: "male" | "female" | null;
+  gym_id: string | null;
+  is_platform_admin: boolean;
+};
+
+export type Membership = {
+  id: string; gym_id: string; role: "member" | "staff" | "admin" | "owner";
+  member_code: string; membership_status: string;
+  gym: { id: string; slug: string; name: string; logo_url: string | null } | null;
 };
 
 export type Child = {
@@ -32,8 +46,11 @@ export type Child = {
 };
 
 
-const AuthCtx = createContext<{ user: User | null; profile: Profile | null; loading: boolean; refresh: () => Promise<void> }>({
-  user: null, profile: null, loading: true, refresh: async () => {},
+const AuthCtx = createContext<{
+  user: User | null; profile: Profile | null; loading: boolean;
+  memberships: Membership[]; refresh: () => Promise<void>;
+}>({
+  user: null, profile: null, loading: true, memberships: [], refresh: async () => {},
 });
 
 // ---------- CHILD (selected child in parent mode) ----------
@@ -41,6 +58,7 @@ const ChildCtx = createContext<{
   children: Child[]; selectedChildId: string | null; setSelectedChildId: (id: string | null) => void;
   selectedChild: Child | null; refreshChildren: () => Promise<void>;
 }>({ children: [], selectedChildId: null, setSelectedChildId: () => {}, selectedChild: null, refreshChildren: async () => {} });
+
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
@@ -77,10 +95,37 @@ export function AppProviders({ children }: { children: ReactNode }) {
     localStorage.setItem("lang", lang);
   }, [theme, lang]);
 
+  const [memberships, setMemberships] = useState<Membership[]>([]);
+
   const loadProfile = async (uid: string) => {
-    const { data } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
-    setProfile(data as Profile | null);
+    const [{ data: p }, { data: ms }] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+      supabase
+        .from("gym_members")
+        .select("*, gym:gyms(id, slug, name, logo_url)")
+        .eq("user_id", uid)
+        .order("created_at"),
+    ]);
+    const list = (ms ?? []) as unknown as Membership[];
+    setMemberships(list);
+    if (!p) return setProfile(null);
+    const active = list.find((m) => m.gym_id === (p as any).active_gym_id) ?? null;
+    const m = active as any;
+    setProfile({
+      ...(p as any),
+      gym_id: (p as any).active_gym_id ?? null,
+      role: m?.role ?? "member",
+      membership_status: m?.membership_status ?? "inactive",
+      referral_code: m?.referral_code ?? "",
+      member_code: m?.member_code ?? "",
+      streak: m?.streak ?? 0,
+      classes_attended: m?.classes_attended ?? 0,
+      pt_sessions_remaining: m?.pt_sessions_remaining ?? 0,
+      group_subscription_until: m?.group_subscription_until ?? null,
+      membership_paused_at: m?.membership_paused_at ?? null,
+    } as Profile);
   };
+
 
   const loadChildren = async (uid: string) => {
     const { data } = await supabase.from("children").select("*").eq("parent_id", uid).order("created_at");
@@ -136,7 +181,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ThemeCtx.Provider value={{ theme, setTheme: setThemeState }}>
       <LangCtx.Provider value={{ lang, setLang: setLangState, t: dict[lang] }}>
-        <AuthCtx.Provider value={{ user, profile, loading, refresh }}>
+        <AuthCtx.Provider value={{ user, profile, loading, memberships, refresh }}>
           <ChildCtx.Provider value={{ children: childList, selectedChildId, setSelectedChildId, selectedChild, refreshChildren }}>
             {children}
           </ChildCtx.Provider>

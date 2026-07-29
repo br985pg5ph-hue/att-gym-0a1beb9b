@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { gp } from "@/lib/gym";
+import { gp, useGymSlug } from "@/lib/gym";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/gym/$gymSlug/auth")({
 
 function AuthPage() {
   const nav = useNavigate();
+  const gymSlug = useGymSlug();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,15 +27,14 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", data.user!.id)
-      .maybeSingle();
-
-    const staffRoles = ["staff", "admin", "owner"];
+    const membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
     setLoading(false);
-    if (prof && staffRoles.includes(prof.role)) {
+    if (!membership) {
+      toast.error("This account isn't a member of this gym yet");
+      return;
+    }
+    await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", data.user!.id);
+    if (isStaffRole(membership.role)) {
       nav({ to: gp("/admin") });
     } else {
       nav({ to: gp("/home") });

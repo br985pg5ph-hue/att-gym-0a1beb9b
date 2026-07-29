@@ -48,14 +48,6 @@ const setupUpdateSchema = z.object({
     .optional(),
 });
 
-/** Resolve the platform gym id (the non-operational gym that owns platform admins). */
-async function getPlatformGymId(adminClient: any): Promise<string> {
-  const { data, error } = await adminClient.from("gyms").select("id").eq("slug", "platform").maybeSingle();
-  if (error) throw error;
-  if (!data) throw new Error("Platform gym not found");
-  return data.id as string;
-}
-
 export const applyForGym = createServerFn({ method: "POST" })
   .inputValidator((input) => applySchema.parse(input))
   .handler(async ({ data }) => {
@@ -105,23 +97,24 @@ export const applyForGym = createServerFn({ method: "POST" })
     }
     const userId = authData.user!.id;
 
-    // handle_new_user trigger already created a profile from user_metadata.
-    // Update it to staff / gym owner.
-    const { error: profErr } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        name: data.ownerName,
-        phone: data.ownerPhone,
-        gym_id: gymId,
-        role: "admin",
-      })
-      .eq("id", userId);
-    if (profErr) {
-      // Rollback
+    const rollback = async (err: unknown) => {
       await supabaseAdmin.auth.admin.deleteUser(userId);
       await supabaseAdmin.from("gyms").delete().eq("id", gymId);
-      throw profErr;
-    }
+      throw err;
+    };
+
+    // handle_new_user created the identity profile; point it at the new gym.
+    const { error: profErr } = await supabaseAdmin
+      .from("profiles")
+      .update({ name: data.ownerName, phone: data.ownerPhone, active_gym_id: gymId })
+      .eq("id", userId);
+    if (profErr) await rollback(profErr);
+
+    // The gym owner's admin membership at their own gym.
+    const { error: memErr } = await supabaseAdmin
+      .from("gym_members")
+      .upsert({ user_id: userId, gym_id: gymId, role: "admin" }, { onConflict: "user_id,gym_id" });
+    if (memErr) await rollback(memErr);
 
     return { success: true, gymId };
   });
@@ -130,17 +123,12 @@ export const getPlatformAdminContext = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getPlatformGymId, isPlatformAdmin } = await import("@/lib/platform.server");
     const platformGymId = await getPlatformGymId(supabaseAdmin);
-
-    const { data: prof, error } = await context.supabase
-      .from("profiles")
-      .select("id, role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (error) throw error;
-
-    const isPlatformAdmin = prof?.role === "owner" && prof.gym_id === platformGymId;
-    return { isPlatformAdmin, platformGymId };
+    return {
+      isPlatformAdmin: await isPlatformAdmin(context.supabase, context.userId),
+      platformGymId,
+    };
   });
 
 export const listGymsForPlatform = createServerFn({ method: "POST" })
@@ -150,17 +138,8 @@ export const listGymsForPlatform = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const platformGymId = await getPlatformGymId(supabaseAdmin);
-
-    const { data: prof, error: profErr } = await context.supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (profErr) throw profErr;
-    if (prof?.role !== "owner" || prof.gym_id !== platformGymId) {
-      throw new Error("Forbidden");
-    }
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
 
     let q = supabaseAdmin.from("gyms").select("*").neq("slug", "platform").order("created_at", { ascending: false });
     if (data.status && data.status !== "all") {
@@ -169,18 +148,20 @@ export const listGymsForPlatform = createServerFn({ method: "POST" })
     const { data: gyms, error } = await q;
     if (error) throw error;
 
-    // Fetch owner profiles for each gym
+    // Fetch the owning admin/staff account for each gym
     const gymIds = (gyms ?? []).map((g) => g.id);
     const { data: owners, error: ownersErr } = await supabaseAdmin
-      .from("profiles")
-      .select("gym_id, name, phone")
+      .from("gym_members")
+      .select("gym_id, profiles(name, phone)")
       .in("role", ["admin", "staff"])
       .in("gym_id", gymIds);
     if (ownersErr) throw ownersErr;
 
     const ownerByGym = new Map<string, { name: string | null; phone: string | null }>();
-    for (const o of owners ?? []) {
-      ownerByGym.set(o.gym_id as string, { name: o.name, phone: o.phone });
+    for (const o of (owners ?? []) as any[]) {
+      if (!ownerByGym.has(o.gym_id)) {
+        ownerByGym.set(o.gym_id as string, { name: o.profiles?.name ?? null, phone: o.profiles?.phone ?? null });
+      }
     }
 
     return (gyms ?? []).map((g) => ({
@@ -194,17 +175,8 @@ export const updateGymStatus = createServerFn({ method: "POST" })
   .inputValidator((input) => statusSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const platformGymId = await getPlatformGymId(supabaseAdmin);
-
-    const { data: prof, error: profErr } = await context.supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (profErr) throw profErr;
-    if (prof?.role !== "owner" || prof.gym_id !== platformGymId) {
-      throw new Error("Forbidden");
-    }
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
 
     const { error } = await supabaseAdmin.from("gyms").update({ status: data.status }).eq("id", data.gymId);
     if (error) throw error;
@@ -214,17 +186,10 @@ export const updateGymStatus = createServerFn({ method: "POST" })
 export const getGymSetupContext = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: prof, error: profErr } = await context.supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (profErr) throw profErr;
-    if (!prof || (prof.role !== "admin" && prof.role !== "owner") || !prof.gym_id) {
-      throw new Error("Forbidden");
-    }
+    const { requireGymRole } = await import("@/lib/platform.server");
+    const { gymId } = await requireGymRole(context.supabase, context.userId, ["admin", "owner"]);
 
-    const { data: gym, error } = await context.supabase.from("gyms").select("*").eq("id", prof.gym_id).maybeSingle();
+    const { data: gym, error } = await context.supabase.from("gyms").select("*").eq("id", gymId).maybeSingle();
     if (error) throw error;
     if (!gym) throw new Error("Gym not found");
     return { gym };
@@ -234,42 +199,25 @@ export const getGymSetupContext = createServerFn({ method: "GET" })
 export const getPortalContext = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: prof, error: profErr } = await context.supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (profErr) throw profErr;
-    const allowed = ["staff", "admin", "owner"];
-    if (!prof || !allowed.includes(prof.role) || !prof.gym_id) {
-      throw new Error("Forbidden");
-    }
+    const { requireGymRole } = await import("@/lib/platform.server");
+    const { gymId, role } = await requireGymRole(context.supabase, context.userId, ["staff", "admin", "owner"]);
 
     const { data: gym, error } = await context.supabase
       .from("gyms")
       .select("id, slug, name, status")
-      .eq("id", prof.gym_id)
+      .eq("id", gymId)
       .maybeSingle();
     if (error) throw error;
     if (!gym) throw new Error("Gym not found");
-    return { role: prof.role as string, gym };
+    return { role, gym };
   });
-
-
 
 export const updateGymSetup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => setupUpdateSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: prof, error: profErr } = await context.supabase
-      .from("profiles")
-      .select("role, gym_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (profErr) throw profErr;
-    if (!prof || (prof.role !== "admin" && prof.role !== "owner") || !prof.gym_id) {
-      throw new Error("Forbidden");
-    }
+    const { requireGymRole } = await import("@/lib/platform.server");
+    const { gymId } = await requireGymRole(context.supabase, context.userId, ["admin", "owner"]);
 
     const update = {
       ...(data.name !== undefined && { name: data.name }),
@@ -287,7 +235,8 @@ export const updateGymSetup = createServerFn({ method: "POST" })
       ...(data.logo_url !== undefined && { logo_url: data.logo_url }),
     };
 
-    const { error } = await context.supabase.from("gyms").update(update as any).eq("id", prof.gym_id);
+    const { error } = await context.supabase.from("gyms").update(update as any).eq("id", gymId);
     if (error) throw error;
     return { success: true };
   });
+

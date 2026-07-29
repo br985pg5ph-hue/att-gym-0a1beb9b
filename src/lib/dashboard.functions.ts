@@ -25,9 +25,10 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
 
     // The caller's own gym is the tenant — never trust a client-supplied slug here.
     const { data: callerProfile } = await context.supabase
-      .from("profiles").select("gym_id").eq("id", context.userId).maybeSingle();
-    const gymId = callerProfile?.gym_id;
+      .from("profiles").select("active_gym_id").eq("id", context.userId).maybeSingle();
+    const gymId = callerProfile?.active_gym_id;
     if (!gymId) throw new Error("Forbidden");
+
 
 
     const now = ammanNow();
@@ -76,7 +77,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .lte("starts_at", tomorrowEnd)
         .is("cancelled_at", null),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
@@ -86,7 +87,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("pt_sessions_remaining")
         .eq("gym_id", gymId),
       supabaseAdmin
@@ -94,23 +95,24 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .select("pt_sessions_remaining")
         .eq("gym_id", gymId),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gte("created_at", weekAgo.toISOString()),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString()),
       supabaseAdmin
-        .from("profiles")
-        .select("id, name, group_subscription_until")
+        .from("gym_members")
+        .select("user_id, group_subscription_until, profiles(name)")
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString())
         .lte("group_subscription_until", weekFromNow.toISOString())
         .order("group_subscription_until", { ascending: true })
         .limit(10),
+
       supabaseAdmin
         .from("transactions")
         .select("id, type, service, classes, days, description, payment_method, created_at, member_id, profiles(id, name), children(id, name)")
@@ -134,13 +136,13 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .lte("created_at", todayEnd)
         .not("payment_method", "is", null),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("created_at")
         .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString())
         .order("created_at", { ascending: true }),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id, group_subscription_until, pt_sessions_remaining, membership_paused_at")
         .eq("gym_id", gymId),
     ]);
@@ -210,8 +212,8 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       newSignupsThisMonth: (newThisMonth ?? []).length,
       expiringSoonCount: (expiringSoon ?? []).length,
       expiringSoonList: (expiringSoon ?? []).map((p: any) => ({
-        id: p.id,
-        name: p.name,
+        id: p.user_id,
+        name: p.profiles?.name ?? "Member",
         group_subscription_until: p.group_subscription_until,
       })),
       recentTransactions: (recentTxns ?? []).map((t: any) => ({

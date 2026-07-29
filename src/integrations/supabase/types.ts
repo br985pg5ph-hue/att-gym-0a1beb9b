@@ -340,14 +340,129 @@ export type Database = {
           },
         ]
       }
+      gym_join_settings: {
+        Row: {
+          created_at: string
+          gym_id: string
+          join_code: string
+          require_code: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          gym_id: string
+          join_code?: string
+          require_code?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          gym_id?: string
+          join_code?: string
+          require_code?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_join_settings_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: true
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gym_members: {
+        Row: {
+          classes_attended: number
+          created_at: string
+          group_subscription_started_at: string | null
+          group_subscription_until: string | null
+          group_track: string | null
+          gym_id: string
+          id: string
+          member_code: string
+          membership_pause_days_used: number
+          membership_paused_at: string | null
+          membership_status: string
+          pt_sessions_remaining: number
+          referral_code: string
+          referral_reward_granted: boolean
+          referred_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          classes_attended?: number
+          created_at?: string
+          group_subscription_started_at?: string | null
+          group_subscription_until?: string | null
+          group_track?: string | null
+          gym_id: string
+          id?: string
+          member_code?: string
+          membership_pause_days_used?: number
+          membership_paused_at?: string | null
+          membership_status?: string
+          pt_sessions_remaining?: number
+          referral_code?: string
+          referral_reward_granted?: boolean
+          referred_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          classes_attended?: number
+          created_at?: string
+          group_subscription_started_at?: string | null
+          group_subscription_until?: string | null
+          group_track?: string | null
+          gym_id?: string
+          id?: string
+          member_code?: string
+          membership_pause_days_used?: number
+          membership_paused_at?: string | null
+          membership_status?: string
+          pt_sessions_remaining?: number
+          referral_code?: string
+          referral_reward_granted?: boolean
+          referred_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_members_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_members_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gyms: {
         Row: {
           address: string
+          city: string
           created_at: string
           hours: Json
           id: string
           instagram_url: string | null
           lat: number
+          listed: boolean
           lng: number
           logo_url: string | null
           maps_url: string | null
@@ -362,11 +477,13 @@ export type Database = {
         }
         Insert: {
           address?: string
+          city?: string
           created_at?: string
           hours?: Json
           id?: string
           instagram_url?: string | null
           lat?: number
+          listed?: boolean
           lng?: number
           logo_url?: string | null
           maps_url?: string | null
@@ -381,11 +498,13 @@ export type Database = {
         }
         Update: {
           address?: string
+          city?: string
           created_at?: string
           hours?: Json
           id?: string
           instagram_url?: string | null
           lat?: number
+          listed?: boolean
           lng?: number
           logo_url?: string | null
           maps_url?: string | null
@@ -402,117 +521,71 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_gym_id: string | null
           avatar_url: string | null
-          classes_attended: number
           created_at: string
           date_of_birth: string | null
           disciplines: string[]
           experience_level: string | null
           gender: string | null
           goals: string[]
-          group_subscription_started_at: string | null
-          group_subscription_until: string | null
-          group_track: string | null
-          gym_id: string
           id: string
           injuries: string | null
           interests: string[]
           is_parent: boolean
-          member_code: string
-          membership_pause_days_used: number
-          membership_paused_at: string | null
-          membership_status: string
+          is_platform_admin: boolean
           name: string
           onboarded: boolean
           phone: string | null
-          pt_sessions_remaining: number
-          referral_code: string
-          referral_reward_granted: boolean
-          referred_by: string | null
-          role: Database["public"]["Enums"]["app_role"]
-          streak: number
           tour_completed_at: string | null
           training_frequency: string | null
         }
         Insert: {
+          active_gym_id?: string | null
           avatar_url?: string | null
-          classes_attended?: number
           created_at?: string
           date_of_birth?: string | null
           disciplines?: string[]
           experience_level?: string | null
           gender?: string | null
           goals?: string[]
-          group_subscription_started_at?: string | null
-          group_subscription_until?: string | null
-          group_track?: string | null
-          gym_id: string
           id: string
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
-          member_code: string
-          membership_pause_days_used?: number
-          membership_paused_at?: string | null
-          membership_status?: string
+          is_platform_admin?: boolean
           name?: string
           onboarded?: boolean
           phone?: string | null
-          pt_sessions_remaining?: number
-          referral_code?: string
-          referral_reward_granted?: boolean
-          referred_by?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
-          streak?: number
           tour_completed_at?: string | null
           training_frequency?: string | null
         }
         Update: {
+          active_gym_id?: string | null
           avatar_url?: string | null
-          classes_attended?: number
           created_at?: string
           date_of_birth?: string | null
           disciplines?: string[]
           experience_level?: string | null
           gender?: string | null
           goals?: string[]
-          group_subscription_started_at?: string | null
-          group_subscription_until?: string | null
-          group_track?: string | null
-          gym_id?: string
           id?: string
           injuries?: string | null
           interests?: string[]
           is_parent?: boolean
-          member_code?: string
-          membership_pause_days_used?: number
-          membership_paused_at?: string | null
-          membership_status?: string
+          is_platform_admin?: boolean
           name?: string
           onboarded?: boolean
           phone?: string | null
-          pt_sessions_remaining?: number
-          referral_code?: string
-          referral_reward_granted?: boolean
-          referred_by?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
-          streak?: number
           tour_completed_at?: string | null
           training_frequency?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "profiles_gym_id_fkey"
-            columns: ["gym_id"]
+            foreignKeyName: "profiles_active_gym_id_fkey"
+            columns: ["active_gym_id"]
             isOneToOne: false
             referencedRelation: "gyms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_referred_by_fkey"
-            columns: ["referred_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -600,96 +673,87 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_role_at: {
+        Args: {
+          _gym_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_member_of: { Args: { _gym_id: string }; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
+      join_gym: {
+        Args: { _code?: string; _referral?: string; _slug: string }
+        Returns: string
+      }
       pause_membership: {
-        Args: { target_user: string }
+        Args: { target_gym?: string; target_user: string }
         Returns: {
-          avatar_url: string | null
           classes_attended: number
           created_at: string
-          date_of_birth: string | null
-          disciplines: string[]
-          experience_level: string | null
-          gender: string | null
-          goals: string[]
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
           gym_id: string
           id: string
-          injuries: string | null
-          interests: string[]
-          is_parent: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
           membership_status: string
-          name: string
-          onboarded: boolean
-          phone: string | null
           pt_sessions_remaining: number
           referral_code: string
           referral_reward_granted: boolean
           referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
-          tour_completed_at: string | null
-          training_frequency: string | null
+          updated_at: string
+          user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "profiles"
+          to: "gym_members"
           isOneToOne: true
           isSetofReturn: false
         }
       }
       resume_membership: {
-        Args: { target_user: string }
+        Args: { target_gym?: string; target_user: string }
         Returns: {
-          avatar_url: string | null
           classes_attended: number
           created_at: string
-          date_of_birth: string | null
-          disciplines: string[]
-          experience_level: string | null
-          gender: string | null
-          goals: string[]
           group_subscription_started_at: string | null
           group_subscription_until: string | null
           group_track: string | null
           gym_id: string
           id: string
-          injuries: string | null
-          interests: string[]
-          is_parent: boolean
           member_code: string
           membership_pause_days_used: number
           membership_paused_at: string | null
           membership_status: string
-          name: string
-          onboarded: boolean
-          phone: string | null
           pt_sessions_remaining: number
           referral_code: string
           referral_reward_granted: boolean
           referred_by: string | null
           role: Database["public"]["Enums"]["app_role"]
           streak: number
-          tour_completed_at: string | null
-          training_frequency: string | null
+          updated_at: string
+          user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "profiles"
+          to: "gym_members"
           isOneToOne: true
           isSetofReturn: false
         }
       }
       same_gym: { Args: { _gym_id: string }; Returns: boolean }
+      set_active_gym: { Args: { _gym_id: string }; Returns: undefined }
       set_group_track: {
         Args: { target_child: string; target_user: string; track: string }
         Returns: undefined
       }
+      shares_gym_with: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "member" | "staff" | "admin" | "owner"
