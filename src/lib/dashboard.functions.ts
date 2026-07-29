@@ -77,7 +77,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .lte("starts_at", tomorrowEnd)
         .is("cancelled_at", null),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
@@ -87,7 +87,7 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString()),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("pt_sessions_remaining")
         .eq("gym_id", gymId),
       supabaseAdmin
@@ -95,23 +95,24 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
         .select("pt_sessions_remaining")
         .eq("gym_id", gymId),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gte("created_at", weekAgo.toISOString()),
       supabaseAdmin
-        .from("profiles")
+        .from("gym_members")
         .select("id")
         .eq("gym_id", gymId)
         .gte("created_at", monthAgo.toISOString()),
       supabaseAdmin
-        .from("profiles")
-        .select("id, name, group_subscription_until")
+        .from("gym_members")
+        .select("user_id, group_subscription_until, profiles(name)")
         .eq("gym_id", gymId)
         .gt("group_subscription_until", now.toISOString())
         .lte("group_subscription_until", weekFromNow.toISOString())
         .order("group_subscription_until", { ascending: true })
         .limit(10),
+
       supabaseAdmin
         .from("transactions")
         .select("id, type, service, classes, days, description, payment_method, created_at, member_id, profiles(id, name), children(id, name)")
