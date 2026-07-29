@@ -8,11 +8,11 @@ import { NuvoLogo } from "@/components/NuvoLogo";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
 import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock } from "lucide-react";
 
-export const Route = createFileRoute("/platform/setup")({
+export const Route = createFileRoute("/gym-portal/setup")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/platform/login" });
+    if (!data.user) throw redirect({ to: "/gym-portal/login" });
   },
   component: GymSetupWizard,
 });
@@ -112,7 +112,7 @@ function GymSetupWizard() {
                 Your gym is active. You can now open your admin dashboard.
               </p>
               <Link
-                to="/g/$gymSlug/admin"
+                to="/gym/$gymSlug/admin"
                 params={{ gymSlug: gym.slug }}
                 className="mt-2 inline-block rounded-pill bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-white"
               >

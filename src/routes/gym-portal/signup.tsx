@@ -6,7 +6,7 @@ import { NuvoLogo } from "@/components/NuvoLogo";
 import { applyForGym } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
-export const Route = createFileRoute("/platform/signup")({
+export const Route = createFileRoute("/gym-portal/signup")({
   ssr: false,
   component: PlatformSignup,
 });
@@ -42,11 +42,11 @@ function PlatformSignup() {
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
       if (signInErr) {
         toast.success("Application submitted! Please sign in to continue setup.");
-        nav({ to: "/platform/login" });
+        nav({ to: "/gym-portal/login" });
         return;
       }
       toast.success("Application submitted!");
-      nav({ to: "/platform/setup" });
+      nav({ to: "/gym-portal/setup" });
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to submit application");
     } finally {
@@ -138,7 +138,7 @@ function PlatformSignup() {
       </form>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Already have an account? <Link to="/platform/login" className="font-semibold text-primary">portal login</Link>
+        Already have an account? <Link to="/gym-portal/login" className="font-semibold text-primary">portal login</Link>
       </p>
       <p className="mt-2 text-center text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">← Back</Link>

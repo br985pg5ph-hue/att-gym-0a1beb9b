@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/settings")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/profile/settings")({
   component: SettingsPage,
 });
 

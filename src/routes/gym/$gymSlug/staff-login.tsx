@@ -5,7 +5,7 @@ import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 import { fetchGym, gp, useGymSlug } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/staff-login")({
+export const Route = createFileRoute("/gym/$gymSlug/staff-login")({
   ssr: false,
   component: StaffLoginPage,
 });
@@ -91,7 +91,7 @@ function StaffLoginPage() {
         ← Back
       </Link>
       <p className="mt-3 text-center text-[10px] text-muted-foreground">
-        Want to add your gym? <Link to="/platform/signup" className="font-semibold text-primary">Sign up your gym</Link>
+        Want to add your gym? <Link to="/gym-portal/signup" className="font-semibold text-primary">Sign up your gym</Link>
       </p>
     </div>
   );

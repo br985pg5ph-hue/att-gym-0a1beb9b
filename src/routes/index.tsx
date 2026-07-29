@@ -71,13 +71,13 @@ function NuvoHome() {
           <Wordmark className="text-2xl" />
           <div className="flex items-center gap-2">
             <Link
-              to="/g/att-academy/admin"
+              to="/gym/att-academy/admin"
               className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
             >
               Portal login
             </Link>
             <Link
-              to="/platform/signup"
+              to="/gym-portal/signup"
               className="hidden rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:block"
             >
               Sign up your gym
@@ -101,13 +101,13 @@ function NuvoHome() {
           </p>
           <div className="mx-auto mt-9 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
-              to="/platform/signup"
+              to="/gym-portal/signup"
               className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
               Sign up your gym
             </Link>
             <Link
-              to="/platform/login"
+              to="/gym-portal/login"
               className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
               Portal login
@@ -155,7 +155,7 @@ function NuvoHome() {
                 No per-feature upsells. Every gym on Nuvo gets the full platform, branded as their own.
               </p>
               <Link
-                to="/platform/signup"
+                to="/gym-portal/signup"
                 className="mt-7 inline-flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
               >
                 Sign up your gym
@@ -178,13 +178,13 @@ function NuvoHome() {
           <h2 className="font-display mt-4 text-4xl sm:text-5xl">Ready to move your gym to Nuvo?</h2>
           <div className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
-              to="/platform/signup"
+              to="/gym-portal/signup"
               className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
               Sign up your gym
             </Link>
             <Link
-              to="/platform/login"
+              to="/gym-portal/login"
               className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
               Access portal
@@ -198,7 +198,7 @@ function NuvoHome() {
           <Wordmark className="text-xl text-foreground" />
           <p>
             Already a member of a gym? Open the link your gym gave you, or{" "}
-            <Link to="/g/$gymSlug" params={{ gymSlug: "att-academy" }} className="font-semibold text-primary">
+            <Link to="/gym/$gymSlug" params={{ gymSlug: "att-academy" }} className="font-semibold text-primary">
               go to ATT Academy
             </Link>
             .

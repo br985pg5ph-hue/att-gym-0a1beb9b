@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { ChevronLeft, User } from "lucide-react";
 import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/bookings")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/profile/bookings")({
   component: BookingsPage,
 });
 

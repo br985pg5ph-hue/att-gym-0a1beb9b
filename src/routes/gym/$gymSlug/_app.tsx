@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { AppTour } from "@/components/AppTour";
 import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/_app")({
+export const Route = createFileRoute("/gym/$gymSlug/_app")({
   ssr: false,
   beforeLoad: async ({ location }) => {
     const { data } = await supabase.auth.getUser();

@@ -33,7 +33,7 @@ import { CountrySelect } from "@/components/CountrySelect";
 import { gp } from "@/lib/gym";
 
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/edit")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/profile/edit")({
   component: EditProfilePage,
 });
 

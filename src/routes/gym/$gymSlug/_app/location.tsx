@@ -6,7 +6,7 @@ import { useLang } from "@/lib/providers";
 import { useGym } from "@/lib/gym";
 import { Phone, Navigation } from "lucide-react";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/location")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/location")({
   component: LocationPage,
 });
 

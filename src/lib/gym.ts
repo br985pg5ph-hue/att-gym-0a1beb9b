@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Multi-tenant: one deployment serves every gym.
- * The tenant is resolved from the `/g/$gymSlug` route segment.
+ * The tenant is resolved from the `/gym/$gymSlug` route segment.
  * VITE_GYM_SLUG remains supported as a pin for single-gym / white-label builds.
  */
 export const DEFAULT_GYM_SLUG: string =
@@ -36,9 +36,9 @@ export function setCurrentGymSlug(slug: string) {
   currentSlug = slug;
 }
 
-/** Absolute in-app path for the active tenant. gp("/home") -> "/g/att-academy/home" */
+/** Absolute in-app path for the active tenant. gp("/home") -> "/gym/att-academy/home" */
 export function gp(path: string) {
-  return (`/g/${currentSlug}${path === "/" ? "" : path}`) as any;
+  return (`/gym/${currentSlug}${path === "/" ? "" : path}`) as any;
 }
 
 const GymSlugCtx = createContext<string>(DEFAULT_GYM_SLUG);
@@ -54,15 +54,15 @@ export function useGymSlug(): string {
 
 /**
  * Builds an absolute in-app path for the current tenant.
- * `gp("/home")` -> "/g/att-academy/home"
+ * `gp("/home")` -> "/gym/att-academy/home"
  */
 export function useGymPath() {
   const slug = useGymSlug();
-  return (path: string) => (`/g/${slug}${path === "/" ? "" : path}` as any);
+  return (path: string) => (`/gym/${slug}${path === "/" ? "" : path}` as any);
 }
 
 export function gymPath(slug: string, path: string): string {
-  return `/g/${slug}${path === "/" ? "" : path}`;
+  return `/gym/${slug}${path === "/" ? "" : path}`;
 }
 
 export const gymQueryKey = (slug: string) => ["gym", slug] as const;

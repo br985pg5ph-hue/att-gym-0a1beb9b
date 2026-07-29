@@ -8,11 +8,11 @@ import { NuvoLogo } from "@/components/NuvoLogo";
 import { getPlatformAdminContext, listGymsForPlatform, updateGymStatus } from "@/lib/platform.functions";
 import { LogOut, CheckCircle, XCircle, PauseCircle, PlayCircle, Users, Building2, Clock } from "lucide-react";
 
-export const Route = createFileRoute("/platform/dashboard")({
+export const Route = createFileRoute("/owner/dashboard")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/platform/console" });
+    if (!data.user) throw redirect({ to: "/owner/console" });
   },
   component: PlatformDashboard,
 });

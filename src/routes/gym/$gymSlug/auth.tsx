@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { gp } from "@/lib/gym";
 import { NuvoLogo } from "@/components/NuvoLogo";
 
-export const Route = createFileRoute("/g/$gymSlug/auth")({
+export const Route = createFileRoute("/gym/$gymSlug/auth")({
   ssr: false,
   component: AuthPage,
 });
@@ -91,7 +91,7 @@ function AuthPage() {
           </p>
           <p className="mt-3 text-center text-[11px] text-muted-foreground">
             Don't have a gym on Nuvo?{" "}
-            <Link to="/platform/signup" className="font-semibold text-primary">
+            <Link to="/gym-portal/signup" className="font-semibold text-primary">
               Sign up your gym
             </Link>
           </p>

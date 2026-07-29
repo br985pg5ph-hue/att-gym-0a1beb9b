@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, notFound, Link } from "@tanstack/react-router";
 import { fetchGym, gymQueryKey, GymSlugProvider, setCurrentGymSlug } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug")({
+export const Route = createFileRoute("/gym/$gymSlug")({
   ssr: false,
   beforeLoad: ({ params }) => {
     // Runs before every child route's beforeLoad, so gp() is always tenant-correct.

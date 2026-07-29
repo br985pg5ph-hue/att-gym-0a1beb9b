@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/AppShell";
 import { Gift, Copy, ChevronLeft, MessageSquare, Share2 } from "lucide-react";
 import { gp } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/referral")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/profile/referral")({
   component: ReferralPage,
 });
 

@@ -6,7 +6,7 @@ import { useAuth, useLang } from "@/lib/providers";
 import { toast } from "sonner";
 import { Pause, Play } from "lucide-react";
 
-export const Route = createFileRoute("/g/$gymSlug/_app/membership")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/membership")({
   component: MembershipPage,
 });
 

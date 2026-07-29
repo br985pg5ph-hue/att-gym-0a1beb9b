@@ -13,7 +13,7 @@ import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut
 import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
 
 
-export const Route = createFileRoute("/g/$gymSlug/admin")({
+export const Route = createFileRoute("/gym/$gymSlug/admin")({
   ssr: false,
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
@@ -40,7 +40,7 @@ function AdminPage() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const { gymSlug } = Route.useParams();
   const pathname = useRouterState({ select: s => s.location.pathname });
-  const base = `/g/${gymSlug}/admin`;
+  const base = `/gym/${gymSlug}/admin`;
   const isChild = pathname !== base && pathname !== `${base}/`;
   if (isChild) return <Outlet />;
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [

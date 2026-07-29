@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { gymPath } from "@/lib/gym";
 
-export const Route = createFileRoute("/g/$gymSlug/")({
+export const Route = createFileRoute("/gym/$gymSlug/")({
   ssr: false,
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();

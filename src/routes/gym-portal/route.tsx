@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/platform")({
-  component: PlatformLayout,
+export const Route = createFileRoute("/gym-portal")({
+  component: GymPortalLayout,
 });
 
-function PlatformLayout() {
+function GymPortalLayout() {
   return (
     <div className="nuvo-site min-h-screen bg-background text-foreground">
       <Outlet />

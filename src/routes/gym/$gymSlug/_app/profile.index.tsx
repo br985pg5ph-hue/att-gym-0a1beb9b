@@ -23,7 +23,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export const Route = createFileRoute("/g/$gymSlug/_app/profile/")({
+export const Route = createFileRoute("/gym/$gymSlug/_app/profile/")({
   component: ProfilePage,
 });
 
