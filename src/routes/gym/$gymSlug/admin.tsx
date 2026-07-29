@@ -530,7 +530,7 @@ function ClassesAdmin() {
       const memberIds = Array.from(new Set(list.flatMap((c: any) => (c.bookings ?? []).map((b: any) => b.member_id).filter(Boolean))));
       let nameMap: Record<string, string> = {};
       if (memberIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, name").eq("gym_id", gymId!).in("id", memberIds);
+        const { data: profs } = await supabase.from("profiles").select("id, name").in("id", memberIds);
         nameMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.name]));
       }
       return list.map((c: any) => ({
