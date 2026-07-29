@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gp } from "@/lib/gym";
+import { AuthBrand } from "@/components/AuthBrand";
 
 export const Route = createFileRoute("/gym/$gymSlug/forgot")({
   ssr: false,
@@ -19,7 +20,7 @@ function ForgotPage() {
   };
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6">
-      <h1 className="font-display text-3xl">Reset password</h1>
+      <AuthBrand subtitle="Reset password" size={56} />
       {sent ? (
         <p className="mt-4 text-sm text-muted-foreground">Check your email for a reset link.</p>
       ) : (

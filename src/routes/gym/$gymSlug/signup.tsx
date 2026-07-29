@@ -5,7 +5,7 @@ import { z } from "zod";
 import { CountrySelect } from "@/components/CountrySelect";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { Logo } from "@/components/Logo";
+import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 import { gp, useGymSlug } from "@/lib/gym";
@@ -77,10 +77,7 @@ function SignUpPage() {
 
   return (
     <div className="mx-auto w-full max-w-md px-6 py-10">
-      <div className="mb-6 flex flex-col items-center">
-        <Logo size={80} />
-        <h1 className="font-display mt-3 text-3xl">{t.createAccount}</h1>
-      </div>
+      <AuthBrand subtitle={t.createAccount} size={56} />
 
 
 

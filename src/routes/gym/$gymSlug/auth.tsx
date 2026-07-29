@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gp } from "@/lib/gym";
-import { NuvoLogo } from "@/components/NuvoLogo";
+import { AuthBrand } from "@/components/AuthBrand";
 
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
   ssr: false,
@@ -44,15 +44,7 @@ function AuthPage() {
     <div className="nuvo-site min-h-screen w-full bg-background">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-10 sm:px-10">
         <div className="w-full sm:mx-auto sm:max-w-md">
-          <div className="mb-8 flex flex-col items-center text-center">
-            <NuvoLogo size={64} />
-            <h1 className="mt-4 font-display text-4xl tracking-tight">
-              Nuvo<span className="text-primary">.</span>
-            </h1>
-            <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
-              Gym sign in
-            </p>
-          </div>
+          <AuthBrand subtitle="Sign in" />
 
           <form onSubmit={submit} className="space-y-3">
             <input
