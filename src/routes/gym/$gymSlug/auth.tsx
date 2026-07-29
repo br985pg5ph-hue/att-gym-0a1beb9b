@@ -25,15 +25,14 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", data.user!.id)
-      .maybeSingle();
-
-    const staffRoles = ["staff", "admin", "owner"];
+    const membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
     setLoading(false);
-    if (prof && staffRoles.includes(prof.role)) {
+    if (!membership) {
+      toast.error("This account isn't a member of this gym yet");
+      return;
+    }
+    await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", data.user!.id);
+    if (isStaffRole(membership.role)) {
       nav({ to: gp("/admin") });
     } else {
       nav({ to: gp("/home") });
