@@ -72,7 +72,7 @@ function AdminPage() {
             <>
               <Logo size={36} />
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">ATT Academy</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
                 <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
               </div>
             </>

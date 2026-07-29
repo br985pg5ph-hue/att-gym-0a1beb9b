@@ -73,7 +73,7 @@ export function AppTour() {
     { route: "/membership", title: "Private Sessions", description: "How many PT (private) sessions you have left, renew any time at the gym.", selector: '[data-tour="membership-pt"]' },
     { route: "/membership", title: "Credit History", description: "Review all your membership credits, PT sessions, and payments in one place.", selector: '[data-tour="membership-history"]' },
     { route: "/profile", title: "Profile & Referral", description: "Edit your info, invite friends with your referral link, and manage settings — including replaying this tour.", selector: '[data-tour="profile-menu"]' },
-    { title: "You're all set", description: "Enjoy training at ATT Academy. You can replay this tour any time from Settings." },
+    { title: "You're all set", description: `Enjoy training at ${gymName}. You can replay this tour any time from Settings.` },
   ];
 
   const runTour = async () => {
@@ -154,7 +154,7 @@ export function AppTour() {
     <div dir={lang === "ar" ? "rtl" : "ltr"} className="fixed inset-0 z-[100] grid place-items-center bg-black/70 px-6">
       <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary">Welcome</p>
-        <h2 className="font-display mt-2 text-2xl leading-tight">Take a quick tour of ATT Academy?</h2>
+        <h2 className="font-display mt-2 text-2xl leading-tight">Take a quick tour of {gymName}?</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           We'll show you how to book classes, track your membership, and find everything you need. Takes about a minute.
         </p>

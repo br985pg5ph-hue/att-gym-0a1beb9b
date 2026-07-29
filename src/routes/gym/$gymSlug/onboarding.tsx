@@ -78,7 +78,7 @@ function OnboardingPage() {
     }).eq("id", u.user.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Welcome to ATT Academy!");
+    toast.success(`Welcome to ${gym?.name ?? "the gym"}!`);
     try { sessionStorage.setItem("att.startTour", "1"); } catch {}
     nav({ to: gp("/home") });
   };

@@ -37,7 +37,7 @@ function ReferralPage() {
     setTimeout(() => setCopied(false), 1800);
   };
   const share = async () => {
-    const shareData = { title: "Join ATT Academy", text: `Join me at ATT Academy! Use my code ${code}`, url: link };
+    const shareData = { title: `Join ${gymName}`, text: `Join me at ${gymName}! Use my code ${code}`, url: link };
     try {
       if (typeof navigator !== "undefined" && (navigator as any).share && (!(navigator as any).canShare || (navigator as any).canShare(shareData))) {
         await (navigator as any).share(shareData);
@@ -48,7 +48,7 @@ function ReferralPage() {
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 1800);
   };
-  const sms = () => { window.location.href = `sms:?body=${encodeURIComponent(`Join me at ATT Academy! Use my code ${code} — ${link}`)}`; };
+  const sms = () => { window.location.href = `sms:?body=${encodeURIComponent(`Join me at ${gymName}! Use my code ${code} — ${link}`)}`; };
 
   return (
     <div>
