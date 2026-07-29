@@ -150,7 +150,7 @@ function GymSetupWizard() {
 
           <Section icon={Instagram} title="Social links">
             <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
-            <SetupField label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
+            <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
           </Section>
         </div>
       </main>
