@@ -47,9 +47,12 @@ function LocationPage() {
         <div className="card-surface p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.hours}</p>
           <ul className="mt-3 divide-y hairline">
-            {(gym.hours as Array<{day:string;open:string;close:string}>).map((h) => (
+            {(gym.hours as Array<{day:string;open:string;close:string;closed?:boolean}>).map((h) => (
               <li key={h.day} className="flex justify-between py-2 text-sm">
-                <span>{h.day}</span><span className="text-muted-foreground">{h.open} – {h.close}</span>
+                <span>{h.day}</span>
+                <span className="text-muted-foreground">
+                  {h.closed || (!h.open && !h.close) ? "Closed" : `${fmt12(h.open)} – ${fmt12(h.close)}`}
+                </span>
               </li>
             ))}
           </ul>
