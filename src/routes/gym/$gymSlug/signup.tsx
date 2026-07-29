@@ -126,6 +126,8 @@ function SignUpPage() {
       <p className="mt-8 text-center text-xs text-muted-foreground">
         {t.haveAccount} <Link to={gp("/auth")} className="font-semibold text-primary">{t.signIn}</Link>
       </p>
+      </div>
     </div>
+
   );
 }
