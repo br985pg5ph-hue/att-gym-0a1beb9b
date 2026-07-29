@@ -10,14 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
-import { Route as PlatformRouteRouteImport } from './routes/platform/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlatformIndexRouteImport } from './routes/platform/index'
-import { Route as PlatformSignupRouteImport } from './routes/platform/signup'
-import { Route as PlatformSetupRouteImport } from './routes/platform/setup'
-import { Route as PlatformLoginRouteImport } from './routes/platform/login'
-import { Route as PlatformDashboardRouteImport } from './routes/platform/dashboard'
-import { Route as PlatformConsoleRouteImport } from './routes/platform/console'
 import { Route as GGymSlugRouteRouteImport } from './routes/g/$gymSlug/route'
 import { Route as GGymSlugIndexRouteImport } from './routes/g/$gymSlug/index'
 import { Route as GGymSlugStaffLoginRouteImport } from './routes/g/$gymSlug/staff-login'
@@ -48,45 +41,10 @@ const SplatRoute = SplatRouteImport.update({
   path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlatformRouteRoute = PlatformRouteRouteImport.update({
-  id: '/platform',
-  path: '/platform',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const PlatformIndexRoute = PlatformIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PlatformRouteRoute,
-} as any)
-const PlatformSignupRoute = PlatformSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => PlatformRouteRoute,
-} as any)
-const PlatformSetupRoute = PlatformSetupRouteImport.update({
-  id: '/setup',
-  path: '/setup',
-  getParentRoute: () => PlatformRouteRoute,
-} as any)
-const PlatformLoginRoute = PlatformLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => PlatformRouteRoute,
-} as any)
-const PlatformDashboardRoute = PlatformDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => PlatformRouteRoute,
-} as any)
-const PlatformConsoleRoute = PlatformConsoleRouteImport.update({
-  id: '/console',
-  path: '/console',
-  getParentRoute: () => PlatformRouteRoute,
 } as any)
 const GGymSlugRouteRoute = GGymSlugRouteRouteImport.update({
   id: '/g/$gymSlug',
@@ -214,15 +172,8 @@ const GGymSlugAppProfileBookingsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/platform': typeof PlatformRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
-  '/platform/console': typeof PlatformConsoleRoute
-  '/platform/dashboard': typeof PlatformDashboardRoute
-  '/platform/login': typeof PlatformLoginRoute
-  '/platform/setup': typeof PlatformSetupRoute
-  '/platform/signup': typeof PlatformSignupRoute
-  '/platform/': typeof PlatformIndexRoute
   '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
   '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
   '/g/$gymSlug/forgot': typeof GGymSlugForgotRoute
@@ -249,12 +200,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/platform/console': typeof PlatformConsoleRoute
-  '/platform/dashboard': typeof PlatformDashboardRoute
-  '/platform/login': typeof PlatformLoginRoute
-  '/platform/setup': typeof PlatformSetupRoute
-  '/platform/signup': typeof PlatformSignupRoute
-  '/platform': typeof PlatformIndexRoute
   '/g/$gymSlug': typeof GGymSlugIndexRoute
   '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
   '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
@@ -280,15 +225,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/platform': typeof PlatformRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/g/$gymSlug': typeof GGymSlugRouteRouteWithChildren
-  '/platform/console': typeof PlatformConsoleRoute
-  '/platform/dashboard': typeof PlatformDashboardRoute
-  '/platform/login': typeof PlatformLoginRoute
-  '/platform/setup': typeof PlatformSetupRoute
-  '/platform/signup': typeof PlatformSignupRoute
-  '/platform/': typeof PlatformIndexRoute
   '/g/$gymSlug/_app': typeof GGymSlugAppRouteWithChildren
   '/g/$gymSlug/admin': typeof GGymSlugAdminRouteWithChildren
   '/g/$gymSlug/auth': typeof GGymSlugAuthRoute
@@ -317,15 +255,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/platform'
     | '/$'
     | '/g/$gymSlug'
-    | '/platform/console'
-    | '/platform/dashboard'
-    | '/platform/login'
-    | '/platform/setup'
-    | '/platform/signup'
-    | '/platform/'
     | '/g/$gymSlug/admin'
     | '/g/$gymSlug/auth'
     | '/g/$gymSlug/forgot'
@@ -352,12 +283,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
-    | '/platform/console'
-    | '/platform/dashboard'
-    | '/platform/login'
-    | '/platform/setup'
-    | '/platform/signup'
-    | '/platform'
     | '/g/$gymSlug'
     | '/g/$gymSlug/admin'
     | '/g/$gymSlug/auth'
@@ -382,15 +307,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/platform'
     | '/$'
     | '/g/$gymSlug'
-    | '/platform/console'
-    | '/platform/dashboard'
-    | '/platform/login'
-    | '/platform/setup'
-    | '/platform/signup'
-    | '/platform/'
     | '/g/$gymSlug/_app'
     | '/g/$gymSlug/admin'
     | '/g/$gymSlug/auth'
@@ -418,7 +336,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PlatformRouteRoute: typeof PlatformRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
   GGymSlugRouteRoute: typeof GGymSlugRouteRouteWithChildren
 }
@@ -432,61 +349,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/platform': {
-      id: '/platform'
-      path: '/platform'
-      fullPath: '/platform'
-      preLoaderRoute: typeof PlatformRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/platform/': {
-      id: '/platform/'
-      path: '/'
-      fullPath: '/platform/'
-      preLoaderRoute: typeof PlatformIndexRouteImport
-      parentRoute: typeof PlatformRouteRoute
-    }
-    '/platform/signup': {
-      id: '/platform/signup'
-      path: '/signup'
-      fullPath: '/platform/signup'
-      preLoaderRoute: typeof PlatformSignupRouteImport
-      parentRoute: typeof PlatformRouteRoute
-    }
-    '/platform/setup': {
-      id: '/platform/setup'
-      path: '/setup'
-      fullPath: '/platform/setup'
-      preLoaderRoute: typeof PlatformSetupRouteImport
-      parentRoute: typeof PlatformRouteRoute
-    }
-    '/platform/login': {
-      id: '/platform/login'
-      path: '/login'
-      fullPath: '/platform/login'
-      preLoaderRoute: typeof PlatformLoginRouteImport
-      parentRoute: typeof PlatformRouteRoute
-    }
-    '/platform/dashboard': {
-      id: '/platform/dashboard'
-      path: '/dashboard'
-      fullPath: '/platform/dashboard'
-      preLoaderRoute: typeof PlatformDashboardRouteImport
-      parentRoute: typeof PlatformRouteRoute
-    }
-    '/platform/console': {
-      id: '/platform/console'
-      path: '/console'
-      fullPath: '/platform/console'
-      preLoaderRoute: typeof PlatformConsoleRouteImport
-      parentRoute: typeof PlatformRouteRoute
     }
     '/g/$gymSlug': {
       id: '/g/$gymSlug'
@@ -659,28 +527,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface PlatformRouteRouteChildren {
-  PlatformConsoleRoute: typeof PlatformConsoleRoute
-  PlatformDashboardRoute: typeof PlatformDashboardRoute
-  PlatformLoginRoute: typeof PlatformLoginRoute
-  PlatformSetupRoute: typeof PlatformSetupRoute
-  PlatformSignupRoute: typeof PlatformSignupRoute
-  PlatformIndexRoute: typeof PlatformIndexRoute
-}
-
-const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
-  PlatformConsoleRoute: PlatformConsoleRoute,
-  PlatformDashboardRoute: PlatformDashboardRoute,
-  PlatformLoginRoute: PlatformLoginRoute,
-  PlatformSetupRoute: PlatformSetupRoute,
-  PlatformSignupRoute: PlatformSignupRoute,
-  PlatformIndexRoute: PlatformIndexRoute,
-}
-
-const PlatformRouteRouteWithChildren = PlatformRouteRoute._addFileChildren(
-  PlatformRouteRouteChildren,
-)
-
 interface GGymSlugAppProfileRouteChildren {
   GGymSlugAppProfileBookingsRoute: typeof GGymSlugAppProfileBookingsRoute
   GGymSlugAppProfileChildrenRoute: typeof GGymSlugAppProfileChildrenRoute
@@ -768,7 +614,6 @@ const GGymSlugRouteRouteWithChildren = GGymSlugRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PlatformRouteRoute: PlatformRouteRouteWithChildren,
   SplatRoute: SplatRoute,
   GGymSlugRouteRoute: GGymSlugRouteRouteWithChildren,
 }

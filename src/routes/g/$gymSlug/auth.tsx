@@ -89,12 +89,6 @@ function AuthPage() {
           <p className="mt-8 text-center text-xs text-muted-foreground">
             This portal is for gym staff and owners. Members sign in through their gym's own app.
           </p>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            Don't have a gym on Nuvo?{" "}
-            <Link to="/platform/signup" className="font-semibold text-primary">
-              Sign up your gym
-            </Link>
-          </p>
         </div>
       </div>
     </div>
