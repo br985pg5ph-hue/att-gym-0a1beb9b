@@ -231,7 +231,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
             onClick={() => setTab("settings")}
             className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
           >
-            <Settings size={14} /> Gym Info
+            <Settings size={14} /> Gym Setup
           </button>
         </div>
         )}
