@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { NuvoLogo } from "@/components/NuvoLogo";
+import { CountrySelect } from "@/components/CountrySelect";
+import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
 import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock } from "lucide-react";
 
