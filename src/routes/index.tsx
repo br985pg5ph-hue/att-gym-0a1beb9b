@@ -110,7 +110,7 @@ function NuvoHome() {
               to="/platform/login"
               className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
-              Access portal
+              Portal login
             </Link>
           </div>
         </section>
