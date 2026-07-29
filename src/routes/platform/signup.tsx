@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Logo } from "@/components/Logo";
+import { NuvoLogo } from "@/components/NuvoLogo";
 import { applyForGym } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -57,7 +57,7 @@ function PlatformSignup() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
       <div className="mb-8 flex flex-col items-center text-center">
-        <Logo size={80} />
+        <NuvoLogo size={80} />
         <h1 className="font-display mt-4 text-3xl">Sign up your gym</h1>
         <p className="mt-2 text-xs text-muted-foreground">Apply to join the Nuvo platform</p>
       </div>
