@@ -10,8 +10,9 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp, Tags, Eye, EyeOff, Pencil } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp, Tags, Eye, EyeOff, Pencil, Lock } from "lucide-react";
 import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
+import { GymSetupPanel } from "@/components/GymSetupPanel";
 
 
 export const Route = createFileRoute("/gym/$gymSlug/admin")({
