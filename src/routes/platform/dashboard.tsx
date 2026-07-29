@@ -51,7 +51,7 @@ function PlatformDashboard() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    window.location.href = "/platform";
+    window.location.href = "/";
   };
 
   if (adminQuery.isLoading) {
@@ -67,7 +67,7 @@ function PlatformDashboard() {
       <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
         <h1 className="font-display text-2xl">Access denied</h1>
         <p className="mt-2 text-sm text-muted-foreground">This account is not a platform admin.</p>
-        <Link to="/platform" className="mt-6 text-sm text-primary">Go back</Link>
+        <Link to="/" className="mt-6 text-sm text-primary">Go back</Link>
       </div>
     );
   }
