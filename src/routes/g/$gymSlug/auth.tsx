@@ -30,8 +30,16 @@ function AuthPage() {
       .select("role")
       .eq("id", data.user!.id)
       .maybeSingle();
+
+    const allowed = ["staff", "admin", "owner"];
+    if (!prof || !allowed.includes(prof.role)) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("This portal is for gym staff and admins only.");
+      return;
+    }
     setLoading(false);
-    nav({ to: prof && prof.role !== "member" ? gp("/admin") : gp("/home") });
+    nav({ to: gp("/admin") });
   };
 
   return (
