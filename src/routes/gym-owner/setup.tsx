@@ -335,6 +335,17 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
     }));
   };
 
+  const copyToAll = (day: string) => {
+    const src = state[day] ?? { open: "", close: "", closed: false };
+    setState(() => {
+      const next: Record<string, DayHours> = {};
+      for (const d of days) next[d] = { ...src };
+      return next;
+    });
+  };
+
+
+
   return (
     <div>
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Opening hours</label>
@@ -362,7 +373,16 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
                 />
                 Closed
               </label>
+              <button
+                type="button"
+                onClick={() => copyToAll(day)}
+                title={`Copy ${day} to all days`}
+                className="shrink-0 rounded-pill border hairline px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+              >
+                Copy to all
+              </button>
             </div>
+
           );
         })}
       </div>
