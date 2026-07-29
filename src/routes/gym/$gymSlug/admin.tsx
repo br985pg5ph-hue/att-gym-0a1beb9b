@@ -10,12 +10,16 @@ import { ammanNow, toAmmanDateInput, toAmmanDateKey, fromAmmanDateInput, addAmma
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminDashboardStats } from "@/lib/dashboard.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp, Tags, Eye, EyeOff, Pencil } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LogOut, Megaphone, CalendarDays, Users, UserCog, ChevronsRight, LayoutDashboard, Flag, ArrowUpDown, Settings, User, Sun, Moon, Wallet, TrendingUp, Tags, Eye, EyeOff, Pencil, Lock } from "lucide-react";
 import { useClassTypeDefs, labelOf, type ClassTypeDef } from "@/lib/classTypes";
+import { GymSetupPanel } from "@/components/GymSetupPanel";
 
 
 export const Route = createFileRoute("/gym/$gymSlug/admin")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: typeof search.tab === "string" ? (search.tab as Tab) : undefined,
+  }),
   beforeLoad: async ({ params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
@@ -30,24 +34,31 @@ export const Route = createFileRoute("/gym/$gymSlug/admin")({
 
 type Tab = "dashboard" | "announcements" | "classes" | "coaches" | "members" | "settings";
 
+/** Tabs that stay locked until the gym is approved by the platform. */
+const RESTRICTED_TABS: Tab[] = ["announcements", "classes", "coaches", "members"];
+
 function AdminPage() {
   const { t } = useLang();
   const { theme, setTheme } = useTheme();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const search = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
   const { gymSlug } = Route.useParams();
   const { gym } = useGym();
   const pathname = useRouterState({ select: s => s.location.pathname });
   const base = `/gym/${gymSlug}/admin`;
   const isChild = pathname !== base && pathname !== `${base}/`;
   if (isChild) return <Outlet />;
+  const isPendingGym = gym?.status === "pending";
+  const locked = isPendingGym && RESTRICTED_TABS.includes(tab);
   const tabs: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
     { key: "dashboard", label: t.dashboard, icon: LayoutDashboard },
     { key: "announcements", label: t.manageAnnouncements, icon: Megaphone },
     { key: "classes", label: t.manageClasses, icon: CalendarDays },
     { key: "members", label: t.membersList, icon: Users },
   ];
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
@@ -91,12 +102,41 @@ function AdminPage() {
         </div>
       </header>
       <main className={`mx-auto ${tab === "dashboard" || tab === "classes" || tab === "members" ? "max-w-7xl" : "max-w-3xl"} px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]`}>
-        {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
-        {tab === "announcements" && <AnnouncementsAdmin />}
-        {tab === "classes" && <ClassesAdmin />}
-        {tab === "coaches" && <CoachesAdmin />}
-        {tab === "members" && <MembersAdmin />}
-        {tab === "settings" && <GymInfoAdmin setTab={setTab} />}
+        {isPendingGym && (
+          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+            <Lock size={18} className="mt-0.5 shrink-0 text-yellow-500" />
+            <div>
+              <p className="text-sm font-semibold text-yellow-500">Approval pending</p>
+              <p className="text-xs text-yellow-500/80">
+                Finish your gym setup below while we review your application. Classes, members, coaches and announcements unlock once your gym is approved.
+              </p>
+            </div>
+          </div>
+        )}
+        {locked ? (
+          <div className="card-surface flex flex-col items-center gap-3 p-8 text-center">
+            <Lock size={24} className="text-muted-foreground" />
+            <h2 className="font-display text-xl">Locked until approval</h2>
+            <p className="max-w-sm text-xs text-muted-foreground">
+              This is part of the full Nuvo platform. You'll get access as soon as your gym is approved — meanwhile you can complete your gym setup.
+            </p>
+            <button
+              onClick={() => setTab("settings")}
+              className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              Open gym setup
+            </button>
+          </div>
+        ) : (
+          <>
+            {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
+            {tab === "announcements" && <AnnouncementsAdmin />}
+            {tab === "classes" && <ClassesAdmin />}
+            {tab === "coaches" && <CoachesAdmin />}
+            {tab === "members" && <MembersAdmin />}
+            {tab === "settings" && <GymSetupPanel />}
+          </>
+        )}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
         <ul className="grid grid-cols-4 items-center px-1">
@@ -104,18 +144,21 @@ function AdminPage() {
           {tabs.map(x => {
             const active = tab === x.key;
             const Icon = x.icon;
+            const isLocked = isPendingGym && RESTRICTED_TABS.includes(x.key);
             return (
               <li key={x.key}>
                 <button
                   onClick={()=>setTab(x.key)}
-                  className={`flex w-full flex-col items-center justify-center gap-1 rounded-pill px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
+                  className={`relative flex w-full flex-col items-center justify-center gap-1 rounded-pill px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : isLocked ? "text-muted-foreground/50" : "text-muted-foreground"}`}
                 >
                   <Icon size={22} strokeWidth={active ? 2.4 : 1.8} />
+                  {isLocked && <Lock size={10} className="absolute right-1/4 top-0" />}
                   <span className="text-center leading-none">{x.label}</span>
                 </button>
               </li>
             );
           })}
+
         </ul>
       </nav>
     </div>
@@ -188,7 +231,7 @@ function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
             onClick={() => setTab("settings")}
             className="flex items-center gap-2 rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-card/80"
           >
-            <Settings size={14} /> Gym Info
+            <Settings size={14} /> Gym Setup
           </button>
         </div>
         )}
@@ -1194,95 +1237,6 @@ function MembersAdmin() {
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function GymInfoAdmin({ setTab }: { setTab: (t: Tab) => void }) {
-  const qc = useQueryClient();
-  const { gym, gymId, isLoading } = useGym();
-  const [form, setForm] = useState<{ name: string; address: string; phone: string; instagram_url: string; whatsapp_number: string; maps_url: string; lat: string; lng: string }>({
-    name: "", address: "", phone: "", instagram_url: "", whatsapp_number: "", maps_url: "", lat: "", lng: "",
-  });
-  const [hydrated, setHydrated] = useState(false);
-  if (gym && !hydrated) {
-    setHydrated(true);
-    setForm({
-      name: gym.name ?? "",
-      address: gym.address ?? "",
-      phone: gym.phone ?? "",
-      instagram_url: (gym as any).instagram_url ?? "",
-      whatsapp_number: (gym as any).whatsapp_number ?? "",
-      maps_url: (gym as any).maps_url ?? "",
-      lat: gym.lat != null ? String(gym.lat) : "",
-      lng: gym.lng != null ? String(gym.lng) : "",
-    });
-  }
-  const save = useMutation({
-    mutationFn: async () => {
-      const payload: any = {
-        name: form.name || null,
-        address: form.address || null,
-        phone: form.phone || null,
-        instagram_url: form.instagram_url || null,
-        whatsapp_number: form.whatsapp_number || null,
-        maps_url: form.maps_url || null,
-        lat: form.lat ? Number(form.lat) : null,
-        lng: form.lng ? Number(form.lng) : null,
-      };
-      const { error } = await supabase.from("gyms").update(payload).eq("id", gymId!);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Gym info updated"); qc.invalidateQueries({ queryKey: ["gym"] }); },
-    onError: (e: any) => toast.error(e.message ?? "Failed to save"),
-  });
-
-  const field = (label: string, key: keyof typeof form, placeholder?: string, type = "text") => (
-    <label className="block">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</span>
-      <input
-        type={type}
-        value={form[key]}
-        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-        placeholder={placeholder}
-        className="mt-1 w-full rounded-2xl border hairline bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
-      />
-    </label>
-  );
-
-  if (isLoading) return <p className="text-center text-xs text-muted-foreground">Loading…</p>;
-
-  return (
-    <div className="space-y-4">
-      <button
-        onClick={() => setTab("dashboard")}
-        className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ChevronLeft size={16} /> Back to Dashboard
-      </button>
-      <div className="card-surface p-5">
-        <h2 className="font-display text-xl">Gym Info</h2>
-        <p className="mt-1 text-xs text-muted-foreground">Edits appear instantly on the members' Profile and Location pages.</p>
-      </div>
-      <div className="card-surface space-y-3 p-5">
-        {field("Gym name", "name")}
-        {field("Address", "address")}
-        {field("Phone", "phone", "+962...")}
-        {field("Instagram URL", "instagram_url", "https://instagram.com/...")}
-        {field("WhatsApp number", "whatsapp_number", "+962...")}
-        {field("Google Maps link", "maps_url", "https://maps.app.goo.gl/...")}
-        <div className="grid grid-cols-2 gap-3">
-          {field("Latitude", "lat", "31.95", "number")}
-          {field("Longitude", "lng", "35.91", "number")}
-        </div>
-        <button
-          onClick={() => save.mutate()}
-          disabled={save.isPending}
-          className="w-full rounded-pill bg-primary py-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
-        >
-          {save.isPending ? "Saving…" : "Save changes"}
-        </button>
-      </div>
     </div>
   );
 }
