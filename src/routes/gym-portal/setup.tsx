@@ -128,7 +128,7 @@ function GymSetupWizard() {
           <Section icon={MapPin} title="Gym basics">
             <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
             <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
-            <SetupField label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
+            <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
           </Section>
 
           <Section icon={Clock} title="Location & hours">
