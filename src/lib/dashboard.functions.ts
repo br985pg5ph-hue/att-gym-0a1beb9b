@@ -25,9 +25,10 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
 
     // The caller's own gym is the tenant — never trust a client-supplied slug here.
     const { data: callerProfile } = await context.supabase
-      .from("profiles").select("gym_id").eq("id", context.userId).maybeSingle();
-    const gymId = callerProfile?.gym_id;
+      .from("profiles").select("active_gym_id").eq("id", context.userId).maybeSingle();
+    const gymId = callerProfile?.active_gym_id;
     if (!gymId) throw new Error("Forbidden");
+
 
 
     const now = ammanNow();
