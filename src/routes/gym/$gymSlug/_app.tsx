@@ -3,22 +3,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { AppTour } from "@/components/AppTour";
 import { gp } from "@/lib/gym";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 
 export const Route = createFileRoute("/gym/$gymSlug/_app")({
   ssr: false,
-  beforeLoad: async ({ location }) => {
+  beforeLoad: async ({ location, params }) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: gp("/auth") });
-    const { data: p } = await supabase.from("profiles").select("onboarded, is_parent, role").eq("id", data.user.id).maybeSingle();
-    if (p && p.role !== "member") throw redirect({ to: gp("/admin") });
-    if (location.pathname !== "/onboarding") {
+
+    // Gym-specific role/state lives on the membership, identity on the profile.
+    const membership = await fetchMembershipBySlug(data.user.id, params.gymSlug);
+    if (!membership) throw redirect({ to: gp("/auth") });
+    if (isStaffRole(membership.role)) throw redirect({ to: gp("/admin") });
+
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("onboarded, is_parent")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (!location.pathname.endsWith("/onboarding")) {
       if (p && !p.onboarded && !p.is_parent) throw redirect({ to: gp("/onboarding") });
     }
-
   },
   component: () => (
     <AppShell><Outlet /><AppTour /></AppShell>
   ),
 });
+
 
 
