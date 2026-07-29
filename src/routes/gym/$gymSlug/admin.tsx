@@ -101,12 +101,41 @@ function AdminPage() {
         </div>
       </header>
       <main className={`mx-auto ${tab === "dashboard" || tab === "classes" || tab === "members" ? "max-w-7xl" : "max-w-3xl"} px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]`}>
-        {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
-        {tab === "announcements" && <AnnouncementsAdmin />}
-        {tab === "classes" && <ClassesAdmin />}
-        {tab === "coaches" && <CoachesAdmin />}
-        {tab === "members" && <MembersAdmin />}
-        {tab === "settings" && <GymInfoAdmin setTab={setTab} />}
+        {isPendingGym && (
+          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+            <Lock size={18} className="mt-0.5 shrink-0 text-yellow-500" />
+            <div>
+              <p className="text-sm font-semibold text-yellow-500">Approval pending</p>
+              <p className="text-xs text-yellow-500/80">
+                Finish your gym setup below while we review your application. Classes, members, coaches and announcements unlock once your gym is approved.
+              </p>
+            </div>
+          </div>
+        )}
+        {locked ? (
+          <div className="card-surface flex flex-col items-center gap-3 p-8 text-center">
+            <Lock size={24} className="text-muted-foreground" />
+            <h2 className="font-display text-xl">Locked until approval</h2>
+            <p className="max-w-sm text-xs text-muted-foreground">
+              This is part of the full Nuvo platform. You'll get access as soon as your gym is approved — meanwhile you can complete your gym setup.
+            </p>
+            <button
+              onClick={() => setTab("settings")}
+              className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              Open gym setup
+            </button>
+          </div>
+        ) : (
+          <>
+            {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
+            {tab === "announcements" && <AnnouncementsAdmin />}
+            {tab === "classes" && <ClassesAdmin />}
+            {tab === "coaches" && <CoachesAdmin />}
+            {tab === "members" && <MembersAdmin />}
+            {tab === "settings" && <GymSetupPanel />}
+          </>
+        )}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
         <ul className="grid grid-cols-4 items-center px-1">
@@ -114,18 +143,21 @@ function AdminPage() {
           {tabs.map(x => {
             const active = tab === x.key;
             const Icon = x.icon;
+            const isLocked = isPendingGym && RESTRICTED_TABS.includes(x.key);
             return (
               <li key={x.key}>
                 <button
                   onClick={()=>setTab(x.key)}
-                  className={`flex w-full flex-col items-center justify-center gap-1 rounded-pill px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
+                  className={`relative flex w-full flex-col items-center justify-center gap-1 rounded-pill px-1 py-1.5 text-[10px] font-medium transition-colors ${active ? "text-primary" : isLocked ? "text-muted-foreground/50" : "text-muted-foreground"}`}
                 >
                   <Icon size={22} strokeWidth={active ? 2.4 : 1.8} />
+                  {isLocked && <Lock size={10} className="absolute right-1/4 top-0" />}
                   <span className="text-center leading-none">{x.label}</span>
                 </button>
               </li>
             );
           })}
+
         </ul>
       </nav>
     </div>
