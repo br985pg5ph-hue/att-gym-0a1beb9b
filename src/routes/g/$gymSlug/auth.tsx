@@ -34,10 +34,12 @@ function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
+    <div className="nuvo-site mx-auto flex min-h-screen w-full max-w-md flex-col justify-center bg-background px-6 py-10">
       <div className="mb-8 flex flex-col items-center">
-        <h1 className="font-display text-3xl">{t.appName}</h1>
-        <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{t.tagline}</p>
+        <h1 className="font-display text-4xl tracking-tight">
+          Nuvo<span className="text-primary">.</span>
+        </h1>
+        <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">Gym software platform</p>
       </div>
       <form onSubmit={submit} className="space-y-3">
         <input required type="email" placeholder={t.email} value={email} onChange={(e)=>setEmail(e.target.value)}
