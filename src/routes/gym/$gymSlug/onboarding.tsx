@@ -44,6 +44,7 @@ const FREQUENCY = ["1× / week", "2–3× / week", "4–5× / week", "Daily"];
 
 function OnboardingPage() {
   const nav = useNavigate();
+  const { gym } = useGym();
   const [step, setStep] = useState(0);
   const [experience, setExperience] = useState<string>("");
   const [disciplines, setDisciplines] = useState<string[]>([]);

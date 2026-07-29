@@ -39,6 +39,7 @@ function AdminPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("dashboard");
   const { gymSlug } = Route.useParams();
+  const { gym } = useGym();
   const pathname = useRouterState({ select: s => s.location.pathname });
   const base = `/gym/${gymSlug}/admin`;
   const isChild = pathname !== base && pathname !== `${base}/`;

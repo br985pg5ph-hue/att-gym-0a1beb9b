@@ -5,7 +5,7 @@ import "driver.js/dist/driver.css";
 import "./AppTour.css";
 import { useAuth, useLang } from "@/lib/providers";
 import { supabase } from "@/integrations/supabase/client";
-import { gp } from "@/lib/gym";
+import { gp, useGym } from "@/lib/gym";
 
 const START_KEY = "att.startTour";
 
@@ -30,6 +30,8 @@ function waitForEl(selector: string, timeoutMs = 2500): Promise<Element | null> 
 }
 
 export function AppTour() {
+  const { gym } = useGym();
+  const gymName = gym?.name ?? "the gym";
   const { profile, user, refresh } = useAuth();
   const { lang } = useLang();
   const navigate = useNavigate();

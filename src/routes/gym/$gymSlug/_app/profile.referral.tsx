@@ -5,7 +5,7 @@ import { useAuth, useLang } from "@/lib/providers";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppShell";
 import { Gift, Copy, ChevronLeft, MessageSquare, Share2 } from "lucide-react";
-import { gp } from "@/lib/gym";
+import { gp, useGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/gym/$gymSlug/_app/profile/referral")({
   component: ReferralPage,
@@ -14,6 +14,8 @@ export const Route = createFileRoute("/gym/$gymSlug/_app/profile/referral")({
 function ReferralPage() {
   const { user, profile } = useAuth();
   const { t } = useLang();
+  const { gym } = useGym();
+  const gymName = gym?.name ?? "my gym";
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const code = profile?.referral_code ?? "";
