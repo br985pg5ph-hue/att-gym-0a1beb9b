@@ -35,7 +35,7 @@ function MemberDetailPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
-  const { gymId } = useGym();
+  const { gymId, gym } = useGym();
 
   const { data: member } = useQuery({
     queryKey: ["admin-member", id, gymId],
