@@ -3,7 +3,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
-import { fetchGym, gp, useGymSlug } from "@/lib/gym";
+import { gp, useGymSlug } from "@/lib/gym";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 
 export const Route = createFileRoute("/gym/$gymSlug/staff-login")({
   ssr: false,
