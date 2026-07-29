@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NuvoLogo } from "@/components/NuvoLogo";
-import { getGymSetupContext } from "@/lib/platform.functions";
+import { getPortalContext } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/platform/login")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/platform/login")({
 
 function GymOwnerLogin() {
   const nav = useNavigate();
-  const getSetup = useServerFn(getGymSetupContext);
+  const getPortal = useServerFn(getPortalContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,12 +39,16 @@ function GymOwnerLogin() {
     }
 
     try {
-      await getSetup();
+      const { role, gym } = await getPortal();
       toast.success("Welcome back");
-      nav({ to: "/platform/setup" });
+      if (role === "staff") {
+        nav({ to: `/g/${gym.slug}/admin` });
+      } else {
+        nav({ to: "/platform/setup" });
+      }
     } catch {
       await supabase.auth.signOut();
-      toast.error("This account is not a gym owner account");
+      toast.error("This portal is for gym staff and admins only");
     } finally {
       setLoading(false);
     }
@@ -55,7 +59,7 @@ function GymOwnerLogin() {
       <div className="mb-8 flex flex-col items-center text-center">
         <NuvoLogo size={80} />
         <h1 className="font-display mt-4 text-3xl">Gym owner portal</h1>
-        <p className="mt-2 text-xs text-muted-foreground">Sign in to manage your gym</p>
+        <p className="mt-2 text-xs text-muted-foreground">Staff and admin sign-in for your gym</p>
       </div>
 
       <form onSubmit={submit} className="space-y-3">
