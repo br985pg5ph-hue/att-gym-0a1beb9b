@@ -90,9 +90,6 @@ function StaffLoginPage() {
       <Link to={gp("/auth")} className="mt-8 text-center text-xs text-muted-foreground hover:text-foreground">
         ← Back
       </Link>
-      <p className="mt-3 text-center text-[10px] text-muted-foreground">
-        Want to add your gym? <Link to="/platform/signup" className="font-semibold text-primary">Sign up your gym</Link>
-      </p>
     </div>
   );
 }
