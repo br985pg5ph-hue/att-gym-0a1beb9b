@@ -212,8 +212,8 @@ export const getAdminDashboardStats = createServerFn({ method: "GET" })
       newSignupsThisMonth: (newThisMonth ?? []).length,
       expiringSoonCount: (expiringSoon ?? []).length,
       expiringSoonList: (expiringSoon ?? []).map((p: any) => ({
-        id: p.id,
-        name: p.name,
+        id: p.user_id,
+        name: p.profiles?.name ?? "Member",
         group_subscription_until: p.group_subscription_until,
       })),
       recentTransactions: (recentTxns ?? []).map((t: any) => ({
