@@ -275,48 +275,107 @@ function SetupNumber({ label, defaultValue, onSave }: { label: string; defaultVa
   );
 }
 
+type DayHours = { open: string; close: string; closed: boolean };
+
+function to12(value: string) {
+  if (!value) return { hour: "", minute: "00", meridiem: "AM" };
+  const [h, m = "00"] = value.split(":");
+  const hn = Number(h);
+  const meridiem = hn >= 12 ? "PM" : "AM";
+  const hour12 = hn % 12 === 0 ? 12 : hn % 12;
+  return { hour: String(hour12), minute: m, meridiem };
+}
+
+function to24(hour: string, minute: string, meridiem: string) {
+  if (!hour) return "";
+  let hn = Number(hour) % 12;
+  if (meridiem === "PM") hn += 12;
+  return `${String(hn).padStart(2, "0")}:${(minute || "00").padStart(2, "0")}`;
+}
+
+function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { hour, minute, meridiem } = to12(value);
+  const cls = "rounded-lg border hairline bg-background px-2 py-1 text-xs outline-none focus:border-primary";
+  return (
+    <div className="flex flex-1 items-center gap-1">
+      <select className={cls} value={hour} onChange={(e) => onChange(to24(e.target.value, minute, meridiem))}>
+        <option value="">--</option>
+        {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((h) => (
+          <option key={h} value={h}>{h}</option>
+        ))}
+      </select>
+      <span className="text-muted-foreground">:</span>
+      <select className={cls} value={minute} onChange={(e) => onChange(to24(hour, e.target.value, meridiem))}>
+        {["00", "15", "30", "45"].map((m) => (
+          <option key={m} value={m}>{m}</option>
+        ))}
+      </select>
+      <select className={cls} value={meridiem} onChange={(e) => onChange(to24(hour, minute, e.target.value))}>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
+    </div>
+  );
+}
+
 function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const [state, setState] = useState<Record<string, { open: string; close: string }>>(() => {
-    const map: Record<string, { open: string; close: string }> = {};
+  const [state, setState] = useState<Record<string, DayHours>>(() => {
+    const map: Record<string, DayHours> = {};
     for (const h of hours) {
-      if (h.day) map[h.day] = { open: h.open ?? "", close: h.close ?? "" };
+      if (h.day) map[h.day] = { open: h.open ?? "", close: h.close ?? "", closed: !!h.closed };
     }
     return map;
   });
 
-  const update = (day: string, key: "open" | "close", value: string) => {
-    setState((prev) => ({ ...prev, [day]: { ...prev[day], [key]: value } }));
+  const update = (day: string, patch: Partial<DayHours>) => {
+    setState((prev) => ({
+      ...prev,
+      [day]: { ...{ open: "", close: "", closed: false }, ...prev[day], ...patch },
+    }));
   };
 
   return (
     <div>
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Opening hours</label>
       <div className="space-y-2">
-        {days.map((day) => (
-          <div key={day} className="flex items-center gap-2 text-sm">
-            <span className="w-24 text-muted-foreground">{day}</span>
-            <input
-              type="time"
-              value={state[day]?.open ?? ""}
-              onChange={(e) => update(day, "open", e.target.value)}
-              className="flex-1 rounded-lg border hairline bg-background px-2 py-1 text-xs"
-            />
-            <span className="text-muted-foreground">-</span>
-            <input
-              type="time"
-              value={state[day]?.close ?? ""}
-              onChange={(e) => update(day, "close", e.target.value)}
-              className="flex-1 rounded-lg border hairline bg-background px-2 py-1 text-xs"
-            />
-          </div>
-        ))}
+        {days.map((day) => {
+          const row = state[day];
+          const closed = !!row?.closed;
+          return (
+            <div key={day} className="flex items-center gap-2 text-sm">
+              <span className="w-24 text-muted-foreground">{day}</span>
+              {closed ? (
+                <span className="flex-1 text-xs font-semibold text-muted-foreground">Closed</span>
+              ) : (
+                <>
+                  <TimeSelect value={row?.open ?? ""} onChange={(v) => update(day, { open: v })} />
+                  <span className="text-muted-foreground">-</span>
+                  <TimeSelect value={row?.close ?? ""} onChange={(v) => update(day, { close: v })} />
+                </>
+              )}
+              <label className="flex shrink-0 items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={closed}
+                  onChange={(e) => update(day, { closed: e.target.checked })}
+                />
+                Closed
+              </label>
+            </div>
+          );
+        })}
       </div>
       <button
         onClick={() => {
           const payload = days
-            .filter((d) => state[d]?.open || state[d]?.close)
-            .map((d) => ({ day: d, open: state[d]?.open ?? "", close: state[d]?.close ?? "" }));
+            .filter((d) => state[d]?.closed || state[d]?.open || state[d]?.close)
+            .map((d) => ({
+              day: d,
+              open: state[d]?.closed ? "" : (state[d]?.open ?? ""),
+              close: state[d]?.closed ? "" : (state[d]?.close ?? ""),
+              closed: !!state[d]?.closed,
+            }));
           onSave(payload);
         }}
         className="mt-3 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
@@ -326,6 +385,7 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
     </div>
   );
 }
+
 
 function LogoUploader({ gymId, currentUrl, onUploaded }: { gymId: string; currentUrl: string | null; onUploaded: (url: string) => void }) {
   const [uploading, setUploading] = useState(false);

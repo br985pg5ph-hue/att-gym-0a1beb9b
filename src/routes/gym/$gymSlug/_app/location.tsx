@@ -10,6 +10,15 @@ export const Route = createFileRoute("/gym/$gymSlug/_app/location")({
   component: LocationPage,
 });
 
+function fmt12(value: string) {
+  if (!value) return "";
+  const [h, m = "00"] = value.split(":");
+  const hn = Number(h);
+  const meridiem = hn >= 12 ? "PM" : "AM";
+  const hour12 = hn % 12 === 0 ? 12 : hn % 12;
+  return `${hour12}:${m} ${meridiem}`;
+}
+
 function LocationPage() {
   const { t } = useLang();
   const { gym } = useGym();
@@ -47,9 +56,12 @@ function LocationPage() {
         <div className="card-surface p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.hours}</p>
           <ul className="mt-3 divide-y hairline">
-            {(gym.hours as Array<{day:string;open:string;close:string}>).map((h) => (
+            {(gym.hours as Array<{day:string;open:string;close:string;closed?:boolean}>).map((h) => (
               <li key={h.day} className="flex justify-between py-2 text-sm">
-                <span>{h.day}</span><span className="text-muted-foreground">{h.open} – {h.close}</span>
+                <span>{h.day}</span>
+                <span className="text-muted-foreground">
+                  {h.closed || (!h.open && !h.close) ? "Closed" : `${fmt12(h.open)} – ${fmt12(h.close)}`}
+                </span>
               </li>
             ))}
           </ul>
