@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { getPlatformAdminContext } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
-export const Route = createFileRoute("/owner/console")({
+export const Route = createFileRoute("/platform-owner/console")({
   ssr: false,
   head: () => ({
     meta: [
@@ -41,7 +41,7 @@ function ConsoleLogin() {
         setLoading(false);
         return;
       }
-      nav({ to: "/owner/dashboard" });
+      nav({ to: "/platform-owner/dashboard" });
     } catch {
       await supabase.auth.signOut();
       toast.error("Invalid credentials");

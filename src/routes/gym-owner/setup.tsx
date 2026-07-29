@@ -10,11 +10,11 @@ import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
 import { CheckCircle, AlertCircle, MapPin, Phone, Instagram, MessageCircle, Image as ImageIcon, Clock, Plus, Trash2 } from "lucide-react";
 
-export const Route = createFileRoute("/gym-portal/setup")({
+export const Route = createFileRoute("/gym-owner/setup")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/gym-portal/login" });
+    if (!data.user) throw redirect({ to: "/gym-owner/login" });
   },
   component: GymSetupWizard,
 });
