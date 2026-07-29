@@ -3,7 +3,7 @@ export type Lang = "en" | "ar";
 export type Dict = Record<string, string>;
 export const dict: Record<Lang, Dict> = {
   en: {
-    appName: "ATT Academy",
+    appName: "Nuvo",
     tagline: "Martial Arts & Functional Training",
     home: "Home", book: "Booking", coaches: "Coaches", news: "News", profile: "Profile", admin: "Admin", dashboard: "Dashboard",
     signIn: "Sign In", signUp: "Sign Up", signOut: "Sign Out", email: "Email", password: "Password", forgotPassword: "Forgot password?",
@@ -33,7 +33,7 @@ export const dict: Record<Lang, Dict> = {
     membershipActive: "Active Member", membershipInactive: "Inactive Member", hours: "Hours", connectWithUs: "Connect with us",
   },
   ar: {
-    appName: "أكاديمية ATT",
+    appName: "نوفو",
     tagline: "فنون قتالية وتدريب وظيفي",
     home: "الرئيسية", book: "الحجز", coaches: "المدربون", news: "الأخبار", profile: "الملف", admin: "الإدارة", dashboard: "لوحة التحكم",
     signIn: "تسجيل الدخول", signUp: "إنشاء حساب", signOut: "تسجيل الخروج", email: "البريد الإلكتروني", password: "كلمة المرور", forgotPassword: "نسيت كلمة المرور؟",

@@ -39,6 +39,7 @@ function AdminPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("dashboard");
   const { gymSlug } = Route.useParams();
+  const { gym } = useGym();
   const pathname = useRouterState({ select: s => s.location.pathname });
   const base = `/gym/${gymSlug}/admin`;
   const isChild = pathname !== base && pathname !== `${base}/`;
@@ -72,7 +73,7 @@ function AdminPage() {
             <>
               <Logo size={36} />
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">ATT Academy</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
                 <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
               </div>
             </>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-import { gp } from "@/lib/gym";
+import { gp, useGym } from "@/lib/gym";
 
 export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
   ssr: false,
@@ -44,6 +44,7 @@ const FREQUENCY = ["1× / week", "2–3× / week", "4–5× / week", "Daily"];
 
 function OnboardingPage() {
   const nav = useNavigate();
+  const { gym } = useGym();
   const [step, setStep] = useState(0);
   const [experience, setExperience] = useState<string>("");
   const [disciplines, setDisciplines] = useState<string[]>([]);
@@ -78,7 +79,7 @@ function OnboardingPage() {
     }).eq("id", u.user.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Welcome to ATT Academy!");
+    toast.success(`Welcome to ${gym?.name ?? "the gym"}!`);
     try { sessionStorage.setItem("att.startTour", "1"); } catch {}
     nav({ to: gp("/home") });
   };

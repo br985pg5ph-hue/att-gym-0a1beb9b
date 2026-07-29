@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gp } from "@/lib/gym";
+import { AuthBrand } from "@/components/AuthBrand";
 
 export const Route = createFileRoute("/gym/$gymSlug/reset-password")({
   ssr: false,
@@ -20,7 +21,7 @@ function ResetPage() {
   };
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6">
-      <h1 className="font-display text-3xl">New password</h1>
+      <AuthBrand subtitle="New password" size={56} />
       <form onSubmit={submit} className="mt-6 space-y-3">
         <input required minLength={6} type="password" placeholder="New password" value={pw} onChange={(e)=>setPw(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
