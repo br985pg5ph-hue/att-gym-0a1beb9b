@@ -167,15 +167,16 @@ function GymOwnerOnboarding() {
         ))}
       </div>
 
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 space-y-3 lg:flex-none lg:rounded-2xl lg:border lg:hairline lg:bg-card lg:p-8">
         {step === 0 && (
-          <>
+          <div className="grid gap-3 lg:grid-cols-2">
             <Field label="Gym name" value={name} onChange={setName} placeholder="e.g. Antaki Top Team" />
             <Field label="City" value={city} onChange={setCity} placeholder="e.g. Amman" />
             <Field label="Address" value={address} onChange={setAddress} placeholder="Street, building, floor" />
             <Field label="Gym phone" value={phone} onChange={setPhone} placeholder="+962 7…" />
-          </>
+          </div>
         )}
+
 
         {step === 1 && (
           <>
