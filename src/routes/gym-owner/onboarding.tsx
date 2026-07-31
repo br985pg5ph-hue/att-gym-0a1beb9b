@@ -263,8 +263,9 @@ function GymOwnerOnboarding() {
         )}
 
         {step === 3 && (
-          <>
+          <div className="grid gap-3 lg:grid-cols-2">
             <div className="rounded-xl border hairline bg-card p-3">
+
               <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Primary color</label>
               <div className="flex items-center gap-2">
                 <input type="color" value={primary} onChange={(e) => setPrimary(e.target.value)} className="h-9 w-12 rounded-lg" />
