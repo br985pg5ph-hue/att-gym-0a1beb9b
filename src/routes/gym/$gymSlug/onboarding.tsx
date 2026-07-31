@@ -71,6 +71,7 @@ function OnboardingPage() {
 
   const [step, setStep] = useState(0);
   const [gym, setGym] = useState<JoinedGym | null>(null);
+  const [waiverSigned, setWaiverSigned] = useState(false);
   const [checking, setChecking] = useState(true);
 
   const [experience, setExperience] = useState<string>("");
