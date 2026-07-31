@@ -13,7 +13,7 @@ export const Route = createFileRoute("/gym/$gymSlug/_app")({
 
     // Gym-specific role/state lives on the membership, identity on the profile.
     const membership = await fetchMembershipBySlug(data.user.id, params.gymSlug);
-    if (!membership) throw redirect({ to: gp("/auth") });
+    if (!membership) throw redirect({ to: gp("/onboarding") });
     if (isStaffRole(membership.role)) throw redirect({ to: gp("/admin") });
 
     const { data: p } = await supabase
