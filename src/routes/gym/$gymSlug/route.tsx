@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, notFound, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { fetchGym, gymQueryKey, GymSlugProvider, setCurrentGymSlug } from "@/lib/gym";
 
 export const Route = createFileRoute("/gym/$gymSlug")({
