@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Building2, Clock, Dumbbell, Palette, Share2 } from "lucide-react";
+import { ArrowLeft, Building2, Clock, Dumbbell, Image as ImageIcon, Palette, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { NuvoLogo } from "@/components/NuvoLogo";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
