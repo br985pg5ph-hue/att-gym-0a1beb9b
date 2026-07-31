@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { NuvoLogo } from "@/components/NuvoLogo";
+import { CountrySelect } from "@/components/CountrySelect";
 import { applyForGym } from "@/lib/platform.functions";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -19,6 +20,7 @@ function PlatformSignup() {
   const [slug, setSlug] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
+  const [cc, setCc] = useState("+962");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -48,7 +50,7 @@ function PlatformSignup() {
 
     setLoading(true);
     try {
-      await apply({ data: { gymName, slug: cleanSlug, ownerName, ownerEmail: email, ownerPhone: phone, password } });
+      await apply({ data: { gymName, slug: cleanSlug, ownerName, ownerEmail: email, ownerPhone: `${cc} ${phone.trim()}`, password } });
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
       if (signInErr) {
         toast.success("Application submitted! Please sign in to continue setup.");
@@ -111,15 +113,18 @@ function PlatformSignup() {
           maxLength={255}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
-        <input
-          required
-          type="tel"
-          placeholder="Owner phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          maxLength={30}
-          className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
-        />
+        <div className="flex gap-2">
+          <CountrySelect value={cc} onChange={setCc} />
+          <input
+            required
+            type="tel"
+            placeholder="Owner phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            maxLength={30}
+            className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
+          />
+        </div>
         <input
           required
           type="password"
