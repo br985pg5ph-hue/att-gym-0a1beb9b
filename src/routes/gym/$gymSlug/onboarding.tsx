@@ -265,16 +265,27 @@ function OnboardingPage() {
         )}
 
         {step === 3 && (
-          <Section title="What types of training have you tried?" hint="Select all that apply">
-            <Chips options={DISCIPLINES} selected={disciplines} onToggle={(v) => toggle(disciplines, setDisciplines, v)} />
+          <Section
+            title="What types of training have you tried?"
+            counter={<SelectionCounter count={disciplines.length} onClear={() => setDisciplines([])} />}
+          >
+            <OptionGrid
+              options={DISCIPLINES}
+              selected={disciplines}
+              onToggle={(v) => toggle(disciplines, setDisciplines, v)}
+            />
           </Section>
         )}
 
         {step === 4 && (
-          <Section title="What are your goals?" hint="Select all that apply">
-            <Chips options={GOALS} selected={goals} onToggle={(v) => toggle(goals, setGoals, v)} />
+          <Section
+            title="What are your goals?"
+            counter={<SelectionCounter count={goals.length} onClear={() => setGoals([])} />}
+          >
+            <OptionGrid options={GOALS} selected={goals} onToggle={(v) => toggle(goals, setGoals, v)} />
           </Section>
         )}
+
 
         {step === 5 && (
           <Section title="How often do you plan to train?">
