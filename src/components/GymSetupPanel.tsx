@@ -113,12 +113,14 @@ export function GymSetupPanel() {
 
 function Section({ icon: Icon, title, children }: { icon: typeof MapPin; title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border hairline bg-card p-4">
-      <div className="mb-4 flex items-center gap-2">
-        <Icon size={16} className="text-muted-foreground" />
-        <h2 className="font-display text-lg">{title}</h2>
+    <div className="flex flex-col rounded-2xl border hairline bg-card p-5">
+      <div className="mb-4 flex items-center gap-3 border-b hairline pb-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon size={16} strokeWidth={2.2} />
+        </div>
+        <h2 className="font-display text-xl tracking-tight">{title}</h2>
       </div>
-      <div className="space-y-3">{children}</div>
+      <div className="flex-1 space-y-3">{children}</div>
     </div>
   );
 }
