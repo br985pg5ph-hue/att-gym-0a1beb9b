@@ -82,8 +82,10 @@ function GymOwnerOnboarding() {
     if (step === 0) return name.trim().length >= 2 && city.trim().length >= 2 && address.trim().length >= 4 && phone.trim().length >= 5;
     if (step === 1) return disciplines.length > 0 && size.length > 0;
     if (step === 2) return hours.some((h) => !h.closed);
+    if (step === 3) return logoUrl.trim().length > 0;
     return true;
-  }, [step, name, city, address, phone, disciplines, size, hours]);
+  }, [step, name, city, address, phone, disciplines, size, hours, logoUrl]);
+
 
   const toggle = (value: string) =>
     setDisciplines((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
