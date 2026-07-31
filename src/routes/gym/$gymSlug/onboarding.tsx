@@ -211,7 +211,6 @@ function OnboardingPage() {
           <WaiverStep
             gym={gym}
             onSigned={() => { setWaiverSigned(true); setStep(2); }}
-            onSigned={() => { setWaiverSigned(true); setStep(2); }}
           />
         )}
 
