@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestHoursRouteImport } from './routes/test-hours'
 import { Route as MemberAppPreviewRouteImport } from './routes/member-app-preview'
 import { Route as AppPreviewSignupRouteImport } from './routes/app-preview-signup'
 import { Route as AppPreviewSigninRouteImport } from './routes/app-preview-signin'
@@ -60,11 +59,6 @@ import { Route as GymGymSlugAppProfileEditRouteImport } from './routes/gym/$gymS
 import { Route as GymGymSlugAppProfileChildrenRouteImport } from './routes/gym/$gymSlug/_app/profile.children'
 import { Route as GymGymSlugAppProfileBookingsRouteImport } from './routes/gym/$gymSlug/_app/profile.bookings'
 
-const TestHoursRoute = TestHoursRouteImport.update({
-  id: '/test-hours',
-  path: '/test-hours',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MemberAppPreviewRoute = MemberAppPreviewRouteImport.update({
   id: '/member-app-preview',
   path: '/member-app-preview',
@@ -337,7 +331,6 @@ export interface FileRoutesByFullPath {
   '/app-preview-signin': typeof AppPreviewSigninRoute
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
-  '/test-hours': typeof TestHoursRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
@@ -388,7 +381,6 @@ export interface FileRoutesByTo {
   '/app-preview-signin': typeof AppPreviewSigninRoute
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
-  '/test-hours': typeof TestHoursRoute
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
@@ -438,7 +430,6 @@ export interface FileRoutesById {
   '/app-preview-signin': typeof AppPreviewSigninRoute
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
-  '/test-hours': typeof TestHoursRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
@@ -492,7 +483,6 @@ export interface FileRouteTypes {
     | '/app-preview-signin'
     | '/app-preview-signup'
     | '/member-app-preview'
-    | '/test-hours'
     | '/gym/$gymSlug'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
@@ -543,7 +533,6 @@ export interface FileRouteTypes {
     | '/app-preview-signin'
     | '/app-preview-signup'
     | '/member-app-preview'
-    | '/test-hours'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
     | '/gym-owner/setup'
@@ -592,7 +581,6 @@ export interface FileRouteTypes {
     | '/app-preview-signin'
     | '/app-preview-signup'
     | '/member-app-preview'
-    | '/test-hours'
     | '/gym/$gymSlug'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
@@ -645,19 +633,11 @@ export interface RootRouteChildren {
   AppPreviewSigninRoute: typeof AppPreviewSigninRoute
   AppPreviewSignupRoute: typeof AppPreviewSignupRoute
   MemberAppPreviewRoute: typeof MemberAppPreviewRoute
-  TestHoursRoute: typeof TestHoursRoute
   GymGymSlugRouteRoute: typeof GymGymSlugRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test-hours': {
-      id: '/test-hours'
-      path: '/test-hours'
-      fullPath: '/test-hours'
-      preLoaderRoute: typeof TestHoursRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/member-app-preview': {
       id: '/member-app-preview'
       path: '/member-app-preview'
@@ -1141,7 +1121,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppPreviewSigninRoute: AppPreviewSigninRoute,
   AppPreviewSignupRoute: AppPreviewSignupRoute,
   MemberAppPreviewRoute: MemberAppPreviewRoute,
-  TestHoursRoute: TestHoursRoute,
   GymGymSlugRouteRoute: GymGymSlugRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
