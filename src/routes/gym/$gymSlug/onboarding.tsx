@@ -13,6 +13,8 @@ import {
   type GymSearchResult,
 } from "@/lib/membership";
 import { Search, MapPin, ShieldCheck } from "lucide-react";
+import { profileNeedsDetails } from "./complete-profile";
+
 
 export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
   ssr: false,
@@ -21,9 +23,13 @@ export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
     if (!data.user) throw redirect({ to: gymPath(params.gymSlug, "/auth") as any });
     const { data: profile } = await supabase
       .from("profiles")
-      .select("is_parent")
+      .select("is_parent, name, phone, gender")
       .eq("id", data.user.id)
       .maybeSingle();
+    // Social sign-ups arrive without a phone/gender — collect them first.
+    if (profileNeedsDetails(profile) && !profile?.is_parent) {
+      throw redirect({ to: gymPath(params.gymSlug, "/complete-profile") as any });
+    }
     if (profile?.is_parent) {
       await supabase.from("profiles").update({ onboarded: true }).eq("id", data.user.id);
       throw redirect({
@@ -32,6 +38,7 @@ export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
       });
     }
   },
+
   component: OnboardingPage,
 });
 

@@ -39,6 +39,7 @@ import { Route as GymGymSlugSignupRouteImport } from './routes/gym/$gymSlug/sign
 import { Route as GymGymSlugResetPasswordRouteImport } from './routes/gym/$gymSlug/reset-password'
 import { Route as GymGymSlugOnboardingRouteImport } from './routes/gym/$gymSlug/onboarding'
 import { Route as GymGymSlugForgotRouteImport } from './routes/gym/$gymSlug/forgot'
+import { Route as GymGymSlugCompleteProfileRouteImport } from './routes/gym/$gymSlug/complete-profile'
 import { Route as GymGymSlugAuthRouteImport } from './routes/gym/$gymSlug/auth'
 import { Route as GymGymSlugAdminRouteImport } from './routes/gym/$gymSlug/admin'
 import { Route as GymGymSlugAppRouteImport } from './routes/gym/$gymSlug/_app'
@@ -207,6 +208,12 @@ const GymGymSlugForgotRoute = GymGymSlugForgotRouteImport.update({
   path: '/forgot',
   getParentRoute: () => GymGymSlugRouteRoute,
 } as any)
+const GymGymSlugCompleteProfileRoute =
+  GymGymSlugCompleteProfileRouteImport.update({
+    id: '/complete-profile',
+    path: '/complete-profile',
+    getParentRoute: () => GymGymSlugRouteRoute,
+  } as any)
 const GymGymSlugAuthRoute = GymGymSlugAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -326,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/platform-owner/dashboard': typeof PlatformOwnerDashboardRoute
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
+  '/gym/$gymSlug/complete-profile': typeof GymGymSlugCompleteProfileRoute
   '/gym/$gymSlug/forgot': typeof GymGymSlugForgotRoute
   '/gym/$gymSlug/onboarding': typeof GymGymSlugOnboardingRoute
   '/gym/$gymSlug/reset-password': typeof GymGymSlugResetPasswordRoute
@@ -374,6 +382,7 @@ export interface FileRoutesByTo {
   '/gym/$gymSlug': typeof GymGymSlugIndexRoute
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
+  '/gym/$gymSlug/complete-profile': typeof GymGymSlugCompleteProfileRoute
   '/gym/$gymSlug/forgot': typeof GymGymSlugForgotRoute
   '/gym/$gymSlug/onboarding': typeof GymGymSlugOnboardingRoute
   '/gym/$gymSlug/reset-password': typeof GymGymSlugResetPasswordRoute
@@ -422,6 +431,7 @@ export interface FileRoutesById {
   '/gym/$gymSlug/_app': typeof GymGymSlugAppRouteWithChildren
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
+  '/gym/$gymSlug/complete-profile': typeof GymGymSlugCompleteProfileRoute
   '/gym/$gymSlug/forgot': typeof GymGymSlugForgotRoute
   '/gym/$gymSlug/onboarding': typeof GymGymSlugOnboardingRoute
   '/gym/$gymSlug/reset-password': typeof GymGymSlugResetPasswordRoute
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/platform-owner/dashboard'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
+    | '/gym/$gymSlug/complete-profile'
     | '/gym/$gymSlug/forgot'
     | '/gym/$gymSlug/onboarding'
     | '/gym/$gymSlug/reset-password'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/gym/$gymSlug'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
+    | '/gym/$gymSlug/complete-profile'
     | '/gym/$gymSlug/forgot'
     | '/gym/$gymSlug/onboarding'
     | '/gym/$gymSlug/reset-password'
@@ -567,6 +579,7 @@ export interface FileRouteTypes {
     | '/gym/$gymSlug/_app'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
+    | '/gym/$gymSlug/complete-profile'
     | '/gym/$gymSlug/forgot'
     | '/gym/$gymSlug/onboarding'
     | '/gym/$gymSlug/reset-password'
@@ -823,6 +836,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GymGymSlugForgotRouteImport
       parentRoute: typeof GymGymSlugRouteRoute
     }
+    '/gym/$gymSlug/complete-profile': {
+      id: '/gym/$gymSlug/complete-profile'
+      path: '/complete-profile'
+      fullPath: '/gym/$gymSlug/complete-profile'
+      preLoaderRoute: typeof GymGymSlugCompleteProfileRouteImport
+      parentRoute: typeof GymGymSlugRouteRoute
+    }
     '/gym/$gymSlug/auth': {
       id: '/gym/$gymSlug/auth'
       path: '/auth'
@@ -1035,6 +1055,7 @@ interface GymGymSlugRouteRouteChildren {
   GymGymSlugAppRoute: typeof GymGymSlugAppRouteWithChildren
   GymGymSlugAdminRoute: typeof GymGymSlugAdminRouteWithChildren
   GymGymSlugAuthRoute: typeof GymGymSlugAuthRoute
+  GymGymSlugCompleteProfileRoute: typeof GymGymSlugCompleteProfileRoute
   GymGymSlugForgotRoute: typeof GymGymSlugForgotRoute
   GymGymSlugOnboardingRoute: typeof GymGymSlugOnboardingRoute
   GymGymSlugResetPasswordRoute: typeof GymGymSlugResetPasswordRoute
@@ -1047,6 +1068,7 @@ const GymGymSlugRouteRouteChildren: GymGymSlugRouteRouteChildren = {
   GymGymSlugAppRoute: GymGymSlugAppRouteWithChildren,
   GymGymSlugAdminRoute: GymGymSlugAdminRouteWithChildren,
   GymGymSlugAuthRoute: GymGymSlugAuthRoute,
+  GymGymSlugCompleteProfileRoute: GymGymSlugCompleteProfileRoute,
   GymGymSlugForgotRoute: GymGymSlugForgotRoute,
   GymGymSlugOnboardingRoute: GymGymSlugOnboardingRoute,
   GymGymSlugResetPasswordRoute: GymGymSlugResetPasswordRoute,
