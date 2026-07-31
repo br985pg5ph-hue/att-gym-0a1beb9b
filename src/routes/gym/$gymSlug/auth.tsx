@@ -94,7 +94,7 @@ function AuthPage() {
             <input
               required
               type="email"
-              placeholder="Work email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
