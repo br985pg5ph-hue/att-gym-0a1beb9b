@@ -74,9 +74,20 @@ function SignUpPage() {
 
 
   const oauth = async (provider: "google" | "apple") => {
-    const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (r.error) toast.error("Sign-in failed");
-    else if (!r.redirected) nav({ to: gp("/onboarding") });
+    // Return to the gym's public auth page, which joins the gym and routes on.
+    const r = await lovable.auth.signInWithOAuth(provider, {
+      redirect_uri: `${window.location.origin}${gp("/auth")}`,
+    });
+    if (r.error) return toast.error("Sign-in failed");
+    if (r.redirected) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return toast.error("Sign-in failed");
+    try {
+      await ensureMembershipBySlug(data.user.id, gymSlug, referral.trim());
+      nav({ to: gp("/onboarding") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sign-in failed");
+    }
   };
 
 
