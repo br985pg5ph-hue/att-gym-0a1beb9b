@@ -561,34 +561,81 @@ function WaiverStep({ gym, onSigned }: { gym: JoinedGym; onSigned: () => void })
   );
 }
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  hint,
+  counter,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  counter?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <h2 className="font-display text-xl">{title}</h2>
-      {hint && <p className="mb-4 text-xs text-muted-foreground">{hint}</p>}
-      {!hint && <div className="mb-4" />}
+      {counter ? (
+        <div className="mb-4 mt-1">{counter}</div>
+      ) : hint ? (
+        <p className="mb-4 text-xs text-muted-foreground">{hint}</p>
+      ) : (
+        <div className="mb-4" />
+      )}
       {children}
     </div>
   );
 }
 
-function Chips({ options, selected, onToggle }: { options: string[]; selected: string[]; onToggle: (v: string) => void }) {
+/** "3 selected" + a Clear action, shown under a multi-select question. */
+function SelectionCounter({ count, onClear }: { count: number; onClear: () => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((o) => {
-        const on = selected.includes(o);
+    <div className="flex items-center justify-between">
+      <p className="text-xs text-muted-foreground">
+        {count === 0 ? "Select all that apply" : `${count} selected`}
+      </p>
+      {count > 0 && (
+        <button onClick={onClear} className="text-xs font-semibold text-primary">
+          Clear
+        </button>
+      )}
+    </div>
+  );
+}
+
+function OptionGrid({
+  options,
+  selected,
+  onToggle,
+}: {
+  options: Option[];
+  selected: string[];
+  onToggle: (v: string) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      {options.map(({ value, icon: Icon }) => {
+        const on = selected.includes(value);
         return (
           <button
-            key={o}
-            onClick={() => onToggle(o)}
-            className={`rounded-pill border px-4 py-2 text-xs font-medium transition ${
-              on ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+            key={value}
+            onClick={() => onToggle(value)}
+            aria-pressed={on}
+            className={`relative flex flex-col items-start gap-3 rounded-2xl border p-4 text-left transition active:scale-[0.97] ${
+              on ? "border-primary bg-primary/10" : "hairline bg-card"
             }`}
           >
-            {o}
+            <Icon size={22} className={on ? "text-primary" : "text-muted-foreground"} />
+            <span className="text-xs font-medium leading-tight">{value}</span>
+            {on && (
+              <span className="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground">
+                <Check size={12} strokeWidth={3} />
+              </span>
+            )}
           </button>
         );
       })}
     </div>
   );
 }
+
