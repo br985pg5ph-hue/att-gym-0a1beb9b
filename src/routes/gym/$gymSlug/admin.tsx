@@ -1335,7 +1335,9 @@ function MembersAdmin() {
           </div>
         );
       })}
+      </div>
     </div>
+
   );
 }
 
