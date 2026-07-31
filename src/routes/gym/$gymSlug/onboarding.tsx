@@ -13,6 +13,8 @@ import {
   type GymSearchResult,
 } from "@/lib/membership";
 import { Search, MapPin, ShieldCheck } from "lucide-react";
+import { profileNeedsDetails } from "./complete-profile";
+
 
 export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
   ssr: false,
