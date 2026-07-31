@@ -38,8 +38,8 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-:root {
-  /* Dark theme (default) */
+.dark {
+  /* Dark theme (opt-in) */
   --background: #0a0a0a;
   --foreground: #ffffff;
   --surface: #151515;
@@ -64,10 +64,9 @@
   --silver: #b8bcc2;
   --success: #22c55e;
   --success-foreground: #052e16;
-  --radius: 16px;
 }
 
-.light {
+:root, .light {
   --background: #efece5;
   --foreground: #161616;
   --surface: #ffffff;
@@ -92,6 +91,7 @@
   --silver: #7a8189;
   --success: #22c55e;
   --success-foreground: #052e16;
+  --radius: 16px;
 }
 
 @layer base {
