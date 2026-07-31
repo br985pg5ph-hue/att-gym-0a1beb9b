@@ -291,7 +291,7 @@ function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) 
 }
 
 function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const buildState = (list: any[]) => {
     const map: Record<string, DayHours> = {};
     for (const h of list ?? []) {
