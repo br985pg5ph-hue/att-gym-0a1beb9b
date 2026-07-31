@@ -56,13 +56,9 @@ function SignUpPage() {
     });
     if (error) { setLoading(false); return toast.error(error.message); }
     if (data.session) {
-      const { error: joinError } = await supabase.rpc("join_gym", {
-        _slug: gymSlug,
-        _referral: trimmedRef || null,
-      });
       setLoading(false);
-      if (joinError) return toast.error(joinError.message);
       toast.success("Account created!");
+      // Members pick their gym as the first onboarding step.
       nav({ to: gp("/onboarding") });
     } else {
       setLoading(false);
@@ -83,12 +79,7 @@ function SignUpPage() {
     if (r.redirected) return;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return toast.error("Sign-in failed");
-    try {
-      await ensureMembershipBySlug(data.user.id, gymSlug, referral.trim());
-      nav({ to: gp("/onboarding") });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Sign-in failed");
-    }
+    nav({ to: gp("/onboarding") });
   };
 
 
