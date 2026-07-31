@@ -1036,7 +1036,7 @@ function ClassesAdmin() {
       {/* Add class modal */}
       {addOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center" onClick={()=>setAddOpen(false)}>
-          <div className="w-full max-w-md space-y-2 rounded-2xl bg-card p-4 shadow-xl" onClick={(e)=>e.stopPropagation()}>
+          <div className="w-full max-w-md space-y-2 rounded-2xl bg-card p-4 shadow-xl lg:max-w-xl lg:space-y-3 lg:p-6" onClick={(e)=>e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="font-display text-xl">New class</h3>
               <button onClick={()=>setAddOpen(false)} className="text-xs text-muted-foreground">Close</button>
