@@ -548,7 +548,7 @@ function BrandColors({
   };
 
   return (
-    <div>
+    <div className="flex flex-col">
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Brand colors</label>
       <div className="space-y-2">
         <ColorRow label="Primary color" value={p} onChange={setP} />
@@ -564,7 +564,7 @@ function BrandColors({
           />
         ))}
       </div>
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-auto flex items-center gap-2 pt-3">
         <button
           onClick={() =>
             setExtras((prev) => [
