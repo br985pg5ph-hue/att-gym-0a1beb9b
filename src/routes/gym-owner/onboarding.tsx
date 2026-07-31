@@ -140,7 +140,7 @@ function GymOwnerOnboarding() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8 lg:max-w-3xl lg:justify-center lg:px-10 lg:py-14">
       <div className="mb-6 flex flex-col items-center text-center">
         <NuvoLogo size={56} />
         <h1 className="font-display mt-3 text-2xl">Set up {gym?.name ?? "your gym"}</h1>
@@ -167,20 +167,21 @@ function GymOwnerOnboarding() {
         ))}
       </div>
 
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 space-y-3 lg:flex-none lg:rounded-2xl lg:border lg:hairline lg:bg-card lg:p-8">
         {step === 0 && (
-          <>
+          <div className="grid gap-3 lg:grid-cols-2">
             <Field label="Gym name" value={name} onChange={setName} placeholder="e.g. Antaki Top Team" />
             <Field label="City" value={city} onChange={setCity} placeholder="e.g. Amman" />
             <Field label="Address" value={address} onChange={setAddress} placeholder="Street, building, floor" />
             <Field label="Gym phone" value={phone} onChange={setPhone} placeholder="+962 7…" />
-          </>
+          </div>
         )}
+
 
         {step === 1 && (
           <>
             <p className="px-1 text-[10px] uppercase tracking-wider text-muted-foreground">What do you offer?</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
               {DISCIPLINES.map((d) => {
                 const on = disciplines.includes(d);
                 return (
@@ -262,8 +263,9 @@ function GymOwnerOnboarding() {
         )}
 
         {step === 3 && (
-          <>
+          <div className="grid gap-3 lg:grid-cols-2">
             <div className="rounded-xl border hairline bg-card p-3">
+
               <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Primary color</label>
               <div className="flex items-center gap-2">
                 <input type="color" value={primary} onChange={(e) => setPrimary(e.target.value)} className="h-9 w-12 rounded-lg" />
@@ -286,16 +288,18 @@ function GymOwnerOnboarding() {
               </div>
             </div>
             <Field label="Logo URL (optional)" value={logoUrl} onChange={setLogoUrl} placeholder="https://…" />
-          </>
+          </div>
+
         )}
 
         {step === 4 && (
-          <>
+          <div className="grid gap-3 lg:grid-cols-2">
             <Field label="Instagram (optional)" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
             <Field label="WhatsApp number (optional)" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
             <Field label="Google Maps link (optional)" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
-          </>
+          </div>
         )}
+
       </div>
 
       <div className="mt-6 flex items-center gap-2">
