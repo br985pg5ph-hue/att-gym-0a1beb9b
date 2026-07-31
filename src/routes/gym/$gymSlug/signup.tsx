@@ -9,7 +9,6 @@ import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 import { gp, useGymSlug } from "@/lib/gym";
-import { ensureMembershipBySlug } from "@/lib/membership";
 
 const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),
