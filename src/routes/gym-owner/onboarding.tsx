@@ -288,7 +288,8 @@ function GymOwnerOnboarding() {
               </div>
             </div>
             <Field label="Logo URL (optional)" value={logoUrl} onChange={setLogoUrl} placeholder="https://…" />
-          </>
+          </div>
+
         )}
 
         {step === 4 && (
