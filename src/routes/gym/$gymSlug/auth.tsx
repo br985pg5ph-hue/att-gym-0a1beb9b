@@ -7,6 +7,8 @@ import { gp, useGymSlug } from "@/lib/gym";
 import { fetchMembershipBySlug } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 import { useLang } from "@/lib/providers";
+import { profileNeedsDetails } from "./complete-profile";
+
 
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
   ssr: false,
