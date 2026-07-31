@@ -12,7 +12,13 @@ import {
   signWaiver,
   type GymSearchResult,
 } from "@/lib/membership";
-import { Search, MapPin, ShieldCheck } from "lucide-react";
+import {
+  Search, MapPin, ShieldCheck, Check,
+  Dumbbell, Footprints, Activity, Flame, Users, Flower2, Move, Waves,
+  Trophy, Swords, Bike, CircleDashed,
+  TrendingDown, Zap, HeartPulse, StretchHorizontal, Brain, PartyPopper, Heart,
+  type LucideIcon,
+} from "lucide-react";
 import { profileNeedsDetails } from "./complete-profile";
 
 
