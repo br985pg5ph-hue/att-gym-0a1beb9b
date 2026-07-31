@@ -115,27 +115,31 @@ function SignUpPage() {
           <input required type="tel" placeholder={t.phone} value={phone} onChange={(e)=>setPhone(e.target.value)}
             className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {(["male","female"] as const).map((g) => (
-            <button type="button" key={g} onClick={() => setGender(g)}
-              className={`rounded-pill border px-4 py-3 text-sm font-medium capitalize transition ${
-                gender === g ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
-              }`}>
-              {g}
-            </button>
-          ))}
+        <div>
+          <div className="grid grid-cols-2 gap-2">
+            {(["male","female"] as const).map((g) => (
+              <button type="button" key={g} onClick={() => setGender(g)}
+                className={`rounded-pill border px-4 py-3 text-sm font-medium capitalize transition ${
+                  gender === g ? "border-primary bg-primary text-primary-foreground" : "hairline bg-card"
+                }`}>
+                {g}
+              </button>
+            ))}
+          </div>
+          {!gender && <p className="mt-1 text-xs text-muted-foreground">Please select your gender</p>}
         </div>
-        <input required type="password" placeholder={t.password} value={password} onChange={(e)=>setPassword(e.target.value)}
+        <input required minLength={6} type="password" placeholder={t.password} value={password} onChange={(e)=>setPassword(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
-        <input required type="password" placeholder={t.confirmPassword} value={confirm} onChange={(e)=>setConfirm(e.target.value)}
+        <input required minLength={6} type="password" placeholder={t.confirmPassword} value={confirm} onChange={(e)=>setConfirm(e.target.value)}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
         <input placeholder="Referral code (optional)" value={referral} onChange={(e)=>setReferral(e.target.value)} maxLength={32}
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary" />
 
-        <button disabled={loading} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+        <button disabled={loading || !complete} className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
           {loading ? "…" : t.createAccount}
 
         </button>
+
       </form>
       <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
         <div className="h-px flex-1 bg-border" /><span>{t.or}</span><div className="h-px flex-1 bg-border" />
