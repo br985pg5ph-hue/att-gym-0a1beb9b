@@ -416,18 +416,18 @@ function LogoUploader({ gymId, currentUrl, onUploaded }: { gymId: string; curren
   };
 
   return (
-    <div>
-      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Logo</label>
-      <div className="flex items-center gap-3">
+    <div className="flex h-full flex-col">
+      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Gym logo</label>
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border hairline bg-background p-5">
         {currentUrl ? (
-          <img src={currentUrl} alt="Gym logo" className="h-14 w-14 rounded-xl object-cover" />
+          <img src={currentUrl} alt="Gym logo" className="h-24 w-24 rounded-xl object-contain" />
         ) : (
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl border hairline bg-background">
-            <ImageIcon size={20} className="text-muted-foreground" />
+          <div className="flex h-24 w-24 items-center justify-center rounded-xl border hairline bg-muted/30">
+            <ImageIcon size={32} className="text-muted-foreground" />
           </div>
         )}
-        <label className="cursor-pointer rounded-pill border hairline px-4 py-2 text-xs font-semibold">
-          {uploading ? "Uploading…" : currentUrl ? "Change logo" : "Upload logo"}
+        <label className="cursor-pointer rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+          {uploading ? "Uploading…" : currentUrl ? "Replace logo" : "Upload logo"}
           <input type="file" accept="image/*" className="hidden" onChange={upload} disabled={uploading} />
         </label>
       </div>
