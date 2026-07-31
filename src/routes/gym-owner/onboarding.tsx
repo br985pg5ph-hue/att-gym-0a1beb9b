@@ -301,9 +301,9 @@ function GymOwnerOnboarding() {
 
         {step === 4 && (
           <div className="grid gap-3 lg:grid-cols-2">
-            <Field label="Instagram (optional)" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
-            <Field label="WhatsApp number (optional)" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
-            <Field label="Google Maps link (optional)" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
+            <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
+            <Field label="WhatsApp number" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
+            <Field label="Google Maps link" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
           </div>
         )}
 
