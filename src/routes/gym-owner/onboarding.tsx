@@ -140,7 +140,7 @@ function GymOwnerOnboarding() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8 lg:max-w-3xl lg:justify-center lg:px-10 lg:py-14">
       <div className="mb-6 flex flex-col items-center text-center">
         <NuvoLogo size={56} />
         <h1 className="font-display mt-3 text-2xl">Set up {gym?.name ?? "your gym"}</h1>
