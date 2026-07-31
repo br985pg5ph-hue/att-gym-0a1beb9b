@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Logo } from "@/components/Logo";
+import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
 import { gp, useGym } from "@/lib/gym";
 
@@ -93,19 +93,20 @@ function OnboardingPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md px-6 py-8 pb-32">
-      <div className="mb-6 flex flex-col items-center">
-        <Logo size={56} logoUrl={gym?.logo_url} />
-        <h1 className="font-display mt-3 text-2xl">Tell us about you</h1>
-        <p className="text-xs text-muted-foreground">Helps us tailor your training</p>
-      </div>
+    <div className="nuvo-site min-h-screen w-full bg-background">
+      <div className="mx-auto w-full max-w-md px-6 py-10 pb-36">
+        <AuthBrand subtitle="Tell us about you" />
+        <p className="-mt-6 mb-8 text-center text-sm text-muted-foreground">
+          Helps {gym?.name ?? "your gym"} tailor your training
+        </p>
 
-      {/* progress */}
-      <div className="mb-6 flex gap-1.5">
-        {Array.from({ length: totalSteps }).map((_, i) => (
-          <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-border"}`} />
-        ))}
-      </div>
+        {/* progress */}
+        <div className="mb-6 flex gap-1.5">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-border"}`} />
+          ))}
+        </div>
+
 
       {step === 0 && (
         <Section title="What's your training experience?">
