@@ -609,9 +609,10 @@ function AnnouncementsAdmin() {
           <Plus size={14} className="inline"/> Post
         </button>
       </div>
-      <div className="space-y-2">
+      <div className="grid gap-2 xl:grid-cols-2">
         {data.map((a: any) => (
-          <div key={a.id} className="card-surface flex items-start justify-between gap-3 p-4">
+          <div key={a.id} className="card-surface flex items-start justify-between gap-3 p-4 transition-colors hover:border-primary/40">
+
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-primary">{a.tag}</p>
               <p className="font-display text-lg leading-tight">{a.title}</p>
