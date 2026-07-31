@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
-import { gymPath, useGymSlug } from "@/lib/gym";
+import { fetchGym, gymPath, gymQueryKey, useGymSlug } from "@/lib/gym";
 import {
   fetchMembershipBySlug,
   joinGymByCode,
@@ -194,10 +194,45 @@ function OnboardingPage() {
     nav({ to: gymPath(gym?.slug ?? routeSlug, "/home") as any });
   };
 
+  // Once the member has joined a gym, the flow takes on that gym's branding.
+  const { data: brand } = useQuery({
+    queryKey: gymQueryKey(gym?.slug ?? ""),
+    queryFn: () => fetchGym(gym!.slug),
+    enabled: !!gym,
+    staleTime: 5 * 60 * 1000,
+  });
+  const branded = !!gym;
+  const brandVars: Record<string, string> = {};
+  if (brand?.primary_color) brandVars["--primary"] = brand.primary_color;
+  if (brand?.secondary_color) brandVars["--accent"] = brand.secondary_color;
+
   return (
-    <div className="nuvo-site min-h-screen w-full bg-background">
+    <div
+      className={`${branded ? "" : "nuvo-site "}min-h-screen w-full bg-background`}
+      style={brandVars as React.CSSProperties}
+    >
       <div className="mx-auto w-full max-w-md px-6 py-10 pb-36">
-        <AuthBrand subtitle={step === 0 ? "Find your gym" : step === 1 ? "Membership waiver" : "Tell us about you"} />
+        {branded ? (
+          <div className="mb-8 flex flex-col items-center text-center">
+            {brand?.logo_url ? (
+              <img
+                src={brand.logo_url}
+                alt={`${gym!.name} logo`}
+                className="h-16 w-16 rounded-2xl object-contain"
+              />
+            ) : (
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-lg font-semibold text-primary">
+                {gym!.name.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+            <h1 className="mt-4 font-display text-4xl tracking-tight">{gym!.name}</h1>
+            <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
+              {step === 1 ? "Membership waiver" : "Tell us about you"}
+            </p>
+          </div>
+        ) : (
+          <AuthBrand subtitle="Find your gym" />
+        )}
         <p className="-mt-6 mb-8 text-center text-sm text-muted-foreground">
           {step === 0
             ? "Search the gyms on Nuvo and join yours"
@@ -205,6 +240,7 @@ function OnboardingPage() {
               ? `Please read and sign before training at ${gym?.name ?? "your gym"}`
               : `Helps ${gym?.name ?? "your gym"} tailor your training`}
         </p>
+
 
         {/* progress — tappable steps */}
         <div className="mb-6 flex gap-1.5">
@@ -242,7 +278,7 @@ function OnboardingPage() {
         {step === 1 && gym && (
           <WaiverStep
             gym={gym}
-            onBack={() => setStep(0)}
+            onBack={() => { setGym(null); setStep(0); }}
             onSigned={() => { setWaiverSigned(true); setStep(2); }}
           />
         )}
