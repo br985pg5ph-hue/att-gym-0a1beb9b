@@ -181,7 +181,7 @@ function GymOwnerOnboarding() {
         {step === 1 && (
           <>
             <p className="px-1 text-[10px] uppercase tracking-wider text-muted-foreground">What do you offer?</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
               {DISCIPLINES.map((d) => {
                 const on = disciplines.includes(d);
                 return (
