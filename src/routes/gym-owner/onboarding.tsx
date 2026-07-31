@@ -302,7 +302,18 @@ function GymOwnerOnboarding() {
         {step === 4 && (
           <div className="grid gap-3 lg:grid-cols-2">
             <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
-            <Field label="WhatsApp number" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
+            <div>
+              <Field label="WhatsApp number" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
+              <label className="mt-2 flex cursor-pointer items-center gap-2 px-1 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-[hsl(var(--primary))]"
+                  checked={whatsapp.trim().length > 0 && whatsapp.trim() === phone.trim()}
+                  onChange={(e) => setWhatsapp(e.target.checked ? phone : "")}
+                />
+                Same as gym number
+              </label>
+            </div>
             <Field label="Google Maps link" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
           </div>
         )}
