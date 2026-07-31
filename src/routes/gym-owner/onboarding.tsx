@@ -376,7 +376,7 @@ function Select({
           <button
             key={o}
             type="button"
-            onClick={() => onChange(o)}
+            onClick={() => onChange(value === o ? "" : o)}
             className={`rounded-pill border px-3 py-2 text-xs transition ${
               value === o ? "border-primary bg-primary/10 font-semibold text-primary" : "hairline bg-card"
             }`}
