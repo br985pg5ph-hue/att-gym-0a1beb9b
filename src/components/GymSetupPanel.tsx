@@ -296,7 +296,7 @@ function timeToMinutes(value: string) {
   return h * 60 + Number(m);
 }
 
-function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
+export function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const buildState = (list: any[]) => {
     const map: Record<string, DayHours> = {};
