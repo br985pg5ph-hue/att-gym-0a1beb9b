@@ -17,6 +17,7 @@ import {
   Dumbbell, Footprints, Activity, Flame, Users, Flower2, Move, Waves,
   Trophy, Swords, Bike, CircleDashed,
   TrendingDown, Zap, HeartPulse, StretchHorizontal, Brain, PartyPopper, Heart,
+  ArrowLeft,
   type LucideIcon,
 } from "lucide-react";
 import { profileNeedsDetails } from "./complete-profile";
