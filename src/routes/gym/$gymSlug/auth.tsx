@@ -1,10 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { gp, useGymSlug } from "@/lib/gym";
-import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
+import { ensureMembershipBySlug, isStaffRole } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
+import { useLang } from "@/lib/providers";
 
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
   ssr: false,
@@ -14,9 +16,40 @@ export const Route = createFileRoute("/gym/$gymSlug/auth")({
 function AuthPage() {
   const nav = useNavigate();
   const gymSlug = useGymSlug();
+  const { t } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const routeAfterAuth = useCallback(
+    async (userId: string) => {
+      const membership = await ensureMembershipBySlug(userId, gymSlug);
+      if (!membership) {
+        toast.error("This account isn't a member of this gym yet");
+        return;
+      }
+      await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", userId);
+      nav({ to: isStaffRole(membership.role) ? gp("/admin") : gp("/home") });
+    },
+    [gymSlug, nav],
+  );
+
+  // Social sign-in returns to this page with a session already set.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (cancelled || !data.session) return;
+      try {
+        await routeAfterAuth(data.session.user.id);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Sign-in failed");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [routeAfterAuth]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,27 +60,26 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    let membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
-    if (!membership) {
-      // Confirmed-by-email signups land here before a membership exists.
-      const { error: joinError } = await supabase.rpc("join_gym", { _slug: gymSlug });
-      if (joinError) {
-        setLoading(false);
-        toast.error(joinError.message);
-        return;
-      }
-      membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
+    try {
+      await routeAfterAuth(data.user!.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sign-in failed");
     }
     setLoading(false);
-    if (!membership) {
-      toast.error("This account isn't a member of this gym yet");
-      return;
-    }
-    await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", data.user!.id);
-    if (isStaffRole(membership.role)) {
-      nav({ to: gp("/admin") });
-    } else {
-      nav({ to: gp("/home") });
+  };
+
+  const oauth = async (provider: "google" | "apple") => {
+    const r = await lovable.auth.signInWithOAuth(provider, {
+      redirect_uri: window.location.href,
+    });
+    if (r.error) return toast.error("Sign-in failed");
+    if (r.redirected) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return toast.error("Sign-in failed");
+    try {
+      await routeAfterAuth(data.user.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sign-in failed");
     }
   };
 
