@@ -30,7 +30,7 @@ function AuthPage() {
         return;
       }
       await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", userId);
-      nav({ to: isStaffRole(membership.role) ? gp("/admin") : gp("/home") });
+      nav({ to: gp("/home") });
     },
     [gymSlug, nav],
   );
