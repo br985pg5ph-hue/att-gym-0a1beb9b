@@ -54,11 +54,17 @@ function SignUpPage() {
       },
     });
     if (error) { setLoading(false); return toast.error(error.message); }
-    setLoading(false);
     if (data.session) {
+      const { error: joinError } = await supabase.rpc("join_gym", {
+        _slug: gymSlug,
+        _referral: trimmedRef || null,
+      });
+      setLoading(false);
+      if (joinError) return toast.error(joinError.message);
       toast.success("Account created!");
       nav({ to: gp("/onboarding") });
     } else {
+      setLoading(false);
       toast.message("Check your email", {
         description: "Confirm your account before signing in.",
       });
