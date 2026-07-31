@@ -546,9 +546,19 @@ function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => 
   const [agreed, setAgreed] = useState(false);
   const [name, setName] = useState("");
   const [signing, setSigning] = useState(false);
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
   const text = useMemo(() => (gym.waiver_text?.trim() ? gym.waiver_text : DEFAULT_WAIVER), [gym.waiver_text]);
 
+  const checkScroll = () => {
+    const el = textRef.current;
+    if (!el) return;
+    const reached = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
+    setScrolledToBottom(reached);
+  };
+
   const sign = async () => {
+    if (!scrolledToBottom) return toast.error("Please scroll to the end of the waiver");
     if (!agreed) return toast.error("Please tick the box to agree");
     if (name.trim().length < 2) return toast.error("Type your full name to sign");
     setSigning(true);
@@ -563,14 +573,23 @@ function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => 
     }
   };
 
+  const canSign = scrolledToBottom && agreed && name.trim().length >= 2;
+
   return (
     <div>
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
         <ShieldCheck size={16} className="text-primary" /> {gym.name} — liability waiver
       </div>
-      <div className="max-h-72 overflow-y-auto whitespace-pre-line rounded-2xl border hairline bg-card p-4 text-xs leading-relaxed text-muted-foreground">
+      <div
+        ref={textRef}
+        onScroll={checkScroll}
+        className="max-h-72 overflow-y-auto whitespace-pre-line rounded-2xl border hairline bg-card p-4 text-xs leading-relaxed text-muted-foreground"
+      >
         {text}
       </div>
+      {!scrolledToBottom && (
+        <p className="mt-2 text-[10px] text-muted-foreground">Scroll to the bottom to enable signing.</p>
+      )}
 
       <label className="mt-4 flex items-start gap-3 rounded-2xl border hairline bg-card p-4">
         <input
@@ -604,7 +623,7 @@ function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => 
           </button>
         )}
         <button
-          disabled={signing}
+          disabled={!canSign || signing}
           onClick={sign}
           className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
