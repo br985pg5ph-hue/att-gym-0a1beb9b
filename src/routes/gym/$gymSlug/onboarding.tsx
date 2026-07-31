@@ -55,16 +55,34 @@ const EXPERIENCE = [
   { id: "advanced", label: "Advanced", desc: "3+ years, very comfortable in the gym" },
 ];
 
-const DISCIPLINES = [
-  "Weight training", "Cardio / Running", "Functional training", "CrossFit style",
-  "Group classes", "Yoga", "Pilates", "Swimming", "Team sports",
-  "Martial arts", "Cycling", "None yet",
+type Option = { value: string; icon: LucideIcon };
+
+const DISCIPLINES: Option[] = [
+  { value: "Weight training", icon: Dumbbell },
+  { value: "Cardio / Running", icon: Footprints },
+  { value: "Functional training", icon: Activity },
+  { value: "CrossFit style", icon: Flame },
+  { value: "Group classes", icon: Users },
+  { value: "Yoga", icon: Flower2 },
+  { value: "Pilates", icon: Move },
+  { value: "Swimming", icon: Waves },
+  { value: "Team sports", icon: Trophy },
+  { value: "Martial arts", icon: Swords },
+  { value: "Cycling", icon: Bike },
+  { value: "None yet", icon: CircleDashed },
 ];
 
-const GOALS = [
-  "Lose weight", "Build muscle", "Get stronger", "Improve endurance",
-  "Flexibility & mobility", "Stress relief", "Community & fun", "General health",
+const GOALS: Option[] = [
+  { value: "Lose weight", icon: TrendingDown },
+  { value: "Build muscle", icon: Dumbbell },
+  { value: "Get stronger", icon: Zap },
+  { value: "Improve endurance", icon: HeartPulse },
+  { value: "Flexibility & mobility", icon: StretchHorizontal },
+  { value: "Stress relief", icon: Brain },
+  { value: "Community & fun", icon: PartyPopper },
+  { value: "General health", icon: Heart },
 ];
+
 
 const FREQUENCY = ["1× / week", "2–3× / week", "4–5× / week", "Daily"];
 
