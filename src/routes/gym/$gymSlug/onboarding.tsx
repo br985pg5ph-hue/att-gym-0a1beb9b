@@ -17,6 +17,7 @@ import {
   Dumbbell, Footprints, Activity, Flame, Users, Flower2, Move, Waves,
   Trophy, Swords, Bike, CircleDashed,
   TrendingDown, Zap, HeartPulse, StretchHorizontal, Brain, PartyPopper, Heart,
+  ArrowLeft,
   type LucideIcon,
 } from "lucide-react";
 import { profileNeedsDetails } from "./complete-profile";
@@ -153,8 +154,8 @@ function OnboardingPage() {
     }
   };
 
-  // Lowest step still reachable: once joined/signed you can't go back to those.
-  const minStep = !gym ? 0 : !waiverSigned ? 1 : 2;
+  // Lowest step still reachable: can go back to gym search until the waiver is signed.
+  const minStep = waiverSigned ? 2 : 0;
 
   // A tab is reachable when every earlier step is complete.
   const canGoTo = (i: number) => {
@@ -241,6 +242,7 @@ function OnboardingPage() {
         {step === 1 && gym && (
           <WaiverStep
             gym={gym}
+            onBack={() => setStep(0)}
             onSigned={() => { setWaiverSigned(true); setStep(2); }}
           />
         )}
@@ -511,7 +513,7 @@ function GymFinder({ onJoined }: { onJoined: (gym: JoinedGym) => void }) {
 }
 
 /** Step 2 — read and sign this gym's waiver. */
-function WaiverStep({ gym, onSigned }: { gym: JoinedGym; onSigned: () => void }) {
+function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => void; onSigned: () => void }) {
   const [agreed, setAgreed] = useState(false);
   const [name, setName] = useState("");
   const [signing, setSigning] = useState(false);
@@ -534,6 +536,15 @@ function WaiverStep({ gym, onSigned }: { gym: JoinedGym; onSigned: () => void })
 
   return (
     <div>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-3 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+        >
+          <ArrowLeft size={14} /> Choose a different gym
+        </button>
+      )}
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
         <ShieldCheck size={16} className="text-primary" /> {gym.name} — liability waiver
       </div>
