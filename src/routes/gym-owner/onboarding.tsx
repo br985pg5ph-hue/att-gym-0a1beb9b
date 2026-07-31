@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Building2, Clock, Dumbbell, Palette, Share2 } from "lucide-react";
+import { ArrowLeft, Building2, Clock, Dumbbell, Image as ImageIcon, Palette, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { NuvoLogo } from "@/components/NuvoLogo";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
@@ -82,8 +82,10 @@ function GymOwnerOnboarding() {
     if (step === 0) return name.trim().length >= 2 && city.trim().length >= 2 && address.trim().length >= 4 && phone.trim().length >= 5;
     if (step === 1) return disciplines.length > 0 && size.length > 0;
     if (step === 2) return hours.some((h) => !h.closed);
+    if (step === 3) return logoUrl.trim().length > 0;
     return true;
-  }, [step, name, city, address, phone, disciplines, size, hours]);
+  }, [step, name, city, address, phone, disciplines, size, hours, logoUrl]);
+
 
   const toggle = (value: string) =>
     setDisciplines((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
@@ -287,7 +289,10 @@ function GymOwnerOnboarding() {
                 />
               </div>
             </div>
-            <Field label="Logo URL (optional)" value={logoUrl} onChange={setLogoUrl} placeholder="https://…" />
+            <div className="lg:col-span-2">
+              <LogoUploader gymId={gym?.id} currentUrl={logoUrl} onUploaded={setLogoUrl} />
+            </div>
+
           </div>
 
         )}
@@ -377,6 +382,62 @@ function Select({
             {o}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function LogoUploader({
+  gymId,
+  currentUrl,
+  onUploaded,
+}: {
+  gymId?: string;
+  currentUrl: string;
+  onUploaded: (url: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+
+  const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !gymId) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "png";
+      const path = `${gymId}/logo-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("logos").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: signed, error: signedErr } = await supabase.storage
+        .from("logos")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signedErr) throw signedErr;
+      onUploaded(signed.signedUrl);
+      toast.success("Logo uploaded");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Could not upload logo");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div>
+      <label className="mb-2 block px-1 text-[10px] uppercase tracking-wider text-muted-foreground">Gym logo</label>
+      <div className="flex items-center gap-3 rounded-xl border hairline bg-card p-3">
+        {currentUrl ? (
+          <img src={currentUrl} alt="Gym logo" className="h-14 w-14 rounded-xl object-cover" />
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl border hairline bg-background">
+            <ImageIcon size={20} className="text-muted-foreground" />
+          </div>
+        )}
+        <div className="min-w-0">
+          <label className="inline-block cursor-pointer rounded-pill border hairline px-4 py-2 text-xs font-semibold">
+            {uploading ? "Uploading…" : currentUrl ? "Change logo" : "Upload logo"}
+            <input type="file" accept="image/*" className="hidden" onChange={upload} disabled={uploading} />
+          </label>
+          <p className="mt-1 text-[10px] text-muted-foreground">Required — PNG or JPG, square works best.</p>
+        </div>
       </div>
     </div>
   );
