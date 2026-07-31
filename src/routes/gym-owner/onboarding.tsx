@@ -80,11 +80,13 @@ function GymOwnerOnboarding() {
 
   const canContinue = useMemo(() => {
     if (step === 0) return name.trim().length >= 2 && city.trim().length >= 2 && address.trim().length >= 4 && phone.trim().length >= 5;
-    if (step === 1) return disciplines.length > 0 && size.length > 0;
+    if (step === 1) return disciplines.length > 0 && size.length > 0 && coaches.length > 0;
     if (step === 2) return hours.some((h) => !h.closed);
-    if (step === 3) return logoUrl.trim().length > 0;
+    if (step === 3) return logoUrl.trim().length > 0 && primary.trim().length > 0 && secondary.trim().length > 0;
+    if (step === 4) return instagram.trim().length > 0 && whatsapp.trim().length > 0 && mapsUrl.trim().length > 0;
     return true;
-  }, [step, name, city, address, phone, disciplines, size, hours, logoUrl]);
+  }, [step, name, city, address, phone, disciplines, size, coaches, hours, logoUrl, primary, secondary, instagram, whatsapp, mapsUrl]);
+
 
 
   const toggle = (value: string) =>
