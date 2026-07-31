@@ -16,7 +16,7 @@ export const Route = createFileRoute("/gym-owner/onboarding")({
     return { gym: ctx.gym as any };
   },
   loader: ({ context }) => ({ gym: (context as any).gym }),
-  component: GymOwnerOnboarding;
+  component: GymOwnerOnboarding,
 });
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
