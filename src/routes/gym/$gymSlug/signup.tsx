@@ -38,11 +38,24 @@ function SignUpPage() {
   const [referral, setReferral] = useState(ref || "");
   const [loading, setLoading] = useState(false);
 
+  const complete =
+    name.trim().length > 1 &&
+    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim()) &&
+    phone.trim().length >= 6 &&
+    !!gender &&
+    password.length >= 6 &&
+    confirm.length >= 6;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) return toast.error("Passwords do not match");
+    if (!name.trim()) return toast.error("Please enter your name");
+    if (!email.trim()) return toast.error("Please enter your email");
+    if (!phone.trim()) return toast.error("Please enter your phone number");
     if (!gender) return toast.error("Please select your gender");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (password !== confirm) return toast.error("Passwords do not match");
     setLoading(true);
+
     const meta: Record<string, string> = { name, phone: `${cc}${phone}`, gender, gym_slug: gymSlug };
     const trimmedRef = referral.trim();
     if (trimmedRef) meta.referral_code = trimmedRef;
