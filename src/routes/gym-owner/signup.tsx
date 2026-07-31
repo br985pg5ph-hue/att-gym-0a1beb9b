@@ -140,7 +140,7 @@ function PlatformSignup() {
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
         <button
-          disabled={loading}
+          disabled={loading || !isComplete}
           className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
           {loading ? "…" : "Apply"}
