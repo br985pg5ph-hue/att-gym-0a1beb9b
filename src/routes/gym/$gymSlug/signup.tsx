@@ -64,6 +64,7 @@ function SignUpPage() {
       toast.success("Account created!");
       nav({ to: gp("/onboarding") });
     } else {
+      setLoading(false);
       toast.message("Check your email", {
         description: "Confirm your account before signing in.",
       });
