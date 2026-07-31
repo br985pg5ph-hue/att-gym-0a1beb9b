@@ -292,6 +292,15 @@ function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) 
 
 function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const shortDays: Record<string, string> = {
+    Monday: "Mon",
+    Tuesday: "Tue",
+    Wednesday: "Wed",
+    Thursday: "Thu",
+    Friday: "Fri",
+    Saturday: "Sat",
+    Sunday: "Sun",
+  };
   const buildState = (list: any[]) => {
     const map: Record<string, DayHours> = {};
     for (const h of list ?? []) {
@@ -321,28 +330,28 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
     });
   };
 
-
-
   return (
     <div>
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Opening hours</label>
-      <div className="space-y-2">
+      <div className="space-y-1">
         {days.map((day) => {
           const row = state[day];
           const closed = !!row?.closed;
           return (
-            <div key={day} className="flex items-center gap-2 text-sm">
-              <span className="w-24 text-muted-foreground">{day}</span>
+            <div
+              key={day}
+              className="grid items-center gap-2 rounded-xl border hairline bg-background px-3 py-2 text-sm lg:grid-cols-[56px_1fr_1fr_auto]"
+            >
+              <span className="text-xs font-medium text-muted-foreground">{shortDays[day]}</span>
               {closed ? (
-                <span className="flex-1 text-xs font-semibold text-muted-foreground">Closed</span>
+                <span className="col-span-2 text-xs font-semibold text-muted-foreground">Closed</span>
               ) : (
                 <>
                   <TimeSelect value={row?.open ?? ""} onChange={(v) => update(day, { open: v })} />
-                  <span className="text-muted-foreground">-</span>
                   <TimeSelect value={row?.close ?? ""} onChange={(v) => update(day, { close: v })} />
                 </>
               )}
-              <label className="flex shrink-0 items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={closed}
@@ -351,36 +360,38 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
                 Closed
               </label>
             </div>
-
           );
         })}
       </div>
-      <button
-        type="button"
-        onClick={() => copyToAll("Monday")}
-        className="mt-3 mr-2 rounded-pill border hairline px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
-      >
-        Copy Monday to All
-      </button>
-      <button
-        onClick={() => {
-          const payload = days
-            .filter((d) => state[d]?.closed || state[d]?.open || state[d]?.close)
-            .map((d) => ({
-              day: d,
-              open: state[d]?.closed ? "" : (state[d]?.open ?? ""),
-              close: state[d]?.closed ? "" : (state[d]?.close ?? ""),
-              closed: !!state[d]?.closed,
-            }));
-          onSave(payload);
-        }}
-        className="mt-3 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
-      >
-        Save hours
-      </button>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => copyToAll("Monday")}
+          className="rounded-pill border hairline px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+        >
+          Copy Monday to All
+        </button>
+        <button
+          onClick={() => {
+            const payload = days
+              .filter((d) => state[d]?.closed || state[d]?.open || state[d]?.close)
+              .map((d) => ({
+                day: d,
+                open: state[d]?.closed ? "" : (state[d]?.open ?? ""),
+                close: state[d]?.closed ? "" : (state[d]?.close ?? ""),
+                closed: !!state[d]?.closed,
+              }));
+            onSave(payload);
+          }}
+          className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+        >
+          Save hours
+        </button>
+      </div>
     </div>
   );
 }
+
 
 
 function LogoUploader({ gymId, currentUrl, onUploaded }: { gymId: string; currentUrl: string | null; onUploaded: (url: string) => void }) {
