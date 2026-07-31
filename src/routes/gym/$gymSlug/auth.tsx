@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { gp, useGymSlug } from "@/lib/gym";
-import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
+import { fetchMembershipBySlug } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 import { useLang } from "@/lib/providers";
 
@@ -30,7 +30,7 @@ function AuthPage() {
         return;
       }
       await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", userId);
-      nav({ to: isStaffRole(membership.role) ? gp("/admin") : gp("/home") });
+      nav({ to: gp("/home") });
     },
     [gymSlug, nav],
   );
@@ -133,9 +133,6 @@ function AuthPage() {
           </div>
 
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            Members and gym staff sign in here — you'll land on the right place automatically.
-          </p>
           <p className="mt-3 text-center text-[11px] text-muted-foreground">
             New member?{" "}
             <Link to={gp("/signup")} className="font-semibold text-primary">
