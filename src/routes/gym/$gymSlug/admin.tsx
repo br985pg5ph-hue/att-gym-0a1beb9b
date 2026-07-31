@@ -1078,7 +1078,7 @@ function ClassesAdmin() {
 
       {editId && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" onClick={()=>setEditId(null)}>
-          <div className="w-full max-w-md space-y-3 rounded-2xl bg-card p-4 shadow-xl" onClick={(e)=>e.stopPropagation()}>
+          <div className="w-full max-w-md space-y-3 rounded-2xl bg-card p-4 shadow-xl lg:max-w-xl lg:p-6" onClick={(e)=>e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="font-display text-xl">Edit class</h3>
               <button onClick={()=>setEditId(null)} className="text-xs text-muted-foreground">Close</button>
