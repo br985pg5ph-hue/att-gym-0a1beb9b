@@ -536,15 +536,6 @@ function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => 
 
   return (
     <div>
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-3 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
-        >
-          <ArrowLeft size={14} /> Choose a different gym
-        </button>
-      )}
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
         <ShieldCheck size={16} className="text-primary" /> {gym.name} — liability waiver
       </div>
@@ -572,13 +563,25 @@ function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => 
         className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
       />
 
-      <button
-        disabled={signing}
-        onClick={sign}
-        className="mt-4 w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
-      >
-        {signing ? "…" : "Sign & continue"}
-      </button>
+      <div className="mt-4 flex items-center gap-3">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Choose a different gym"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border hairline bg-card text-muted-foreground active:scale-95"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        )}
+        <button
+          disabled={signing}
+          onClick={sign}
+          className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+        >
+          {signing ? "…" : "Sign & continue"}
+        </button>
+      </div>
     </div>
   );
 }
