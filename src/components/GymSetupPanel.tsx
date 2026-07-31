@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CountrySelect } from "@/components/CountrySelect";
 import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
-import { MapPin, Instagram, Image as ImageIcon, Clock, Plus, Trash2 } from "lucide-react";
+import { MapPin, Instagram, Image as ImageIcon, Clock, Plus, Trash2, FileText } from "lucide-react";
 
 type SetupPayload = {
   name?: string;
@@ -20,6 +20,8 @@ type SetupPayload = {
   primary_color?: string;
   secondary_color?: string;
   hours?: { day: string; open: string; close: string; closed?: boolean }[];
+  waiver_text?: string;
+
   logo_url?: string;
   theme?: Record<string, any>;
 };
@@ -85,10 +87,22 @@ export function GymSetupPanel() {
         <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
       </Section>
 
+      <Section icon={FileText} title="Membership waiver">
+        <p className="text-xs text-muted-foreground">
+          New members read and sign this during onboarding. Leave empty to use Nuvo's standard waiver.
+        </p>
+        <SetupTextArea
+          label="Waiver text"
+          defaultValue={(gym as any).waiver_text ?? ""}
+          onSave={(waiver_text) => saveMutation.mutate({ waiver_text })}
+        />
+      </Section>
+
       <Section icon={Instagram} title="Social links">
         <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
         <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
       </Section>
+
     </div>
   );
 }
@@ -101,6 +115,31 @@ function Section({ icon: Icon, title, children }: { icon: typeof MapPin; title: 
         <h2 className="font-display text-lg">{title}</h2>
       </div>
       <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function SetupTextArea({ label, defaultValue, onSave }: { label: string; defaultValue: string; onSave: (value: string) => void }) {
+  const [value, setValue] = useState(defaultValue);
+  useEffect(() => setValue(defaultValue), [defaultValue]);
+  return (
+    <div>
+      <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">{label}</label>
+      <textarea
+        value={value}
+        rows={8}
+        onChange={(e) => setValue(e.target.value.slice(0, 20000))}
+        placeholder="Leave empty to use Nuvo's standard waiver"
+        className="w-full rounded-xl border hairline bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+      />
+      <div className="mt-2 flex justify-end">
+        <button
+          onClick={() => onSave(value)}
+          className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

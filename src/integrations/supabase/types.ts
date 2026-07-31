@@ -393,6 +393,8 @@ export type Database = {
           streak: number
           updated_at: string
           user_id: string
+          waiver_name: string | null
+          waiver_signed_at: string | null
         }
         Insert: {
           classes_attended?: number
@@ -414,6 +416,8 @@ export type Database = {
           streak?: number
           updated_at?: string
           user_id: string
+          waiver_name?: string | null
+          waiver_signed_at?: string | null
         }
         Update: {
           classes_attended?: number
@@ -435,6 +439,8 @@ export type Database = {
           streak?: number
           updated_at?: string
           user_id?: string
+          waiver_name?: string | null
+          waiver_signed_at?: string | null
         }
         Relationships: [
           {
@@ -473,6 +479,7 @@ export type Database = {
           slug: string
           status: string
           theme: Json
+          waiver_text: string
           whatsapp_number: string | null
         }
         Insert: {
@@ -494,6 +501,7 @@ export type Database = {
           slug: string
           status?: string
           theme?: Json
+          waiver_text?: string
           whatsapp_number?: string | null
         }
         Update: {
@@ -515,6 +523,7 @@ export type Database = {
           slug?: string
           status?: string
           theme?: Json
+          waiver_text?: string
           whatsapp_number?: string | null
         }
         Relationships: []
@@ -687,6 +696,10 @@ export type Database = {
         Args: { _code?: string; _referral?: string; _slug: string }
         Returns: string
       }
+      join_gym_by_code: {
+        Args: { _code: string; _referral?: string }
+        Returns: string
+      }
       pause_membership: {
         Args: { target_gym?: string; target_user: string }
         Returns: {
@@ -709,6 +722,8 @@ export type Database = {
           streak: number
           updated_at: string
           user_id: string
+          waiver_name: string | null
+          waiver_signed_at: string | null
         }
         SetofOptions: {
           from: "*"
@@ -739,6 +754,8 @@ export type Database = {
           streak: number
           updated_at: string
           user_id: string
+          waiver_name: string | null
+          waiver_signed_at: string | null
         }
         SetofOptions: {
           from: "*"
@@ -754,6 +771,10 @@ export type Database = {
         Returns: undefined
       }
       shares_gym_with: { Args: { _user_id: string }; Returns: boolean }
+      sign_waiver: {
+        Args: { _gym_id: string; _name: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "member" | "staff" | "admin" | "owner"

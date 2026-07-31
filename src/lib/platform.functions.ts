@@ -31,6 +31,8 @@ const setupUpdateSchema = z.object({
   secondary_color: z.string().trim().max(50).optional(),
   hours: z.array(z.object({ day: z.string(), open: z.string(), close: z.string(), closed: z.boolean().optional().default(false) })).optional(),
   logo_url: z.string().trim().max(500).optional(),
+  waiver_text: z.string().trim().max(20000).optional(),
+
   theme: z
     .object({
       colors: z
@@ -233,6 +235,8 @@ export const updateGymSetup = createServerFn({ method: "POST" })
       ...(data.hours !== undefined && { hours: data.hours }),
       ...(data.theme !== undefined && { theme: data.theme }),
       ...(data.logo_url !== undefined && { logo_url: data.logo_url }),
+      ...(data.waiver_text !== undefined && { waiver_text: data.waiver_text }),
+
     };
 
     const { error } = await context.supabase.from("gyms").update(update as any).eq("id", gymId);

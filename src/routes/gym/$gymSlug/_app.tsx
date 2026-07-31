@@ -22,8 +22,11 @@ export const Route = createFileRoute("/gym/$gymSlug/_app")({
       .eq("id", data.user.id)
       .maybeSingle();
     if (!location.pathname.endsWith("/onboarding")) {
+      // Members must sign their gym's waiver before using the app.
+      if (!membership.waiver_signed_at) throw redirect({ to: gp("/onboarding") });
       if (p && !p.onboarded && !p.is_parent) throw redirect({ to: gp("/onboarding") });
     }
+
   },
   component: () => (
     <AppShell><Outlet /><AppTour /></AppShell>
