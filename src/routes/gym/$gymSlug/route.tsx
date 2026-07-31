@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, notFound, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { fetchGym, gymQueryKey, GymSlugProvider, setCurrentGymSlug } from "@/lib/gym";
 
 export const Route = createFileRoute("/gym/$gymSlug")({
@@ -36,8 +37,16 @@ function UnknownGym() {
 }
 
 function TenantLayout() {
-  const { gym } = Route.useLoaderData();
+  const loaded = Route.useLoaderData();
   const { gymSlug } = Route.useParams();
+  // Subscribe to the gym query so branding updates immediately after an admin saves.
+  const { data: live } = useQuery({
+    queryKey: gymQueryKey(gymSlug),
+    queryFn: () => fetchGym(gymSlug),
+    initialData: loaded.gym,
+  });
+  const gym = live ?? loaded.gym;
+
 
   if (gym.status === "suspended") {
     return (
