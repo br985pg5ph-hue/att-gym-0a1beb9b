@@ -96,6 +96,7 @@ function OnboardingPage() {
           name: m.gyms.name,
           waiver_text: m.gyms.waiver_text || "",
         });
+        setWaiverSigned(!!m.waiver_signed_at);
         setStep(m.waiver_signed_at ? 2 : 1);
       } finally {
         if (!cancelled) setChecking(false);
