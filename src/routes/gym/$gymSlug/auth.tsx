@@ -119,6 +119,19 @@ function AuthPage() {
             </button>
           </form>
 
+          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="h-px flex-1 bg-border" /><span>{t.or}</span><div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="space-y-2">
+            <button onClick={() => oauth("google")} className="w-full rounded-pill border hairline bg-card py-3 text-sm font-medium">
+              {t.continueWithGoogle}
+            </button>
+            <button onClick={() => oauth("apple")} className="w-full rounded-pill border hairline bg-card py-3 text-sm font-medium">
+              {t.continueWithApple}
+            </button>
+          </div>
+
+
           <p className="mt-8 text-center text-xs text-muted-foreground">
             Members and gym staff sign in here — you'll land on the right place automatically.
           </p>
