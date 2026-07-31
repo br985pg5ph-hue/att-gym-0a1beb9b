@@ -154,8 +154,8 @@ function OnboardingPage() {
     }
   };
 
-  // Lowest step still reachable: once joined/signed you can't go back to those.
-  const minStep = !gym ? 0 : !waiverSigned ? 1 : 2;
+  // Lowest step still reachable: can go back to gym search until the waiver is signed.
+  const minStep = waiverSigned ? 2 : 0;
 
   // A tab is reachable when every earlier step is complete.
   const canGoTo = (i: number) => {
