@@ -170,34 +170,35 @@ function OnboardingPage() {
         </Section>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 border-t hairline bg-background/90 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          {step > 0 ? (
-            <button onClick={() => setStep(step - 1)} className="rounded-pill border hairline px-5 py-3 text-sm font-medium">
-              Back
-            </button>
-          ) : (
-            <button onClick={skip} className="rounded-pill px-5 py-3 text-sm font-medium text-muted-foreground">
-              Skip
-            </button>
-          )}
-          {step < totalSteps - 1 ? (
-            <button
-              disabled={!canNext}
-              onClick={() => setStep(step + 1)}
-              className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40"
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              disabled={saving}
-              onClick={finish}
-              className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
-            >
-              {saving ? "…" : "Finish"}
-            </button>
-          )}
+        <div className="fixed inset-x-0 bottom-0 border-t hairline bg-background/90 px-6 py-4 backdrop-blur">
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            {step > 0 ? (
+              <button onClick={() => setStep(step - 1)} className="rounded-pill border hairline px-5 py-3 text-sm font-medium">
+                Back
+              </button>
+            ) : (
+              <button onClick={skip} className="rounded-pill px-5 py-3 text-sm font-medium text-muted-foreground">
+                Skip
+              </button>
+            )}
+            {step < totalSteps - 1 ? (
+              <button
+                disabled={!canNext}
+                onClick={() => setStep(step + 1)}
+                className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40"
+              >
+                Continue
+              </button>
+            ) : (
+              <button
+                disabled={saving}
+                onClick={finish}
+                className="flex-1 rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {saving ? "…" : "Finish"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
