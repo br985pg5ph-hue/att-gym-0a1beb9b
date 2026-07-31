@@ -1,58 +1,31 @@
-## Goal
+# Onboarding: icon card grid for multi-select steps
 
-One app, Nuvo. A member downloads/opens it, creates an account (no gym involved), searches the gym directory, joins their gym (instantly, or with a code when that gym requires one), and lands in that gym's branded UI. A member can join several gyms and switch between them; each gym's data, membership and credits stay separate.
-
-## Current state (verified)
-
-- The app already assumes a gym before the account exists: sign-in/sign-up live at `/gym/{slug}/auth` and `/gym/{slug}/signup`, and the account-creation trigger stamps a single gym onto the new profile.
-- Every member's gym-specific state (membership expiry, PT sessions, member ID, track, streak, attendance) lives directly on the profile row, so one profile can only ever belong to one gym.
-- The database holds 7 gyms and 2 accounts, with no members, bookings, children or transactions yet — so restructuring now costs nothing in data.
+Replace the pill chips in the onboarding questionnaire with a 2-column grid of tappable icon cards, applied to every multi-select step.
 
 ## What changes
 
-### 1. Membership record per gym
+**Training types step** ("What types of training have you tried?")
+- 2-column grid of cards. Each card shows a Lucide icon on top, the label below, and a filled checkmark badge in the top-right corner when selected.
+- Selected state: primary border, tinted primary background, primary-coloured icon. Unselected: hairline border, card background, muted icon.
+- Subtle press/scale transition on tap.
 
-Introduce a `gym_members` record that links one account to one gym and carries everything that is gym-specific: role at that gym (member/staff/admin), group membership dates and pause state, PT sessions, member ID, booking track, streak and attendance, join date. Children get the same treatment (a child belongs to a gym membership).
+**Goals step** ("What are your goals?")
+- Same card grid, its own icon set.
 
-The profile becomes gym-agnostic identity only: name, phone, gender, date of birth, avatar, language/theme preferences, plus an "active gym" pointer used to decide what the app shows on open.
+**Shared header for both steps**
+- Under the question title: a live counter ("3 selected") replacing the plain "Select all that apply" hint, plus a small "Clear" action once anything is picked.
 
-Access rules are rewritten so "same gym" means "the caller has a membership at that gym", and staff/admin powers are granted per gym rather than globally.
+Single-choice steps (experience, frequency) keep their current full-width rows so choosing one vs. many stays visually distinct.
 
-### 2. Account-first auth
+## Icon mapping
 
-- New top-level `/auth`, `/signup`, `/forgot`, `/reset-password` — Nuvo-branded, no gym in the URL. The existing gym-scoped auth pages redirect here.
-- After sign-up the member goes to a short profile step (name, phone, gender, DOB), then straight to gym search.
-- Signing in with no memberships → gym search. With one → that gym's home. With several → a gym picker (remembering the last used).
-
-### 3. Gym directory and joining
-
-- `/gyms` — searchable directory of active gyms: logo, name, city/address, with search by name. A gym can be hidden from the directory if it prefers code-only access.
-- Tapping a gym shows a join screen with its branding. If the gym has "require join code" switched on, the member must enter the code; otherwise joining is instant.
-- Joining creates the membership and drops the member into that gym's home with no active membership yet — staff activates payment in person, exactly as today.
-- Gym admins get a "Join settings" area: toggle code requirement, view/regenerate the join code, toggle directory visibility.
-
-### 4. Switching gyms
-
-- A gym switcher in the member's profile/header lists their gyms plus "Join another gym". Switching changes the active gym and re-brands the app.
-- Booking, membership, credits, referrals, children and history are always read through the active gym's membership, so nothing bleeds between gyms.
-
-### 5. Staff, admin and owner
-
-- Staff/admin accounts are memberships with an elevated role at that gym; one person can be staff at one gym and a member at another.
-- Gym-owner and platform-owner portals are unchanged apart from reading roles from the new membership record.
-
-## Rollout order
-
-1. Database restructure: `gym_members`, move gym-specific fields off profiles, rewrite access rules and the account-creation trigger, add join code / directory fields to gyms. Re-seed the two existing accounts as memberships of their gyms.
-2. Account-first auth routes and the post-signup profile step.
-3. Gym directory, join screen, join-code enforcement.
-4. Gym switcher and active-gym resolution replacing today's slug-only resolution.
-5. Update member screens (home, booking, membership, profile, children, referral) to read from the membership record.
-6. Update the gym admin area (member list, member detail, dashboard) and add join settings.
+- Training types: Weight training (dumbbell), Cardio / Running (footprints), Functional training (activity), CrossFit style (flame), Group classes (users), Yoga (flower), Pilates (move), Swimming (waves), Team sports (trophy), Martial arts (swords), Cycling (bike), None yet (circle-dashed).
+- Goals: Lose weight (trending-down), Build muscle (dumbbell), Get stronger (zap), Improve endurance (heart-pulse), Flexibility & mobility (stretch-horizontal), Stress relief (brain), Community & fun (party-popper), General health (heart).
 
 ## Technical notes
 
-- `gym_members` gets a unique constraint on (user, gym); `current_gym_id()` reads the profile's active gym but every policy validates against an actual membership row via a security-definer helper, so `same_gym()` no longer trusts the pointer alone.
-- Routes stay at `/gym/$gymSlug/*` (unchanged deep links, still white-label ready); the new gym-agnostic routes sit above them, and `/member-app-preview` keeps pointing at the reserved `preview` gym.
-- The directory read is public (anon-readable gym rows, name/logo/address only); join is a security-definer function that validates the code server-side so codes are never exposed to the client.
-- Given zero member data, the migration recreates structure rather than doing a careful backfill — this is the cheapest moment to make this change.
+- File: `src/routes/gym/$gymSlug/onboarding.tsx`.
+- Replace the `Chips` helper with an `OptionGrid` component taking `options: { value: string; icon: LucideIcon }[]`, `selected`, `onToggle`.
+- Convert the existing `DISCIPLINES` and `GOALS` string arrays into arrays of `{ value, icon }`; the stored values sent to `profiles.disciplines` / `profiles.goals` stay identical, so no database or validation change.
+- `Section` gains an optional `counter` node so the "N selected / Clear" row renders in the same place the hint does.
+- Icons from `lucide-react`; all colours via existing semantic tokens (`primary`, `card`, `muted-foreground`, `hairline`).
