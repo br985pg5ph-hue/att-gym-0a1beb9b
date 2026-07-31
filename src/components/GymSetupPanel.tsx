@@ -376,7 +376,7 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
                   checked={!closed}
                   onChange={(e) => update(day, { closed: !e.target.checked })}
                 />
-                <div className="h-5 w-9 rounded-full bg-muted-foreground/30 transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-checked:after:translate-x-full" />
+                <div className="h-5 w-9 rounded-full bg-muted-foreground/30 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-muted-foreground/20 after:bg-card after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-ring" />
                 <span className={`ms-2 text-[10px] font-medium uppercase tracking-wider transition-colors ${closed ? "text-muted-foreground" : "text-foreground"}`}>
                   {closed ? "Closed" : "Open"}
                 </span>
