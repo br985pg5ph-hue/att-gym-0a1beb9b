@@ -335,7 +335,7 @@ export function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: a
   };
 
   return (
-    <div className="rounded-2xl border hairline bg-card p-4">
+    <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="font-display text-base">Opening hours</h3>
