@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CountrySelect } from "@/components/CountrySelect";
 import { COUNTRIES } from "@/lib/countries";
 import { getGymSetupContext, updateGymSetup } from "@/lib/platform.functions";
-import { MapPin, Instagram, Image as ImageIcon, Clock, Plus, Trash2, FileText } from "lucide-react";
+import { MapPin, Instagram, Image as ImageIcon, Clock, Plus, Trash2, FileText, Copy } from "lucide-react";
 
 type SetupPayload = {
   name?: string;
