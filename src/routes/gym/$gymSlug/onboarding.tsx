@@ -71,6 +71,7 @@ function OnboardingPage() {
 
   const [step, setStep] = useState(0);
   const [gym, setGym] = useState<JoinedGym | null>(null);
+  const [waiverSigned, setWaiverSigned] = useState(false);
   const [checking, setChecking] = useState(true);
 
   const [experience, setExperience] = useState<string>("");
@@ -95,6 +96,7 @@ function OnboardingPage() {
           name: m.gyms.name,
           waiver_text: m.gyms.waiver_text || "",
         });
+        setWaiverSigned(!!m.waiver_signed_at);
         setStep(m.waiver_signed_at ? 2 : 1);
       } finally {
         if (!cancelled) setChecking(false);
@@ -107,12 +109,31 @@ function OnboardingPage() {
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const totalSteps = 7;
-  const canNext =
-    (step === 2 && !!experience) ||
-    (step === 3 && disciplines.length > 0) ||
-    (step === 4 && goals.length > 0) ||
-    (step === 5 && !!frequency) ||
-    step === 6;
+
+  const stepDone = (i: number) => {
+    switch (i) {
+      case 0: return !!gym;
+      case 1: return waiverSigned;
+      case 2: return !!experience;
+      case 3: return disciplines.length > 0;
+      case 4: return goals.length > 0;
+      case 5: return !!frequency;
+      default: return true;
+    }
+  };
+
+  // Lowest step still reachable: once joined/signed you can't go back to those.
+  const minStep = !gym ? 0 : !waiverSigned ? 1 : 2;
+
+  // A tab is reachable when every earlier step is complete.
+  const canGoTo = (i: number) => {
+    if (i < minStep) return false;
+    if (i <= step) return true;
+    for (let j = minStep; j < i; j++) if (!stepDone(j)) return false;
+    return true;
+  };
+
+  const canNext = stepDone(step);
 
   const finish = async () => {
     setSaving(true);
@@ -153,11 +174,28 @@ function OnboardingPage() {
               : `Helps ${gym?.name ?? "your gym"} tailor your training`}
         </p>
 
-        {/* progress */}
+        {/* progress — tappable steps */}
         <div className="mb-6 flex gap-1.5">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-border"}`} />
-          ))}
+          {Array.from({ length: totalSteps }).map((_, i) => {
+            const enabled = canGoTo(i) && i !== step;
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Step ${i + 1} of ${totalSteps}`}
+                aria-current={i === step ? "step" : undefined}
+                disabled={!enabled}
+                onClick={() => enabled && setStep(i)}
+                className={`group flex-1 py-2 ${enabled ? "cursor-pointer" : "cursor-default"}`}
+              >
+                <span
+                  className={`block h-1 rounded-full transition ${
+                    i <= step ? "bg-primary" : "bg-border"
+                  } ${enabled ? "group-hover:opacity-70" : ""}`}
+                />
+              </button>
+            );
+          })}
         </div>
 
         {step === 0 && !checking && (
@@ -172,7 +210,7 @@ function OnboardingPage() {
         {step === 1 && gym && (
           <WaiverStep
             gym={gym}
-            onSigned={() => setStep(2)}
+            onSigned={() => { setWaiverSigned(true); setStep(2); }}
           />
         )}
 
