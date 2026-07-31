@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { gp, useGymSlug } from "@/lib/gym";
-import { ensureMembershipBySlug, isStaffRole } from "@/lib/membership";
+import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 import { useLang } from "@/lib/providers";
 
@@ -23,9 +23,10 @@ function AuthPage() {
 
   const routeAfterAuth = useCallback(
     async (userId: string) => {
-      const membership = await ensureMembershipBySlug(userId, gymSlug);
+      const membership = await fetchMembershipBySlug(userId, gymSlug);
       if (!membership) {
-        toast.error("This account isn't a member of this gym yet");
+        // Not linked to a gym yet — send them to onboarding to pick one.
+        nav({ to: gp("/onboarding") });
         return;
       }
       await supabase.from("profiles").update({ active_gym_id: membership.gym_id }).eq("id", userId);
