@@ -1,0 +1,3 @@
+CREATE POLICY "Gym admins can upload logos" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'logos' AND public.has_role_at(auth.uid(), ((storage.foldername(name))[1])::uuid, 'admin'));
+CREATE POLICY "Gym admins can update logos" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'logos' AND public.has_role_at(auth.uid(), ((storage.foldername(name))[1])::uuid, 'admin')) WITH CHECK (bucket_id = 'logos' AND public.has_role_at(auth.uid(), ((storage.foldername(name))[1])::uuid, 'admin'));
+CREATE POLICY "Gym admins can delete logos" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'logos' AND public.has_role_at(auth.uid(), ((storage.foldername(name))[1])::uuid, 'admin'));
