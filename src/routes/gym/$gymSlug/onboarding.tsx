@@ -187,12 +187,6 @@ function OnboardingPage() {
     nav({ to: gymPath(gym?.slug ?? routeSlug, "/home") as any });
   };
 
-  const skip = async () => {
-    const { data: u } = await supabase.auth.getUser();
-    if (u.user) await supabase.from("profiles").update({ onboarded: true }).eq("id", u.user.id);
-    try { sessionStorage.setItem("att.startTour", "1"); } catch {}
-    nav({ to: gymPath(gym?.slug ?? routeSlug, "/home") as any });
-  };
 
   // Once the member has joined a gym, the flow takes on that gym's branding.
   const { data: brand } = useQuery({
@@ -359,15 +353,14 @@ function OnboardingPage() {
         {step >= 2 && (
           <div className="fixed inset-x-0 bottom-0 border-t hairline bg-background/90 px-6 py-4 backdrop-blur">
             <div className="mx-auto flex max-w-md items-center gap-3">
-              {step > 2 ? (
-                <button onClick={() => setStep(step - 1)} className="rounded-pill border hairline px-5 py-3 text-sm font-medium">
-                  Back
-                </button>
-              ) : (
-                <button onClick={skip} className="rounded-pill px-5 py-3 text-sm font-medium text-muted-foreground">
-                  Skip
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setStep(step - 1)}
+                aria-label="Back"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full border hairline bg-card text-muted-foreground active:scale-95"
+              >
+                <ArrowLeft size={18} />
+              </button>
               {step < totalSteps - 1 ? (
                 <button
                   disabled={!canNext}
