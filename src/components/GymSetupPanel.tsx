@@ -361,8 +361,8 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
               key={day}
               className={`flex items-center gap-4 rounded-xl border px-3 py-2.5 transition-all ${
                 closed
-                  ? "border-transparent bg-muted/40 opacity-60"
-                  : "hairline bg-background hover:border-primary/30"
+                  ? "border-transparent bg-card/60 opacity-60"
+                  : "hairline bg-card hover:border-primary/30"
               }`}
             >
               <span className={`w-20 shrink-0 text-sm font-medium ${closed ? "text-muted-foreground" : "text-foreground"}`}>
