@@ -408,7 +408,7 @@ export function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: a
         })}
       </div>
 
-      <div className="mt-4 flex items-center justify-end border-t hairline pt-4">
+      <div className="mt-4 flex items-center justify-end">
         <button
           onClick={() => {
             const payload = days
