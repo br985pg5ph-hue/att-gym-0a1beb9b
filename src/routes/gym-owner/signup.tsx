@@ -56,7 +56,7 @@ function PlatformSignup() {
         return;
       }
       toast.success("Application submitted!");
-      nav({ to: "/gym-owner/setup" });
+      nav({ to: "/gym-owner/onboarding" });
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to submit application");
     } finally {

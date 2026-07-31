@@ -21,6 +21,7 @@ const statusSchema = z.object({
 const setupUpdateSchema = z.object({
   name: z.string().trim().min(2).max(120).optional(),
   address: z.string().trim().max(255).optional(),
+  city: z.string().trim().max(120).optional(),
   phone: z.string().trim().max(50).optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
@@ -224,6 +225,7 @@ export const updateGymSetup = createServerFn({ method: "POST" })
     const update = {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.address !== undefined && { address: data.address }),
+      ...(data.city !== undefined && { city: data.city }),
       ...(data.phone !== undefined && { phone: data.phone }),
       ...(data.lat !== undefined && { lat: data.lat }),
       ...(data.lng !== undefined && { lng: data.lng }),
