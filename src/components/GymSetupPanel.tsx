@@ -61,31 +61,41 @@ export function GymSetupPanel() {
   const gym = data.gym;
 
   return (
-    <div className="space-y-4">
-      <Section icon={MapPin} title="Gym basics">
-        <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
-        <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
-        <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
-      </Section>
+    <div className="space-y-5">
+      {/* Two-column grid on desktop */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Section icon={MapPin} title="Gym basics">
+          <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
+          <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
+          <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
+        </Section>
 
-      <Section icon={Clock} title="Location & hours">
-        <div className="grid grid-cols-2 gap-3">
-          <SetupNumber label="Latitude" defaultValue={gym.lat} onSave={(lat) => saveMutation.mutate({ lat })} />
-          <SetupNumber label="Longitude" defaultValue={gym.lng} onSave={(lng) => saveMutation.mutate({ lng })} />
-        </div>
-        <SetupField label="Maps URL" defaultValue={gym.maps_url ?? ""} onSave={(maps_url) => saveMutation.mutate({ maps_url })} />
-        <HoursEditor hours={(gym.hours as any) ?? []} onSave={(hours) => saveMutation.mutate({ hours })} />
-      </Section>
+        <Section icon={Clock} title="Location & hours">
+          <div className="grid grid-cols-2 gap-3">
+            <SetupNumber label="Latitude" defaultValue={gym.lat} onSave={(lat) => saveMutation.mutate({ lat })} />
+            <SetupNumber label="Longitude" defaultValue={gym.lng} onSave={(lng) => saveMutation.mutate({ lng })} />
+          </div>
+          <SetupField label="Maps URL" defaultValue={gym.maps_url ?? ""} onSave={(maps_url) => saveMutation.mutate({ maps_url })} />
+          <HoursEditor hours={(gym.hours as any) ?? []} onSave={(hours) => saveMutation.mutate({ hours })} />
+        </Section>
 
-      <Section icon={ImageIcon} title="Branding">
-        <BrandColors
-          primary={gym.primary_color ?? ""}
-          secondary={gym.secondary_color ?? ""}
-          theme={(gym.theme as any) ?? {}}
-          onSave={(payload) => saveMutation.mutate(payload)}
-        />
-        <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
-      </Section>
+        <Section icon={ImageIcon} title="Branding">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <BrandColors
+              primary={gym.primary_color ?? ""}
+              secondary={gym.secondary_color ?? ""}
+              theme={(gym.theme as any) ?? {}}
+              onSave={(payload) => saveMutation.mutate(payload)}
+            />
+            <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
+          </div>
+        </Section>
+
+        <Section icon={Instagram} title="Social links">
+          <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
+          <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
+        </Section>
+      </div>
 
       <Section icon={FileText} title="Membership waiver">
         <p className="text-xs text-muted-foreground">
@@ -97,12 +107,6 @@ export function GymSetupPanel() {
           onSave={(waiver_text) => saveMutation.mutate({ waiver_text })}
         />
       </Section>
-
-      <Section icon={Instagram} title="Social links">
-        <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
-        <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
-      </Section>
-
     </div>
   );
 }
