@@ -513,7 +513,7 @@ function GymFinder({ onJoined }: { onJoined: (gym: JoinedGym) => void }) {
 }
 
 /** Step 2 — read and sign this gym's waiver. */
-function WaiverStep({ gym, onSigned }: { gym: JoinedGym; onSigned: () => void }) {
+function WaiverStep({ gym, onBack, onSigned }: { gym: JoinedGym; onBack?: () => void; onSigned: () => void }) {
   const [agreed, setAgreed] = useState(false);
   const [name, setName] = useState("");
   const [signing, setSigning] = useState(false);
@@ -536,6 +536,15 @@ function WaiverStep({ gym, onSigned }: { gym: JoinedGym; onSigned: () => void })
 
   return (
     <div>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-3 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+        >
+          <ArrowLeft size={14} /> Choose a different gym
+        </button>
+      )}
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
         <ShieldCheck size={16} className="text-primary" /> {gym.name} — liability waiver
       </div>
