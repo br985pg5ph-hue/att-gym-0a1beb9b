@@ -350,19 +350,18 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
                 />
                 Closed
               </label>
-              <button
-                type="button"
-                onClick={() => copyToAll(day)}
-                title={`Copy ${day} to all days`}
-                className="shrink-0 rounded-pill border hairline px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
-              >
-                Copy to all
-              </button>
             </div>
 
           );
         })}
       </div>
+      <button
+        type="button"
+        onClick={() => copyToAll("Monday")}
+        className="mt-3 mr-2 rounded-pill border hairline px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+      >
+        Copy Monday to All
+      </button>
       <button
         onClick={() => {
           const payload = days
