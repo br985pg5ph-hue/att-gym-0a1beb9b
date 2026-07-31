@@ -31,6 +31,7 @@ import { Route as PlatformOwnerDashboardRouteImport } from './routes/platform-ow
 import { Route as PlatformOwnerConsoleRouteImport } from './routes/platform-owner/console'
 import { Route as GymOwnerSignupRouteImport } from './routes/gym-owner/signup'
 import { Route as GymOwnerSetupRouteImport } from './routes/gym-owner/setup'
+import { Route as GymOwnerOnboardingRouteImport } from './routes/gym-owner/onboarding'
 import { Route as GymOwnerLoginRouteImport } from './routes/gym-owner/login'
 import { Route as GymGymSlugRouteRouteImport } from './routes/gym/$gymSlug/route'
 import { Route as GymGymSlugIndexRouteImport } from './routes/gym/$gymSlug/index'
@@ -166,6 +167,11 @@ const GymOwnerSignupRoute = GymOwnerSignupRouteImport.update({
 const GymOwnerSetupRoute = GymOwnerSetupRouteImport.update({
   id: '/setup',
   path: '/setup',
+  getParentRoute: () => GymOwnerRouteRoute,
+} as any)
+const GymOwnerOnboardingRoute = GymOwnerOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => GymOwnerRouteRoute,
 } as any)
 const GymOwnerLoginRoute = GymOwnerLoginRouteImport.update({
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-owner/login': typeof GymOwnerLoginRoute
+  '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
@@ -375,6 +382,7 @@ export interface FileRoutesByTo {
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym-owner/login': typeof GymOwnerLoginRoute
+  '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
@@ -424,6 +432,7 @@ export interface FileRoutesById {
   '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/gym-owner/login': typeof GymOwnerLoginRoute
+  '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
@@ -476,6 +485,7 @@ export interface FileRouteTypes {
     | '/member-app-preview'
     | '/gym/$gymSlug'
     | '/gym-owner/login'
+    | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/app-preview-signup'
     | '/member-app-preview'
     | '/gym-owner/login'
+    | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
@@ -572,6 +583,7 @@ export interface FileRouteTypes {
     | '/member-app-preview'
     | '/gym/$gymSlug'
     | '/gym-owner/login'
+    | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
@@ -780,6 +792,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GymOwnerSetupRouteImport
       parentRoute: typeof GymOwnerRouteRoute
     }
+    '/gym-owner/onboarding': {
+      id: '/gym-owner/onboarding'
+      path: '/onboarding'
+      fullPath: '/gym-owner/onboarding'
+      preLoaderRoute: typeof GymOwnerOnboardingRouteImport
+      parentRoute: typeof GymOwnerRouteRoute
+    }
     '/gym-owner/login': {
       id: '/gym-owner/login'
       path: '/login'
@@ -967,12 +986,14 @@ declare module '@tanstack/react-router' {
 
 interface GymOwnerRouteRouteChildren {
   GymOwnerLoginRoute: typeof GymOwnerLoginRoute
+  GymOwnerOnboardingRoute: typeof GymOwnerOnboardingRoute
   GymOwnerSetupRoute: typeof GymOwnerSetupRoute
   GymOwnerSignupRoute: typeof GymOwnerSignupRoute
 }
 
 const GymOwnerRouteRouteChildren: GymOwnerRouteRouteChildren = {
   GymOwnerLoginRoute: GymOwnerLoginRoute,
+  GymOwnerOnboardingRoute: GymOwnerOnboardingRoute,
   GymOwnerSetupRoute: GymOwnerSetupRoute,
   GymOwnerSignupRoute: GymOwnerSignupRoute,
 }
