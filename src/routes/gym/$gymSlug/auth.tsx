@@ -133,9 +133,6 @@ function AuthPage() {
           </div>
 
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            Members and gym staff sign in here — you'll land on the right place automatically.
-          </p>
           <p className="mt-3 text-center text-[11px] text-muted-foreground">
             New member?{" "}
             <Link to={gp("/signup")} className="font-semibold text-primary">
