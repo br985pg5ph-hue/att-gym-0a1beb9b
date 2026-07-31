@@ -38,6 +38,25 @@ export async function fetchMembershipBySlug(
   return (data as unknown as MembershipRow) ?? null;
 }
 
+/**
+ * Membership at this gym, joining the gym first when the account has none yet
+ * (email-confirmed signups and social sign-in land here without one).
+ */
+export async function ensureMembershipBySlug(
+  userId: string,
+  slug: string,
+  referral?: string | null,
+): Promise<MembershipRow | null> {
+  const existing = await fetchMembershipBySlug(userId, slug);
+  if (existing) return existing;
+  const { error } = await supabase.rpc("join_gym", {
+    _slug: slug,
+    _referral: referral || null,
+  });
+  if (error) throw error;
+  return fetchMembershipBySlug(userId, slug);
+}
+
 export const STAFF_ROLES = ["staff", "admin", "owner"];
 
 export function isStaffRole(role?: string | null) {
