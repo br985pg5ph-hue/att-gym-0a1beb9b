@@ -80,11 +80,13 @@ function GymOwnerOnboarding() {
 
   const canContinue = useMemo(() => {
     if (step === 0) return name.trim().length >= 2 && city.trim().length >= 2 && address.trim().length >= 4 && phone.trim().length >= 5;
-    if (step === 1) return disciplines.length > 0 && size.length > 0;
+    if (step === 1) return disciplines.length > 0 && size.length > 0 && coaches.length > 0;
     if (step === 2) return hours.some((h) => !h.closed);
-    if (step === 3) return logoUrl.trim().length > 0;
+    if (step === 3) return logoUrl.trim().length > 0 && primary.trim().length > 0 && secondary.trim().length > 0;
+    if (step === 4) return instagram.trim().length > 0 && whatsapp.trim().length > 0 && mapsUrl.trim().length > 0;
     return true;
-  }, [step, name, city, address, phone, disciplines, size, hours, logoUrl]);
+  }, [step, name, city, address, phone, disciplines, size, coaches, hours, logoUrl, primary, secondary, instagram, whatsapp, mapsUrl]);
+
 
 
   const toggle = (value: string) =>
@@ -299,9 +301,9 @@ function GymOwnerOnboarding() {
 
         {step === 4 && (
           <div className="grid gap-3 lg:grid-cols-2">
-            <Field label="Instagram (optional)" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
-            <Field label="WhatsApp number (optional)" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
-            <Field label="Google Maps link (optional)" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
+            <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/…" />
+            <Field label="WhatsApp number" value={whatsapp} onChange={setWhatsapp} placeholder="+962 7…" />
+            <Field label="Google Maps link" value={mapsUrl} onChange={setMapsUrl} placeholder="https://maps.google.com/…" />
           </div>
         )}
 
@@ -374,7 +376,7 @@ function Select({
           <button
             key={o}
             type="button"
-            onClick={() => onChange(o)}
+            onClick={() => onChange(value === o ? "" : o)}
             className={`rounded-pill border px-3 py-2 text-xs transition ${
               value === o ? "border-primary bg-primary/10 font-semibold text-primary" : "hairline bg-card"
             }`}
