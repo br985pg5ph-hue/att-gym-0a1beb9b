@@ -174,11 +174,28 @@ function OnboardingPage() {
               : `Helps ${gym?.name ?? "your gym"} tailor your training`}
         </p>
 
-        {/* progress */}
+        {/* progress — tappable steps */}
         <div className="mb-6 flex gap-1.5">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-border"}`} />
-          ))}
+          {Array.from({ length: totalSteps }).map((_, i) => {
+            const enabled = canGoTo(i) && i !== step;
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Step ${i + 1} of ${totalSteps}`}
+                aria-current={i === step ? "step" : undefined}
+                disabled={!enabled}
+                onClick={() => enabled && setStep(i)}
+                className={`group flex-1 py-2 ${enabled ? "cursor-pointer" : "cursor-default"}`}
+              >
+                <span
+                  className={`block h-1 rounded-full transition ${
+                    i <= step ? "bg-primary" : "bg-border"
+                  } ${enabled ? "group-hover:opacity-70" : ""}`}
+                />
+              </button>
+            );
+          })}
         </div>
 
         {step === 0 && !checking && (
@@ -193,7 +210,8 @@ function OnboardingPage() {
         {step === 1 && gym && (
           <WaiverStep
             gym={gym}
-            onSigned={() => setStep(2)}
+            alreadySigned={waiverSigned}
+            onSigned={() => { setWaiverSigned(true); setStep(2); }}
           />
         )}
 
