@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthBrand } from "@/components/AuthBrand";
 import { toast } from "sonner";
-import { gymPath, useGymSlug } from "@/lib/gym";
+import { fetchGym, gymPath, gymQueryKey, useGymSlug } from "@/lib/gym";
 import {
   fetchMembershipBySlug,
   joinGymByCode,
