@@ -51,7 +51,7 @@ export async function ensureMembershipBySlug(
   if (existing) return existing;
   const { error } = await supabase.rpc("join_gym", {
     _slug: slug,
-    _referral: referral || null,
+    _referral: referral || undefined,
   });
   if (error) throw error;
   return fetchMembershipBySlug(userId, slug);
