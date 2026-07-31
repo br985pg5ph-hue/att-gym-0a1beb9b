@@ -91,6 +91,7 @@
   --silver: #7a8189;
   --success: #22c55e;
   --success-foreground: #052e16;
+  --radius: 16px;
 }
 
 @layer base {

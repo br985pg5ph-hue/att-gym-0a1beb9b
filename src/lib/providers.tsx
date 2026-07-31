@@ -5,7 +5,7 @@ import { dict, type Lang, type Dict } from "./i18n";
 
 // ---------- THEME ----------
 type Theme = "dark" | "light";
-const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({ theme: "dark", setTheme: () => {} });
+const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({ theme: "light", setTheme: () => {} });
 
 // ---------- LANG ----------
 const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict }>({ lang: "en", setLang: () => {}, t: dict.en });
@@ -61,7 +61,7 @@ const ChildCtx = createContext<{
 
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [lang, setLangState] = useState<Lang>("en");
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -77,7 +77,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   // hydrate from localStorage
   useEffect(() => {
-    const t = (localStorage.getItem("theme") as Theme | null) ?? "dark";
+    const t = (localStorage.getItem("theme") as Theme | null) ?? "light";
     const l = (localStorage.getItem("lang") as Lang | null) ?? "en";
     setThemeState(t);
     setLangState(l);
