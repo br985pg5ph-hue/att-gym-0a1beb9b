@@ -23,6 +23,16 @@ function AuthPage() {
 
   const routeAfterAuth = useCallback(
     async (userId: string) => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name, phone, gender")
+        .eq("id", userId)
+        .maybeSingle();
+      // Google/Apple accounts have no phone or gender yet — require them first.
+      if (profileNeedsDetails(profile)) {
+        nav({ to: gp("/complete-profile") });
+        return;
+      }
       const membership = await fetchMembershipBySlug(userId, gymSlug);
       if (!membership) {
         // Not linked to a gym yet — send them to onboarding to pick one.
@@ -34,6 +44,7 @@ function AuthPage() {
     },
     [gymSlug, nav],
   );
+
 
   // Social sign-in returns to this page with a session already set.
   useEffect(() => {
