@@ -119,6 +119,31 @@ function Section({ icon: Icon, title, children }: { icon: typeof MapPin; title: 
   );
 }
 
+function SetupTextArea({ label, defaultValue, onSave }: { label: string; defaultValue: string; onSave: (value: string) => void }) {
+  const [value, setValue] = useState(defaultValue);
+  useEffect(() => setValue(defaultValue), [defaultValue]);
+  return (
+    <div>
+      <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">{label}</label>
+      <textarea
+        value={value}
+        rows={8}
+        onChange={(e) => setValue(e.target.value.slice(0, 20000))}
+        placeholder="Leave empty to use Nuvo's standard waiver"
+        className="w-full rounded-xl border hairline bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+      />
+      <div className="mt-2 flex justify-end">
+        <button
+          onClick={() => onSave(value)}
+          className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SetupField({ label, defaultValue, onSave }: { label: string; defaultValue: string; onSave: (value: string) => void }) {
   const [value, setValue] = useState(defaultValue);
   useEffect(() => setValue(defaultValue), [defaultValue]);
