@@ -67,78 +67,171 @@ function AdminPage() {
   };
   const nextTheme = theme === "dark" ? "light" : "dark";
   const ThemeIcon = theme === "dark" ? Sun : Moon;
+  const sectionTitle =
+    tab === "dashboard" ? t.dashboard
+    : tab === "announcements" ? t.manageAnnouncements
+    : tab === "classes" ? t.manageClasses
+    : tab === "members" ? t.membersList
+    : tab === "coaches" ? "Coaches"
+    : "Gym setup";
+
+  const secondary: Array<{ key: Tab; label: string; icon: typeof Megaphone }> = [
+    { key: "coaches", label: "Coaches", icon: UserCog },
+    { key: "settings", label: "Gym setup", icon: Settings },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="flex items-center justify-between gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)]">
-        <div className="flex min-w-0 items-center gap-3">
-          {tab === "coaches" || tab === "settings" ? (
-            <button
-              onClick={() => setTab("dashboard")}
-              className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft size={14} /> {t.dashboard}
-            </button>
-          ) : (
-            <>
-              <Logo size={36} logoUrl={gym?.logo_url} />
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
-                <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
-              </div>
-            </>
-          )}
+    <div className="min-h-screen bg-background lg:flex">
+      {/* Desktop sidebar */}
+      <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 flex-col border-r hairline bg-card/40 lg:flex">
+        <div className="flex items-center gap-3 px-5 py-6">
+          <Logo size={40} logoUrl={gym?.logo_url} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight">{gym?.name ?? "Nuvo"}</p>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{t.admin}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <nav className="flex-1 space-y-1 px-3">
+          {tabs.map((x) => {
+            const active = tab === x.key;
+            const Icon = x.icon;
+            const isLocked = isPendingGym && RESTRICTED_TABS.includes(x.key);
+            return (
+              <button
+                key={x.key}
+                onClick={() => setTab(x.key)}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                  active ? "bg-primary/10 text-primary" : isLocked ? "text-muted-foreground/50 hover:bg-muted" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
+                <span className="truncate">{x.label}</span>
+                {isLocked && <Lock size={12} className="ml-auto" />}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="space-y-1 border-t hairline p-3">
+          {secondary.map((x) => {
+            const active = tab === x.key;
+            const Icon = x.icon;
+            return (
+              <button
+                key={x.key}
+                onClick={() => setTab(x.key)}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Icon size={18} />
+                <span>{x.label}</span>
+              </button>
+            );
+          })}
           <button
             onClick={() => setTheme(nextTheme)}
-            aria-label={`Switch to ${nextTheme} mode`}
-            className="flex h-8 w-8 items-center justify-center rounded-full border hairline text-muted-foreground transition-colors hover:text-foreground"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ThemeIcon size={16} />
+            <ThemeIcon size={18} /> {theme === "dark" ? "Light mode" : "Dark mode"}
           </button>
-          <button onClick={signOut} className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive">
-            <LogOut size={14} /> {t.signOut}
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <LogOut size={18} /> {t.signOut}
           </button>
         </div>
-      </header>
-      <main className={`mx-auto ${tab === "dashboard" || tab === "classes" || tab === "members" ? "max-w-7xl" : "max-w-3xl"} px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)]`}>
-        {isPendingGym && (
-          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
-            <Lock size={18} className="mt-0.5 shrink-0 text-yellow-500" />
-            <div>
-              <p className="text-sm font-semibold text-yellow-500">Approval pending</p>
-              <p className="text-xs text-yellow-500/80">
-                Finish your gym setup below while we review your application. Classes, members, coaches and announcements unlock once your gym is approved.
-              </p>
-            </div>
+      </aside>
+
+      <div className="min-w-0 flex-1">
+        {/* Mobile header */}
+        <header className="flex items-center justify-between gap-3 border-b hairline px-5 py-4 pt-[max(env(safe-area-inset-top),16px)] lg:hidden">
+          <div className="flex min-w-0 items-center gap-3">
+            {tab === "coaches" || tab === "settings" ? (
+              <button
+                onClick={() => setTab("dashboard")}
+                className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ChevronLeft size={14} /> {t.dashboard}
+              </button>
+            ) : (
+              <>
+                <Logo size={36} logoUrl={gym?.logo_url} />
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
+                  <h1 className="font-display text-2xl leading-none">{t.admin}</h1>
+                </div>
+              </>
+            )}
           </div>
-        )}
-        {locked ? (
-          <div className="card-surface flex flex-col items-center gap-3 p-8 text-center">
-            <Lock size={24} className="text-muted-foreground" />
-            <h2 className="font-display text-xl">Locked until approval</h2>
-            <p className="max-w-sm text-xs text-muted-foreground">
-              This is part of the full Nuvo platform. You'll get access as soon as your gym is approved — meanwhile you can complete your gym setup.
-            </p>
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setTab("settings")}
-              className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+              onClick={() => setTheme(nextTheme)}
+              aria-label={`Switch to ${nextTheme} mode`}
+              className="flex h-8 w-8 items-center justify-center rounded-full border hairline text-muted-foreground transition-colors hover:text-foreground"
             >
-              Open gym setup
+              <ThemeIcon size={16} />
+            </button>
+            <button onClick={signOut} className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive">
+              <LogOut size={14} /> {t.signOut}
             </button>
           </div>
-        ) : (
-          <>
-            {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
-            {tab === "announcements" && <AnnouncementsAdmin />}
-            {tab === "classes" && <ClassesAdmin />}
-            {tab === "coaches" && <CoachesAdmin />}
-            {tab === "members" && <MembersAdmin />}
-            {tab === "settings" && <GymSetupPanel />}
-          </>
-        )}
-      </main>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
+        </header>
+
+        {/* Desktop header */}
+        <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 border-b hairline bg-background/90 px-8 py-5 backdrop-blur lg:flex">
+          <div className="min-w-0">
+            <h1 className="font-display truncate text-3xl leading-none">{sectionTitle}</h1>
+            <p className="mt-1 text-xs text-muted-foreground">{gym?.name ?? "Nuvo"}</p>
+          </div>
+          {isPendingGym && (
+            <span className="flex shrink-0 items-center gap-1.5 rounded-pill bg-yellow-500/10 px-3 py-1.5 text-xs font-semibold text-yellow-600">
+              <Lock size={13} /> Approval pending
+            </span>
+          )}
+        </header>
+
+        <main className="mx-auto w-full max-w-[1400px] px-5 py-5 pb-[max(env(safe-area-inset-bottom),96px)] lg:px-8 lg:py-8 lg:pb-12">
+          {isPendingGym && (
+            <div className="mb-4 flex items-start gap-3 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+              <Lock size={18} className="mt-0.5 shrink-0 text-yellow-500" />
+              <div>
+                <p className="text-sm font-semibold text-yellow-500">Approval pending</p>
+                <p className="text-xs text-yellow-500/80">
+                  Finish your gym setup below while we review your application. Classes, members, coaches and announcements unlock once your gym is approved.
+                </p>
+              </div>
+            </div>
+          )}
+          {locked ? (
+            <div className="card-surface flex flex-col items-center gap-3 p-8 text-center">
+              <Lock size={24} className="text-muted-foreground" />
+              <h2 className="font-display text-xl">Locked until approval</h2>
+              <p className="max-w-sm text-xs text-muted-foreground">
+                This is part of the full Nuvo platform. You'll get access as soon as your gym is approved — meanwhile you can complete your gym setup.
+              </p>
+              <button
+                onClick={() => setTab("settings")}
+                className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+              >
+                Open gym setup
+              </button>
+            </div>
+          ) : (
+            <div className={tab === "announcements" || tab === "coaches" || tab === "settings" ? "mx-auto w-full max-w-4xl" : ""}>
+              {tab === "dashboard" && <DashboardAdmin setTab={setTab} />}
+              {tab === "announcements" && <AnnouncementsAdmin />}
+              {tab === "classes" && <ClassesAdmin />}
+              {tab === "coaches" && <CoachesAdmin />}
+              {tab === "members" && <MembersAdmin />}
+              {tab === "settings" && <GymSetupPanel />}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-background pb-[max(env(safe-area-inset-bottom),8px)] pt-2 lg:hidden">
         <ul className="grid grid-cols-4 items-center px-1">
 
           {tabs.map(x => {
@@ -164,6 +257,7 @@ function AdminPage() {
     </div>
   );
 }
+
 
 function DashboardAdmin({ setTab }: { setTab: (t: Tab) => void }) {
   const { t } = useLang();
