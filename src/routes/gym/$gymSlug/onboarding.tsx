@@ -24,20 +24,21 @@ export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
 });
 
 const EXPERIENCE = [
-  { id: "none", label: "Complete beginner", desc: "Never trained a fighting sport" },
-  { id: "some", label: "Some experience", desc: "A few months of training" },
+  { id: "none", label: "Complete beginner", desc: "New to training or coming back after a long break" },
+  { id: "some", label: "Some experience", desc: "A few months of regular training" },
   { id: "intermediate", label: "Intermediate", desc: "1–3 years of consistent training" },
-  { id: "advanced", label: "Advanced", desc: "3+ years, competed or coached" },
+  { id: "advanced", label: "Advanced", desc: "3+ years, very comfortable in the gym" },
 ];
 
 const DISCIPLINES = [
-  "Muay Thai", "Boxing", "MMA", "BJJ / Grappling", "Kickboxing",
-  "Wrestling", "Karate", "Judo", "Taekwondo", "Functional Training", "None yet",
+  "Weight training", "Cardio / Running", "Functional training", "CrossFit style",
+  "Group classes", "Yoga", "Pilates", "Swimming", "Team sports",
+  "Martial arts", "Cycling", "None yet",
 ];
 
 const GOALS = [
-  "Get fit & lose weight", "Build strength", "Learn self-defense",
-  "Compete in fights", "Stress relief", "Community & fun", "Improve technique",
+  "Lose weight", "Build muscle", "Get stronger", "Improve endurance",
+  "Flexibility & mobility", "Stress relief", "Community & fun", "General health",
 ];
 
 const FREQUENCY = ["1× / week", "2–3× / week", "4–5× / week", "Daily"];
@@ -107,7 +108,7 @@ function OnboardingPage() {
       </div>
 
       {step === 0 && (
-        <Section title="What's your experience with fighting sports?">
+        <Section title="What's your training experience?">
           <div className="space-y-2">
             {EXPERIENCE.map((e) => (
               <button
@@ -126,7 +127,7 @@ function OnboardingPage() {
       )}
 
       {step === 1 && (
-        <Section title="Which disciplines have you tried?" hint="Select all that apply">
+        <Section title="What types of training have you tried?" hint="Select all that apply">
           <Chips options={DISCIPLINES} selected={disciplines} onToggle={(v) => toggle(disciplines, setDisciplines, v)} />
         </Section>
       )}
