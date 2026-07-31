@@ -287,7 +287,10 @@ function GymOwnerOnboarding() {
                 />
               </div>
             </div>
-            <Field label="Logo URL (optional)" value={logoUrl} onChange={setLogoUrl} placeholder="https://…" />
+            <div className="lg:col-span-2">
+              <LogoUploader gymId={gym?.id} currentUrl={logoUrl} onUploaded={setLogoUrl} />
+            </div>
+
           </div>
 
         )}
