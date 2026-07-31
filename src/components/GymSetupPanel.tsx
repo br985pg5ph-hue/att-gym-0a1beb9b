@@ -61,41 +61,31 @@ export function GymSetupPanel() {
   const gym = data.gym;
 
   return (
-    <div className="space-y-5">
-      {/* Two-column grid on desktop */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Section icon={MapPin} title="Gym basics">
-          <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
-          <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
-          <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
-        </Section>
+    <div className="space-y-4">
+      <Section icon={MapPin} title="Gym basics">
+        <SetupField label="Gym name" defaultValue={gym.name} onSave={(name) => saveMutation.mutate({ name })} />
+        <SetupField label="Address" defaultValue={gym.address} onSave={(address) => saveMutation.mutate({ address })} />
+        <SetupPhone label="Phone" defaultValue={gym.phone} onSave={(phone) => saveMutation.mutate({ phone })} />
+      </Section>
 
-        <Section icon={Clock} title="Location & hours">
-          <div className="grid grid-cols-2 gap-3">
-            <SetupNumber label="Latitude" defaultValue={gym.lat} onSave={(lat) => saveMutation.mutate({ lat })} />
-            <SetupNumber label="Longitude" defaultValue={gym.lng} onSave={(lng) => saveMutation.mutate({ lng })} />
-          </div>
-          <SetupField label="Maps URL" defaultValue={gym.maps_url ?? ""} onSave={(maps_url) => saveMutation.mutate({ maps_url })} />
-          <HoursEditor hours={(gym.hours as any) ?? []} onSave={(hours) => saveMutation.mutate({ hours })} />
-        </Section>
+      <Section icon={Clock} title="Location & hours">
+        <div className="grid grid-cols-2 gap-3">
+          <SetupNumber label="Latitude" defaultValue={gym.lat} onSave={(lat) => saveMutation.mutate({ lat })} />
+          <SetupNumber label="Longitude" defaultValue={gym.lng} onSave={(lng) => saveMutation.mutate({ lng })} />
+        </div>
+        <SetupField label="Maps URL" defaultValue={gym.maps_url ?? ""} onSave={(maps_url) => saveMutation.mutate({ maps_url })} />
+        <HoursEditor hours={(gym.hours as any) ?? []} onSave={(hours) => saveMutation.mutate({ hours })} />
+      </Section>
 
-        <Section icon={ImageIcon} title="Branding">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <BrandColors
-              primary={gym.primary_color ?? ""}
-              secondary={gym.secondary_color ?? ""}
-              theme={(gym.theme as any) ?? {}}
-              onSave={(payload) => saveMutation.mutate(payload)}
-            />
-            <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
-          </div>
-        </Section>
-
-        <Section icon={Instagram} title="Social links">
-          <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
-          <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
-        </Section>
-      </div>
+      <Section icon={ImageIcon} title="Branding">
+        <BrandColors
+          primary={gym.primary_color ?? ""}
+          secondary={gym.secondary_color ?? ""}
+          theme={(gym.theme as any) ?? {}}
+          onSave={(payload) => saveMutation.mutate(payload)}
+        />
+        <LogoUploader gymId={gym.id} currentUrl={gym.logo_url} onUploaded={(logo_url) => saveMutation.mutate({ logo_url })} />
+      </Section>
 
       <Section icon={FileText} title="Membership waiver">
         <p className="text-xs text-muted-foreground">
@@ -107,20 +97,24 @@ export function GymSetupPanel() {
           onSave={(waiver_text) => saveMutation.mutate({ waiver_text })}
         />
       </Section>
+
+      <Section icon={Instagram} title="Social links">
+        <SetupField label="Instagram URL" defaultValue={gym.instagram_url ?? ""} onSave={(instagram_url) => saveMutation.mutate({ instagram_url })} />
+        <SetupPhone label="WhatsApp number" defaultValue={gym.whatsapp_number ?? ""} onSave={(whatsapp_number) => saveMutation.mutate({ whatsapp_number })} />
+      </Section>
+
     </div>
   );
 }
 
 function Section({ icon: Icon, title, children }: { icon: typeof MapPin; title: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col rounded-2xl border hairline bg-card p-5">
-      <div className="mb-4 flex items-center gap-3 border-b hairline pb-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon size={16} strokeWidth={2.2} />
-        </div>
-        <h2 className="font-display text-xl tracking-tight">{title}</h2>
+    <div className="rounded-2xl border hairline bg-card p-4">
+      <div className="mb-4 flex items-center gap-2">
+        <Icon size={16} className="text-muted-foreground" />
+        <h2 className="font-display text-lg">{title}</h2>
       </div>
-      <div className="flex-1 space-y-3">{children}</div>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }
@@ -416,18 +410,18 @@ function LogoUploader({ gymId, currentUrl, onUploaded }: { gymId: string; curren
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Gym logo</label>
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border hairline bg-background p-5">
+    <div>
+      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Logo</label>
+      <div className="flex items-center gap-3">
         {currentUrl ? (
-          <img src={currentUrl} alt="Gym logo" className="h-24 w-24 rounded-xl object-contain" />
+          <img src={currentUrl} alt="Gym logo" className="h-14 w-14 rounded-xl object-cover" />
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-xl border hairline bg-muted/30">
-            <ImageIcon size={32} className="text-muted-foreground" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl border hairline bg-background">
+            <ImageIcon size={20} className="text-muted-foreground" />
           </div>
         )}
-        <label className="cursor-pointer rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-          {uploading ? "Uploading…" : currentUrl ? "Replace logo" : "Upload logo"}
+        <label className="cursor-pointer rounded-pill border hairline px-4 py-2 text-xs font-semibold">
+          {uploading ? "Uploading…" : currentUrl ? "Change logo" : "Upload logo"}
           <input type="file" accept="image/*" className="hidden" onChange={upload} disabled={uploading} />
         </label>
       </div>
@@ -548,7 +542,7 @@ function BrandColors({
   };
 
   return (
-    <div className="flex flex-col">
+    <div>
       <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Brand colors</label>
       <div className="space-y-2">
         <ColorRow label="Primary color" value={p} onChange={setP} />
@@ -564,7 +558,7 @@ function BrandColors({
           />
         ))}
       </div>
-      <div className="mt-auto flex items-center gap-2 pt-3">
+      <div className="mt-3 flex items-center gap-2">
         <button
           onClick={() =>
             setExtras((prev) => [
