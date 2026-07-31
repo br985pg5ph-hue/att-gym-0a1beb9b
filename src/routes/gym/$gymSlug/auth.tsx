@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { gp, useGymSlug } from "@/lib/gym";
-import { fetchMembershipBySlug, isStaffRole } from "@/lib/membership";
+import { fetchMembershipBySlug } from "@/lib/membership";
 import { AuthBrand } from "@/components/AuthBrand";
 import { useLang } from "@/lib/providers";
 
