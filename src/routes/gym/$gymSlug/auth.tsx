@@ -27,7 +27,17 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    const membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
+    let membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
+    if (!membership) {
+      // Confirmed-by-email signups land here before a membership exists.
+      const { error: joinError } = await supabase.rpc("join_gym", { _slug: gymSlug });
+      if (joinError) {
+        setLoading(false);
+        toast.error(joinError.message);
+        return;
+      }
+      membership = await fetchMembershipBySlug(data.user!.id, gymSlug);
+    }
     setLoading(false);
     if (!membership) {
       toast.error("This account isn't a member of this gym yet");
