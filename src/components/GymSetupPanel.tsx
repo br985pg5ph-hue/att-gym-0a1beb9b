@@ -290,17 +290,14 @@ function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
+function timeToMinutes(value: string) {
+  const [h, m = "0"] = value.split(":").map(Number);
+  if (isNaN(h) || isNaN(Number(m))) return 0;
+  return h * 60 + Number(m);
+}
+
 function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) => void }) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const shortDays: Record<string, string> = {
-    Monday: "Mon",
-    Tuesday: "Tue",
-    Wednesday: "Wed",
-    Thursday: "Thu",
-    Friday: "Fri",
-    Saturday: "Sat",
-    Sunday: "Sun",
-  };
   const buildState = (list: any[]) => {
     const map: Record<string, DayHours> = {};
     for (const h of list ?? []) {
@@ -330,47 +327,88 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
     });
   };
 
+  const durationPercent = (open: string, close: string) => {
+    const o = timeToMinutes(open);
+    const c = timeToMinutes(close);
+    if (!o || !c || c <= o) return 0;
+    return Math.min(100, Math.max(4, ((c - o) / (24 * 60)) * 100));
+  };
+
   return (
-    <div>
-      <label className="mb-2 block text-[10px] uppercase tracking-wider text-muted-foreground">Opening hours</label>
-      <div className="space-y-1">
+    <div className="rounded-2xl border hairline bg-card p-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="font-display text-base">Opening hours</h3>
+          <p className="text-xs text-muted-foreground">Manage the weekly operating schedule</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => copyToAll("Monday")}
+          className="inline-flex items-center gap-1.5 rounded-full border hairline bg-background px-3 py-1.5 text-[11px] font-medium text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+        >
+          <Copy size={12} />
+          Copy Monday to all
+        </button>
+      </div>
+
+      <div className="space-y-2">
         {days.map((day) => {
           const row = state[day];
           const closed = !!row?.closed;
+          const barWidth = durationPercent(row?.open ?? "", row?.close ?? "");
           return (
             <div
               key={day}
-              className="grid items-center gap-2 rounded-xl border hairline bg-background px-3 py-2 text-sm lg:grid-cols-[56px_1fr_1fr_auto]"
+              className={`flex items-center gap-4 rounded-xl border px-3 py-2.5 transition-all ${
+                closed
+                  ? "border-transparent bg-muted/40 opacity-60"
+                  : "hairline bg-background hover:border-primary/30"
+              }`}
             >
-              <span className="text-xs font-medium text-muted-foreground">{shortDays[day]}</span>
-              {closed ? (
-                <span className="col-span-2 text-xs font-semibold text-muted-foreground">Closed</span>
-              ) : (
-                <>
-                  <TimeSelect value={row?.open ?? ""} onChange={(v) => update(day, { open: v })} />
-                  <TimeSelect value={row?.close ?? ""} onChange={(v) => update(day, { close: v })} />
-                </>
-              )}
-              <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <span className={`w-20 shrink-0 text-sm font-medium ${closed ? "text-muted-foreground" : "text-foreground"}`}>
+                {day}
+              </span>
+
+              <label className="relative inline-flex shrink-0 cursor-pointer items-center">
                 <input
                   type="checkbox"
-                  checked={closed}
-                  onChange={(e) => update(day, { closed: e.target.checked })}
+                  className="sr-only peer"
+                  checked={!closed}
+                  onChange={(e) => update(day, { closed: !e.target.checked })}
                 />
-                Closed
+                <div className="h-5 w-9 rounded-full bg-muted-foreground/30 transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-checked:after:translate-x-full" />
+                <span className={`ms-2 text-[10px] font-medium uppercase tracking-wider transition-colors ${closed ? "text-muted-foreground" : "text-foreground"}`}>
+                  {closed ? "Closed" : "Open"}
+                </span>
               </label>
+
+              <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
+                {closed ? (
+                  <span className="text-xs font-medium text-muted-foreground italic">Closed</span>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-1.5">
+                      <TimeSelect value={row?.open ?? ""} onChange={(v) => update(day, { open: v })} />
+                      <span className="text-muted-foreground">–</span>
+                      <TimeSelect value={row?.close ?? ""} onChange={(v) => update(day, { close: v })} />
+                    </div>
+                    <div className="hidden sm:block w-16 lg:w-24">
+                      <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-primary transition-all"
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => copyToAll("Monday")}
-          className="rounded-pill border hairline px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
-        >
-          Copy Monday to All
-        </button>
+
+      <div className="mt-4 flex items-center justify-end border-t hairline pt-4">
         <button
           onClick={() => {
             const payload = days
@@ -383,9 +421,9 @@ function HoursEditor({ hours, onSave }: { hours: any[]; onSave: (hours: any[]) =
               }));
             onSave(payload);
           }}
-          className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          className="rounded-pill bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
         >
-          Save hours
+          Save schedule
         </button>
       </div>
     </div>
