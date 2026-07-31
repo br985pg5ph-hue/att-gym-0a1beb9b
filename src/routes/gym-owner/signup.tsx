@@ -30,10 +30,20 @@ function PlatformSignup() {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
+  const cleanSlug = normalizeSlug(slug);
+  const isComplete =
+    gymName.trim().length >= 2 &&
+    cleanSlug.length >= 2 &&
+    ownerName.trim().length >= 2 &&
+    email.trim().length > 0 &&
+    phone.trim().length >= 5 &&
+    password.length >= 8 &&
+    confirm.length >= 8;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isComplete) return toast.error("Please fill in all required fields");
     if (password !== confirm) return toast.error("Passwords do not match");
-    const cleanSlug = normalizeSlug(slug);
     if (cleanSlug.length < 2) return toast.error("Please enter a valid gym URL slug");
 
     setLoading(true);
@@ -130,7 +140,7 @@ function PlatformSignup() {
           className="w-full rounded-xl border hairline bg-card px-4 py-3 text-sm outline-none focus:border-primary"
         />
         <button
-          disabled={loading}
+          disabled={loading || !isComplete}
           className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
           {loading ? "…" : "Apply"}
