@@ -1277,6 +1277,7 @@ function MembersAdmin() {
       {sorted.length === 0 && (
         <p className="py-6 text-center text-xs text-muted-foreground">No members found.</p>
       )}
+      <div className="grid gap-2 xl:grid-cols-2 2xl:grid-cols-3">
       {sorted.map((m: any) => {
         const kids = m.children ?? [];
         const hasKids = kids.length > 0;
@@ -1284,7 +1285,8 @@ function MembersAdmin() {
         const expiryDays = daysUntilGroupExpiry(m.group_subscription_until);
         const showFlag = expiryDays !== null && expiryDays <= 3;
         return (
-          <div key={m.id} className="card-surface p-4">
+          <div key={m.id} className="card-surface p-4 transition-colors hover:border-primary/40">
+
             <div className="flex w-full items-start justify-between gap-3">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <div className="shrink-0 h-11 w-11 rounded-full overflow-hidden bg-muted flex items-center justify-center hairline border">
