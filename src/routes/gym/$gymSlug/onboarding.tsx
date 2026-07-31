@@ -107,12 +107,31 @@ function OnboardingPage() {
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const totalSteps = 7;
-  const canNext =
-    (step === 2 && !!experience) ||
-    (step === 3 && disciplines.length > 0) ||
-    (step === 4 && goals.length > 0) ||
-    (step === 5 && !!frequency) ||
-    step === 6;
+
+  const stepDone = (i: number) => {
+    switch (i) {
+      case 0: return !!gym;
+      case 1: return waiverSigned;
+      case 2: return !!experience;
+      case 3: return disciplines.length > 0;
+      case 4: return goals.length > 0;
+      case 5: return !!frequency;
+      default: return true;
+    }
+  };
+
+  // Lowest step still reachable: once joined/signed you can't go back to those.
+  const minStep = !gym ? 0 : !waiverSigned ? 1 : 2;
+
+  // A tab is reachable when every earlier step is complete.
+  const canGoTo = (i: number) => {
+    if (i < minStep) return false;
+    if (i <= step) return true;
+    for (let j = minStep; j < i; j++) if (!stepDone(j)) return false;
+    return true;
+  };
+
+  const canNext = stepDone(step);
 
   const finish = async () => {
     setSaving(true);
