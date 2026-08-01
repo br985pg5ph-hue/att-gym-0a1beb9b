@@ -7,20 +7,27 @@ import { DEFAULT_GYM_SLUG } from "@/lib/gym";
  */
 const LEGACY = [
   "home", "book", "membership", "profile", "coaches", "news", "location",
-  "auth", "signup", "forgot", "reset-password", "onboarding", "staff-login", "admin",
+  "reset-password", "onboarding", "staff-login", "admin",
 ];
+
+/** Account entry points are Nuvo-branded and gym-agnostic now. */
+const NUVO_ENTRY = ["auth", "signup", "forgot"];
 
 export const Route = createFileRoute("/$")({
   ssr: false,
   beforeLoad: ({ params }) => {
     const splat = (params._splat ?? "").replace(/^\/+/, "");
     const head = splat.split("/")[0];
+    if (NUVO_ENTRY.includes(head)) {
+      throw redirect({ to: `/app/${head}` as any, search: true as any });
+    }
     if (LEGACY.includes(head)) {
       throw redirect({ to: `/gym/${DEFAULT_GYM_SLUG}/${splat}` as any });
     }
   },
   component: NotFoundPage,
 });
+
 
 function NotFoundPage() {
   return (

@@ -20,7 +20,7 @@ import {
   ArrowLeft,
   type LucideIcon,
 } from "lucide-react";
-import { profileNeedsDetails } from "./complete-profile";
+import { profileNeedsDetails } from "@/lib/memberRouting";
 
 
 export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/gym/$gymSlug/onboarding")({
       .maybeSingle();
     // Social sign-ups arrive without a phone/gender — collect them first.
     if (profileNeedsDetails(profile) && !profile?.is_parent) {
-      throw redirect({ to: gymPath(params.gymSlug, "/complete-profile") as any });
+      throw redirect({ to: "/app/complete-profile" as any });
     }
     if (profile?.is_parent) {
       await supabase.from("profiles").update({ onboarded: true }).eq("id", data.user.id);
@@ -421,7 +421,7 @@ function OnboardingPage() {
 }
 
 /** Step 1 — search the gym directory, or join with a code the gym provided. */
-function GymFinder({ onJoined }: { onJoined: (gym: JoinedGym) => void }) {
+export function GymFinder({ onJoined }: { onJoined: (gym: JoinedGym) => void }) {
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
   const [joining, setJoining] = useState<string | null>(null);

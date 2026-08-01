@@ -71,6 +71,12 @@ function NuvoHome() {
           <Wordmark className="text-2xl" />
           <div className="flex items-center gap-2">
             <Link
+              to="/app/auth"
+              className="rounded-pill px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+            >
+              Member sign in
+            </Link>
+            <Link
               to="/gym-owner/login"
               className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
             >
@@ -83,6 +89,7 @@ function NuvoHome() {
               Sign up your gym
             </Link>
           </div>
+
         </div>
       </header>
 

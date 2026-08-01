@@ -27,12 +27,18 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as PlatformOwnerRouteRouteImport } from './routes/platform-owner/route'
 import { Route as GymOwnerRouteRouteImport } from './routes/gym-owner/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as PlatformOwnerDashboardRouteImport } from './routes/platform-owner/dashboard'
 import { Route as PlatformOwnerConsoleRouteImport } from './routes/platform-owner/console'
 import { Route as GymOwnerSignupRouteImport } from './routes/gym-owner/signup'
 import { Route as GymOwnerSetupRouteImport } from './routes/gym-owner/setup'
 import { Route as GymOwnerOnboardingRouteImport } from './routes/gym-owner/onboarding'
 import { Route as GymOwnerLoginRouteImport } from './routes/gym-owner/login'
+import { Route as AppSignupRouteImport } from './routes/app.signup'
+import { Route as AppJoinRouteImport } from './routes/app.join'
+import { Route as AppForgotRouteImport } from './routes/app.forgot'
+import { Route as AppCompleteProfileRouteImport } from './routes/app.complete-profile'
+import { Route as AppAuthRouteImport } from './routes/app.auth'
 import { Route as GymGymSlugRouteRouteImport } from './routes/gym/$gymSlug/route'
 import { Route as GymGymSlugIndexRouteImport } from './routes/gym/$gymSlug/index'
 import { Route as GymGymSlugStaffLoginRouteImport } from './routes/gym/$gymSlug/staff-login'
@@ -149,6 +155,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlatformOwnerDashboardRoute = PlatformOwnerDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -178,6 +189,31 @@ const GymOwnerLoginRoute = GymOwnerLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => GymOwnerRouteRoute,
+} as any)
+const AppSignupRoute = AppSignupRouteImport.update({
+  id: '/app/signup',
+  path: '/app/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppJoinRoute = AppJoinRouteImport.update({
+  id: '/app/join',
+  path: '/app/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppForgotRoute = AppForgotRouteImport.update({
+  id: '/app/forgot',
+  path: '/app/forgot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCompleteProfileRoute = AppCompleteProfileRouteImport.update({
+  id: '/app/complete-profile',
+  path: '/app/complete-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAuthRoute = AppAuthRouteImport.update({
+  id: '/app/auth',
+  path: '/app/auth',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const GymGymSlugRouteRoute = GymGymSlugRouteRouteImport.update({
   id: '/gym/$gymSlug',
@@ -332,12 +368,18 @@ export interface FileRoutesByFullPath {
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
+  '/app/auth': typeof AppAuthRoute
+  '/app/complete-profile': typeof AppCompleteProfileRoute
+  '/app/forgot': typeof AppForgotRoute
+  '/app/join': typeof AppJoinRoute
+  '/app/signup': typeof AppSignupRoute
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
   '/platform-owner/dashboard': typeof PlatformOwnerDashboardRoute
+  '/app/': typeof AppIndexRoute
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
   '/gym/$gymSlug/complete-profile': typeof GymGymSlugCompleteProfileRoute
@@ -381,12 +423,18 @@ export interface FileRoutesByTo {
   '/app-preview-signin': typeof AppPreviewSigninRoute
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
+  '/app/auth': typeof AppAuthRoute
+  '/app/complete-profile': typeof AppCompleteProfileRoute
+  '/app/forgot': typeof AppForgotRoute
+  '/app/join': typeof AppJoinRoute
+  '/app/signup': typeof AppSignupRoute
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
   '/platform-owner/dashboard': typeof PlatformOwnerDashboardRoute
+  '/app': typeof AppIndexRoute
   '/gym/$gymSlug': typeof GymGymSlugIndexRoute
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
@@ -431,12 +479,18 @@ export interface FileRoutesById {
   '/app-preview-signup': typeof AppPreviewSignupRoute
   '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
+  '/app/auth': typeof AppAuthRoute
+  '/app/complete-profile': typeof AppCompleteProfileRoute
+  '/app/forgot': typeof AppForgotRoute
+  '/app/join': typeof AppJoinRoute
+  '/app/signup': typeof AppSignupRoute
   '/gym-owner/login': typeof GymOwnerLoginRoute
   '/gym-owner/onboarding': typeof GymOwnerOnboardingRoute
   '/gym-owner/setup': typeof GymOwnerSetupRoute
   '/gym-owner/signup': typeof GymOwnerSignupRoute
   '/platform-owner/console': typeof PlatformOwnerConsoleRoute
   '/platform-owner/dashboard': typeof PlatformOwnerDashboardRoute
+  '/app/': typeof AppIndexRoute
   '/gym/$gymSlug/_app': typeof GymGymSlugAppRouteWithChildren
   '/gym/$gymSlug/admin': typeof GymGymSlugAdminRouteWithChildren
   '/gym/$gymSlug/auth': typeof GymGymSlugAuthRoute
@@ -484,12 +538,18 @@ export interface FileRouteTypes {
     | '/app-preview-signup'
     | '/member-app-preview'
     | '/gym/$gymSlug'
+    | '/app/auth'
+    | '/app/complete-profile'
+    | '/app/forgot'
+    | '/app/join'
+    | '/app/signup'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
     | '/platform-owner/dashboard'
+    | '/app/'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
     | '/gym/$gymSlug/complete-profile'
@@ -533,12 +593,18 @@ export interface FileRouteTypes {
     | '/app-preview-signin'
     | '/app-preview-signup'
     | '/member-app-preview'
+    | '/app/auth'
+    | '/app/complete-profile'
+    | '/app/forgot'
+    | '/app/join'
+    | '/app/signup'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
     | '/platform-owner/dashboard'
+    | '/app'
     | '/gym/$gymSlug'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
@@ -582,12 +648,18 @@ export interface FileRouteTypes {
     | '/app-preview-signup'
     | '/member-app-preview'
     | '/gym/$gymSlug'
+    | '/app/auth'
+    | '/app/complete-profile'
+    | '/app/forgot'
+    | '/app/join'
+    | '/app/signup'
     | '/gym-owner/login'
     | '/gym-owner/onboarding'
     | '/gym-owner/setup'
     | '/gym-owner/signup'
     | '/platform-owner/console'
     | '/platform-owner/dashboard'
+    | '/app/'
     | '/gym/$gymSlug/_app'
     | '/gym/$gymSlug/admin'
     | '/gym/$gymSlug/auth'
@@ -634,6 +706,12 @@ export interface RootRouteChildren {
   AppPreviewSignupRoute: typeof AppPreviewSignupRoute
   MemberAppPreviewRoute: typeof MemberAppPreviewRoute
   GymGymSlugRouteRoute: typeof GymGymSlugRouteRouteWithChildren
+  AppAuthRoute: typeof AppAuthRoute
+  AppCompleteProfileRoute: typeof AppCompleteProfileRoute
+  AppForgotRoute: typeof AppForgotRoute
+  AppJoinRoute: typeof AppJoinRoute
+  AppSignupRoute: typeof AppSignupRoute
+  AppIndexRoute: typeof AppIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -764,6 +842,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/platform-owner/dashboard': {
       id: '/platform-owner/dashboard'
       path: '/dashboard'
@@ -805,6 +890,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/gym-owner/login'
       preLoaderRoute: typeof GymOwnerLoginRouteImport
       parentRoute: typeof GymOwnerRouteRoute
+    }
+    '/app/signup': {
+      id: '/app/signup'
+      path: '/app/signup'
+      fullPath: '/app/signup'
+      preLoaderRoute: typeof AppSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/join': {
+      id: '/app/join'
+      path: '/app/join'
+      fullPath: '/app/join'
+      preLoaderRoute: typeof AppJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/forgot': {
+      id: '/app/forgot'
+      path: '/app/forgot'
+      fullPath: '/app/forgot'
+      preLoaderRoute: typeof AppForgotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/complete-profile': {
+      id: '/app/complete-profile'
+      path: '/app/complete-profile'
+      fullPath: '/app/complete-profile'
+      preLoaderRoute: typeof AppCompleteProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/auth': {
+      id: '/app/auth'
+      path: '/app/auth'
+      fullPath: '/app/auth'
+      preLoaderRoute: typeof AppAuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/gym/$gymSlug': {
       id: '/gym/$gymSlug'
@@ -1122,6 +1242,12 @@ const rootRouteChildren: RootRouteChildren = {
   AppPreviewSignupRoute: AppPreviewSignupRoute,
   MemberAppPreviewRoute: MemberAppPreviewRoute,
   GymGymSlugRouteRoute: GymGymSlugRouteRouteWithChildren,
+  AppAuthRoute: AppAuthRoute,
+  AppCompleteProfileRoute: AppCompleteProfileRoute,
+  AppForgotRoute: AppForgotRoute,
+  AppJoinRoute: AppJoinRoute,
+  AppSignupRoute: AppSignupRoute,
+  AppIndexRoute: AppIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
