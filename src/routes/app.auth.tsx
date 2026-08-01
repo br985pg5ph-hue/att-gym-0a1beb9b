@@ -145,6 +145,13 @@ function AppAuthPage() {
               Create an account
             </Link>
           </p>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            Own a gym?{" "}
+            <a href="/gym-owner/login" className="font-semibold text-primary">
+              Go to the gym portal
+            </a>
+          </p>
+
         </div>
       </div>
     </div>
