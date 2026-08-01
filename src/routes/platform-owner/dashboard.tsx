@@ -339,6 +339,8 @@ function GymDetailDrawer({
   onStatusChange,
   onOpenAdmin,
   statusPending,
+  onDelete,
+  deletePending,
 }: {
   gym: any;
   details: any;
@@ -347,9 +349,15 @@ function GymDetailDrawer({
   onStatusChange: (status: string) => void;
   onOpenAdmin: () => void;
   statusPending: boolean;
+  onDelete: (confirmName: string) => void;
+  deletePending: boolean;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const requiredName = String(gym.name ?? "").toUpperCase();
   const owner = details?.owner;
   const onboarding = details?.onboarding ?? {};
+
   const checklist = [
     { key: "basics", label: "Basics (name, city, address, phone)", done: onboarding.basics },
     { key: "offering", label: "Training offering", done: onboarding.offering },
