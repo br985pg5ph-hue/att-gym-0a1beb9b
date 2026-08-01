@@ -322,6 +322,9 @@ function PlatformDashboard() {
           onStatusChange={(status) => statusMutation.mutate({ gymId: selectedGym.id, status })}
           onOpenAdmin={() => impersonateMutation.mutate(selectedGym.id)}
           statusPending={statusMutation.isPending}
+          onDelete={(confirmName) => deleteMutation.mutate({ gymId: selectedGym.id, confirmName })}
+          deletePending={deleteMutation.isPending}
+
         />
       )}
     </div>
