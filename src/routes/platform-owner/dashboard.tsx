@@ -34,6 +34,8 @@ import {
   Map,
   AlertCircle,
   Check,
+  Trash2,
+
 } from "lucide-react";
 
 export const Route = createFileRoute("/platform-owner/dashboard")({
