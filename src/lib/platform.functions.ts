@@ -423,3 +423,57 @@ async function logAudit(
   if (error) console.error("Failed to write audit log:", error);
 }
 
+
+export const deleteGym = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ gymId: z.string().uuid(), confirmName: z.string().trim().min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
+
+    const { data: gym, error: gymErr } = await supabaseAdmin
+      .from("gyms")
+      .select("id, name, slug")
+      .eq("id", data.gymId)
+      .maybeSingle();
+    if (gymErr) throw gymErr;
+    if (!gym) throw new Error("Gym not found");
+
+    if (data.confirmName !== gym.name.toUpperCase()) {
+      throw new Error("Confirmation text does not match the gym name in capitals");
+    }
+
+    // Remove dependent rows first (no cascade on these foreign keys)
+    for (const table of [
+      "bookings",
+      "transactions",
+      "announcements",
+      "classes",
+      "class_type_defs",
+      "coaches",
+      "children",
+      "gym_members",
+      "gym_join_settings",
+    ] as const) {
+      const { error } = await supabaseAdmin.from(table).delete().eq("gym_id", data.gymId);
+      if (error) throw error;
+    }
+
+    await supabaseAdmin.from("profiles").update({ active_gym_id: null }).eq("active_gym_id", data.gymId);
+    await supabaseAdmin.from("platform_audit_log").update({ gym_id: null }).eq("gym_id", data.gymId);
+
+    const { error: delErr } = await supabaseAdmin.from("gyms").delete().eq("id", data.gymId);
+    if (delErr) throw delErr;
+
+    await logAudit(supabaseAdmin, {
+      actor_id: context.userId,
+      gym_id: null,
+      action: "gym_deleted",
+      details: { name: gym.name, slug: gym.slug },
+    });
+
+    return { success: true };
+  });
