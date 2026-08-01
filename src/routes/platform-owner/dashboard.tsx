@@ -107,6 +107,19 @@ function PlatformDashboard() {
     onError: (err: any) => toast.error(err?.message ?? "Failed to open gym admin"),
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: ({ gymId, confirmName }: { gymId: string; confirmName: string }) =>
+      removeGym({ data: { gymId, confirmName } }),
+    onSuccess: () => {
+      setSelectedGymId(null);
+      qc.invalidateQueries({ queryKey: ["platform-gyms"] });
+      qc.invalidateQueries({ queryKey: ["platform-audit-log"] });
+      toast.success("Gym deleted");
+    },
+    onError: (err: any) => toast.error(err?.message ?? "Failed to delete gym"),
+  });
+
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
