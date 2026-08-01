@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { AuthBrand } from "@/components/AuthBrand";
 import { useLang } from "@/lib/providers";
-import { resolveMemberEntry } from "@/lib/memberRouting";
+import { resolveMemberEntry, isStaffOnlyAccount } from "@/lib/memberRouting";
 
 export const Route = createFileRoute("/app/auth")({
   ssr: false,
@@ -31,10 +31,17 @@ function AppAuthPage() {
 
   const routeOn = useCallback(
     async (userId: string) => {
+      // Gym staff belong in the gym portal, not the member app.
+      if (await isStaffOnlyAccount(userId)) {
+        await supabase.auth.signOut();
+        toast.error("This account manages a gym. Sign in at the Nuvo gym portal instead.");
+        return;
+      }
       nav({ to: (await resolveMemberEntry(userId)) as any });
     },
     [nav],
   );
+
 
   // Social sign-in returns here with a session already set.
   useEffect(() => {
