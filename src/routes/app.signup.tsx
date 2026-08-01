@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useLang } from "@/lib/providers";
 
 const searchSchema = z.object({
-  ref: fallback(z.string(), "").default(""),
+  ref: fallback(z.string(), "").optional(),
 });
 
 export const Route = createFileRoute("/app/signup")({
@@ -40,7 +40,7 @@ function AppSignUpPage() {
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [referral, setReferral] = useState(ref || "");
+  const [referral, setReferral] = useState(ref ?? "");
   const [loading, setLoading] = useState(false);
 
   const complete =
