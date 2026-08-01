@@ -181,9 +181,165 @@ export const updateGymStatus = createServerFn({ method: "POST" })
     const { isPlatformAdmin } = await import("@/lib/platform.server");
     if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
 
+    const { data: before } = await supabaseAdmin.from("gyms").select("status, slug").eq("id", data.gymId).maybeSingle();
     const { error } = await supabaseAdmin.from("gyms").update({ status: data.status }).eq("id", data.gymId);
     if (error) throw error;
+
+    await logAudit(supabaseAdmin, {
+      actor_id: context.userId,
+      gym_id: data.gymId,
+      action: "gym_status_changed",
+      details: { from: before?.status ?? null, to: data.status },
+    });
+
     return { success: true };
+  });
+
+export const getGymDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ gymId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
+
+    const { data: gym, error } = await supabaseAdmin.from("gyms").select("*").eq("id", data.gymId).maybeSingle();
+    if (error) throw error;
+    if (!gym) throw new Error("Gym not found");
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from("gym_members")
+      .select("user_id, role, profiles(name, phone)")
+      .eq("gym_id", data.gymId)
+      .in("role", ["admin", "owner"])
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    let ownerEmail: string | null = null;
+    if (ownerRow?.user_id) {
+      try {
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(ownerRow.user_id as string);
+        ownerEmail = authUser.user?.email ?? null;
+      } catch {
+        ownerEmail = null;
+      }
+    }
+
+    const { data: coaches } = await supabaseAdmin.from("coaches").select("id").eq("gym_id", data.gymId).limit(1);
+    const { data: classes } = await supabaseAdmin.from("classes").select("id").eq("gym_id", data.gymId).limit(1);
+    const { data: members } = await supabaseAdmin.from("gym_members").select("id").eq("gym_id", data.gymId).limit(1);
+
+    const theme = (gym.theme ?? {}) as Record<string, any>;
+    const hasLogo = Boolean(gym.logo_url && gym.logo_url.trim().length > 0);
+    const hasHours = Array.isArray(gym.hours) && gym.hours.some((h: any) => !h.closed);
+    const hasSocial = Boolean(gym.instagram_url && gym.whatsapp_number && gym.maps_url);
+    const hasWaiver = Boolean(gym.waiver_text && gym.waiver_text.trim().length > 10);
+    const hasCoaches = (coaches ?? []).length > 0;
+    const hasClasses = (classes ?? []).length > 0;
+    const hasMembers = (members ?? []).length > 0;
+    const basicsComplete = Boolean(gym.name && gym.city && gym.address && gym.phone);
+    const offeringComplete = Boolean(
+      Array.isArray(theme.disciplines) && theme.disciplines.length > 0 && theme.member_range && theme.coach_count,
+    );
+
+    return {
+      gym,
+      owner: ownerRow
+        ? {
+            id: ownerRow.user_id,
+            name: (ownerRow.profiles as any)?.name ?? null,
+            phone: (ownerRow.profiles as any)?.phone ?? null,
+            email: ownerEmail,
+            role: ownerRow.role,
+          }
+        : null,
+      onboarding: {
+        basics: basicsComplete,
+        offering: offeringComplete,
+        hours: hasHours,
+        brand: hasLogo,
+        social: hasSocial,
+        waiver: hasWaiver,
+        coaches: hasCoaches,
+        classes: hasClasses,
+        members: hasMembers,
+      },
+    };
+  });
+
+export const listPlatformAuditLog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ gymId: z.string().uuid().optional(), limit: z.number().int().min(1).max(100).default(50) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
+
+    let q = supabaseAdmin.from("platform_audit_log").select("*, profiles:actor_id(name)").order("created_at", { ascending: false });
+    if (data.gymId) q = q.eq("gym_id", data.gymId);
+    const { data: rows, error } = await q.limit(data.limit);
+    if (error) throw error;
+
+    return (rows ?? []).map((r: any) => ({
+      id: r.id,
+      action: r.action,
+      details: r.details,
+      created_at: r.created_at,
+      actor_name: r.profiles?.name ?? null,
+      gym_id: r.gym_id,
+    }));
+  });
+
+export const impersonateGymAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ gymId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { isPlatformAdmin } = await import("@/lib/platform.server");
+    if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
+
+    const { data: gym, error: gymErr } = await supabaseAdmin.from("gyms").select("slug").eq("id", data.gymId).maybeSingle();
+    if (gymErr) throw gymErr;
+    if (!gym) throw new Error("Gym not found");
+
+    const { data: existing } = await supabaseAdmin
+      .from("gym_members")
+      .select("id, role")
+      .eq("user_id", context.userId)
+      .eq("gym_id", data.gymId)
+      .maybeSingle();
+
+    if (!existing) {
+      const { error: memErr } = await supabaseAdmin
+        .from("gym_members")
+        .insert({ user_id: context.userId, gym_id: data.gymId, role: "admin" });
+      if (memErr) throw memErr;
+    } else if (!["admin", "owner"].includes(existing.role)) {
+      const { error: updErr } = await supabaseAdmin
+        .from("gym_members")
+        .update({ role: "admin" })
+        .eq("user_id", context.userId)
+        .eq("gym_id", data.gymId);
+      if (updErr) throw updErr;
+    }
+
+    const { error: profErr } = await supabaseAdmin
+      .from("profiles")
+      .update({ active_gym_id: data.gymId })
+      .eq("id", context.userId);
+    if (profErr) throw profErr;
+
+    await logAudit(supabaseAdmin, {
+      actor_id: context.userId,
+      gym_id: data.gymId,
+      action: "impersonated_gym_admin",
+      details: { slug: gym.slug },
+    });
+
+    return { slug: gym.slug as string };
   });
 
 export const getGymSetupContext = createServerFn({ method: "GET" })
@@ -245,4 +401,17 @@ export const updateGymSetup = createServerFn({ method: "POST" })
     if (error) throw error;
     return { success: true };
   });
+
+async function logAudit(
+  adminClient: any,
+  entry: { actor_id: string; gym_id?: string | null; action: string; details?: Record<string, unknown> },
+) {
+  const { error } = await adminClient.from("platform_audit_log").insert({
+    actor_id: entry.actor_id,
+    gym_id: entry.gym_id ?? null,
+    action: entry.action,
+    details: entry.details ?? {},
+  });
+  if (error) console.error("Failed to write audit log:", error);
+}
 

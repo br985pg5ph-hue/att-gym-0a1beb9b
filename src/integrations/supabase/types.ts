@@ -528,6 +528,41 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          gym_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          gym_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          gym_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_audit_log_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active_gym_id: string | null
