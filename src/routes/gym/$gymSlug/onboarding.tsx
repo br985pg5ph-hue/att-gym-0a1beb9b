@@ -298,7 +298,16 @@ function OnboardingPage() {
           <WaiverStep
             gym={gym}
             onBack={() => { setGym(null); setStep(0); }}
-            onSigned={() => { setWaiverSigned(true); setStep(2); }}
+            onSigned={() => {
+              setWaiverSigned(true);
+              if (alreadyOnboarded.current) {
+                toast.success("Waiver signed");
+                nav({ to: gymPath(gym.slug, "/home") as any });
+                return;
+              }
+              setStep(2);
+            }}
+
           />
         )}
 
