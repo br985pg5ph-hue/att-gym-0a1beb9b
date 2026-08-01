@@ -358,21 +358,9 @@ export const getGymSetupContext = createServerFn({ method: "GET" })
 export const getPortalContext = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireGymRole, isPlatformAdmin } = await import("@/lib/platform.server");
-    const platformAdmin = await isPlatformAdmin(context.supabase, context.userId);
-
-    if (platformAdmin) {
-      const { data: gym, error } = await context.supabase
-        .from("gyms")
-        .select("id, slug, name, status")
-        .eq("id", (await requireGymRole(context.supabase, context.userId, ["staff", "admin", "owner"])).gymId)
-        .maybeSingle();
-      if (error) throw error;
-      if (!gym) throw new Error("Gym not found");
-      return { role: "owner", gym };
-    }
-
+    const { requireGymRole } = await import("@/lib/platform.server");
     const { gymId, role } = await requireGymRole(context.supabase, context.userId, ["staff", "admin", "owner"]);
+
     const { data: gym, error } = await context.supabase
       .from("gyms")
       .select("id, slug, name, status")
