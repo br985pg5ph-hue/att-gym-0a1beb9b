@@ -278,19 +278,27 @@ export const listPlatformAuditLog = createServerFn({ method: "POST" })
     const { isPlatformAdmin } = await import("@/lib/platform.server");
     if (!(await isPlatformAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
 
-    let q = supabaseAdmin.from("platform_audit_log").select("*, profiles:actor_id(name)").order("created_at", { ascending: false });
+    let q = supabaseAdmin.from("platform_audit_log").select("*").order("created_at", { ascending: false });
     if (data.gymId) q = q.eq("gym_id", data.gymId);
     const { data: rows, error } = await q.limit(data.limit);
     if (error) throw error;
+
+    const actorIds = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+    const names = new Map<string, string>();
+    if (actorIds.length > 0) {
+      const { data: profs } = await supabaseAdmin.from("profiles").select("id, name").in("id", actorIds);
+      for (const p of profs ?? []) names.set(p.id as string, (p as any).name as string);
+    }
 
     return (rows ?? []).map((r: any) => ({
       id: r.id,
       action: r.action,
       details: r.details,
       created_at: r.created_at,
-      actor_name: r.profiles?.name ?? null,
+      actor_name: r.actor_id ? (names.get(r.actor_id) ?? null) : null,
       gym_id: r.gym_id,
     }));
+
   });
 
 export const impersonateGymAdmin = createServerFn({ method: "POST" })
