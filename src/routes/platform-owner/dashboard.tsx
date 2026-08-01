@@ -12,6 +12,8 @@ import {
   getGymDetails,
   listPlatformAuditLog,
   impersonateGymAdmin,
+  deleteGym,
+
 } from "@/lib/platform.functions";
 import {
   LogOut,
