@@ -207,19 +207,30 @@ export const getGymDetails = createServerFn({ method: "POST" })
     if (error) throw error;
     if (!gym) throw new Error("Gym not found");
 
-    const { data: owner } = await supabaseAdmin
+    const { data: ownerRow } = await supabaseAdmin
       .from("gym_members")
-      .select("user_id, role, profiles(name, phone, email:auth.users!inner(email))")
+      .select("user_id, role, profiles(name, phone)")
       .eq("gym_id", data.gymId)
       .in("role", ["admin", "owner"])
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle();
 
+    let ownerEmail: string | null = null;
+    if (ownerRow?.user_id) {
+      try {
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(ownerRow.user_id as string);
+        ownerEmail = authUser.user?.email ?? null;
+      } catch {
+        ownerEmail = null;
+      }
+    }
+
     const { data: coaches } = await supabaseAdmin.from("coaches").select("id").eq("gym_id", data.gymId).limit(1);
     const { data: classes } = await supabaseAdmin.from("classes").select("id").eq("gym_id", data.gymId).limit(1);
     const { data: members } = await supabaseAdmin.from("gym_members").select("id").eq("gym_id", data.gymId).limit(1);
 
+    const theme = (gym.theme ?? {}) as Record<string, any>;
     const hasLogo = Boolean(gym.logo_url && gym.logo_url.trim().length > 0);
     const hasHours = Array.isArray(gym.hours) && gym.hours.some((h: any) => !h.closed);
     const hasSocial = Boolean(gym.instagram_url && gym.whatsapp_number && gym.maps_url);
@@ -229,18 +240,18 @@ export const getGymDetails = createServerFn({ method: "POST" })
     const hasMembers = (members ?? []).length > 0;
     const basicsComplete = Boolean(gym.name && gym.city && gym.address && gym.phone);
     const offeringComplete = Boolean(
-      Array.isArray(gym.theme?.disciplines) && gym.theme.disciplines.length > 0 && gym.theme.member_range && gym.theme.coach_count,
+      Array.isArray(theme.disciplines) && theme.disciplines.length > 0 && theme.member_range && theme.coach_count,
     );
 
     return {
       gym,
-      owner: owner
+      owner: ownerRow
         ? {
-            id: owner.user_id,
-            name: (owner.profiles as any)?.name ?? null,
-            phone: (owner.profiles as any)?.phone ?? null,
-            email: (owner.profiles as any)?.email ?? null,
-            role: owner.role,
+            id: ownerRow.user_id,
+            name: (ownerRow.profiles as any)?.name ?? null,
+            phone: (ownerRow.profiles as any)?.phone ?? null,
+            email: ownerEmail,
+            role: ownerRow.role,
           }
         : null,
       onboarding: {
