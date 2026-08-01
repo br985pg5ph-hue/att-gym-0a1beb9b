@@ -12,6 +12,8 @@ import {
   getGymDetails,
   listPlatformAuditLog,
   impersonateGymAdmin,
+  deleteGym,
+
 } from "@/lib/platform.functions";
 import {
   LogOut,
@@ -32,6 +34,8 @@ import {
   Map,
   AlertCircle,
   Check,
+  Trash2,
+
 } from "lucide-react";
 
 export const Route = createFileRoute("/platform-owner/dashboard")({
@@ -56,6 +60,8 @@ function PlatformDashboard() {
   const fetchGymDetails = useServerFn(getGymDetails);
   const fetchAuditLog = useServerFn(listPlatformAuditLog);
   const impersonate = useServerFn(impersonateGymAdmin);
+  const removeGym = useServerFn(deleteGym);
+
 
   const adminQuery = useQuery({
     queryKey: ["platform-admin-context"],
@@ -100,6 +106,19 @@ function PlatformDashboard() {
     },
     onError: (err: any) => toast.error(err?.message ?? "Failed to open gym admin"),
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: ({ gymId, confirmName }: { gymId: string; confirmName: string }) =>
+      removeGym({ data: { gymId, confirmName } }),
+    onSuccess: () => {
+      setSelectedGymId(null);
+      qc.invalidateQueries({ queryKey: ["platform-gyms"] });
+      qc.invalidateQueries({ queryKey: ["platform-audit-log"] });
+      toast.success("Gym deleted");
+    },
+    onError: (err: any) => toast.error(err?.message ?? "Failed to delete gym"),
+  });
+
 
   const signOut = async () => {
     await qc.cancelQueries();
@@ -303,6 +322,9 @@ function PlatformDashboard() {
           onStatusChange={(status) => statusMutation.mutate({ gymId: selectedGym.id, status })}
           onOpenAdmin={() => impersonateMutation.mutate(selectedGym.id)}
           statusPending={statusMutation.isPending}
+          onDelete={(confirmName) => deleteMutation.mutate({ gymId: selectedGym.id, confirmName })}
+          deletePending={deleteMutation.isPending}
+
         />
       )}
     </div>
@@ -317,6 +339,8 @@ function GymDetailDrawer({
   onStatusChange,
   onOpenAdmin,
   statusPending,
+  onDelete,
+  deletePending,
 }: {
   gym: any;
   details: any;
@@ -325,9 +349,15 @@ function GymDetailDrawer({
   onStatusChange: (status: string) => void;
   onOpenAdmin: () => void;
   statusPending: boolean;
+  onDelete: (confirmName: string) => void;
+  deletePending: boolean;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const requiredName = String(gym.name ?? "").toUpperCase();
   const owner = details?.owner;
   const onboarding = details?.onboarding ?? {};
+
   const checklist = [
     { key: "basics", label: "Basics (name, city, address, phone)", done: onboarding.basics },
     { key: "offering", label: "Training offering", done: onboarding.offering },
@@ -387,7 +417,50 @@ function GymDetailDrawer({
           >
             <ExternalLink size={12} /> Open as admin
           </button>
+          <button
+            onClick={() => {
+              setConfirmText("");
+              setConfirmOpen(true);
+            }}
+            className="flex items-center gap-1 rounded-pill border border-destructive/40 px-4 py-2 text-xs font-semibold text-destructive"
+          >
+            <Trash2 size={12} /> Delete gym
+          </button>
         </div>
+
+        {confirmOpen && (
+          <div className="mt-4 rounded-2xl border border-destructive/40 bg-destructive/5 p-4">
+            <h3 className="font-display text-lg text-destructive">Delete this gym permanently</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              This removes the gym and all of its members, classes, bookings and history. This cannot be undone.
+            </p>
+            <p className="mt-3 text-xs">
+              Type <span className="font-semibold">{requiredName}</span> to confirm.
+            </p>
+            <input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
+              placeholder={requiredName}
+              className="mt-2 w-full rounded-xl border hairline bg-card px-3 py-2 text-sm uppercase tracking-wide outline-none"
+            />
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => onDelete(confirmText.trim())}
+                disabled={confirmText.trim() !== requiredName || deletePending}
+                className="rounded-pill bg-destructive px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+              >
+                {deletePending ? "Deleting…" : "Delete gym"}
+              </button>
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="rounded-pill border hairline px-4 py-2 text-xs font-semibold text-muted-foreground"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
 
         {isLoading ? (
           <p className="mt-6 text-sm text-muted-foreground">Loading details…</p>
