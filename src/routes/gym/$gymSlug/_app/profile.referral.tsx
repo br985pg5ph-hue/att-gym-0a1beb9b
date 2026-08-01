@@ -19,7 +19,7 @@ function ReferralPage() {
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const code = profile?.referral_code ?? "";
-  const link = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${code}` : "";
+  const link = typeof window !== "undefined" ? `${window.location.origin}/app/signup?ref=${code}` : "";
 
   const { data: stats } = useQuery({
     queryKey: ["referral-stats", user?.id],
