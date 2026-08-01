@@ -9,20 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MemberAppPreviewRouteImport } from './routes/member-app-preview'
-import { Route as AppPreviewSignupRouteImport } from './routes/app-preview-signup'
-import { Route as AppPreviewSigninRouteImport } from './routes/app-preview-signin'
-import { Route as AppPreviewSettingsRouteImport } from './routes/app-preview-settings'
-import { Route as AppPreviewReferralRouteImport } from './routes/app-preview-referral'
-import { Route as AppPreviewProfileRouteImport } from './routes/app-preview-profile'
-import { Route as AppPreviewOnboardingRouteImport } from './routes/app-preview-onboarding'
-import { Route as AppPreviewNewsRouteImport } from './routes/app-preview-news'
-import { Route as AppPreviewMembershipRouteImport } from './routes/app-preview-membership'
-import { Route as AppPreviewLocationRouteImport } from './routes/app-preview-location'
-import { Route as AppPreviewHomeRouteImport } from './routes/app-preview-home'
-import { Route as AppPreviewCoachesRouteImport } from './routes/app-preview-coaches'
-import { Route as AppPreviewBookingsRouteImport } from './routes/app-preview-bookings'
-import { Route as AppPreviewBookRouteImport } from './routes/app-preview-book'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as PlatformOwnerRouteRouteImport } from './routes/platform-owner/route'
 import { Route as GymOwnerRouteRouteImport } from './routes/gym-owner/route'
@@ -65,76 +51,6 @@ import { Route as GymGymSlugAppProfileEditRouteImport } from './routes/gym/$gymS
 import { Route as GymGymSlugAppProfileChildrenRouteImport } from './routes/gym/$gymSlug/_app/profile.children'
 import { Route as GymGymSlugAppProfileBookingsRouteImport } from './routes/gym/$gymSlug/_app/profile.bookings'
 
-const MemberAppPreviewRoute = MemberAppPreviewRouteImport.update({
-  id: '/member-app-preview',
-  path: '/member-app-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewSignupRoute = AppPreviewSignupRouteImport.update({
-  id: '/app-preview-signup',
-  path: '/app-preview-signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewSigninRoute = AppPreviewSigninRouteImport.update({
-  id: '/app-preview-signin',
-  path: '/app-preview-signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewSettingsRoute = AppPreviewSettingsRouteImport.update({
-  id: '/app-preview-settings',
-  path: '/app-preview-settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewReferralRoute = AppPreviewReferralRouteImport.update({
-  id: '/app-preview-referral',
-  path: '/app-preview-referral',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewProfileRoute = AppPreviewProfileRouteImport.update({
-  id: '/app-preview-profile',
-  path: '/app-preview-profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewOnboardingRoute = AppPreviewOnboardingRouteImport.update({
-  id: '/app-preview-onboarding',
-  path: '/app-preview-onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewNewsRoute = AppPreviewNewsRouteImport.update({
-  id: '/app-preview-news',
-  path: '/app-preview-news',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewMembershipRoute = AppPreviewMembershipRouteImport.update({
-  id: '/app-preview-membership',
-  path: '/app-preview-membership',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewLocationRoute = AppPreviewLocationRouteImport.update({
-  id: '/app-preview-location',
-  path: '/app-preview-location',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewHomeRoute = AppPreviewHomeRouteImport.update({
-  id: '/app-preview-home',
-  path: '/app-preview-home',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewCoachesRoute = AppPreviewCoachesRouteImport.update({
-  id: '/app-preview-coaches',
-  path: '/app-preview-coaches',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewBookingsRoute = AppPreviewBookingsRouteImport.update({
-  id: '/app-preview-bookings',
-  path: '/app-preview-bookings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPreviewBookRoute = AppPreviewBookRouteImport.update({
-  id: '/app-preview-book',
-  path: '/app-preview-book',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -353,20 +269,6 @@ export interface FileRoutesByFullPath {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
-  '/app-preview-book': typeof AppPreviewBookRoute
-  '/app-preview-bookings': typeof AppPreviewBookingsRoute
-  '/app-preview-coaches': typeof AppPreviewCoachesRoute
-  '/app-preview-home': typeof AppPreviewHomeRoute
-  '/app-preview-location': typeof AppPreviewLocationRoute
-  '/app-preview-membership': typeof AppPreviewMembershipRoute
-  '/app-preview-news': typeof AppPreviewNewsRoute
-  '/app-preview-onboarding': typeof AppPreviewOnboardingRoute
-  '/app-preview-profile': typeof AppPreviewProfileRoute
-  '/app-preview-referral': typeof AppPreviewReferralRoute
-  '/app-preview-settings': typeof AppPreviewSettingsRoute
-  '/app-preview-signin': typeof AppPreviewSigninRoute
-  '/app-preview-signup': typeof AppPreviewSignupRoute
-  '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -409,20 +311,6 @@ export interface FileRoutesByTo {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
-  '/app-preview-book': typeof AppPreviewBookRoute
-  '/app-preview-bookings': typeof AppPreviewBookingsRoute
-  '/app-preview-coaches': typeof AppPreviewCoachesRoute
-  '/app-preview-home': typeof AppPreviewHomeRoute
-  '/app-preview-location': typeof AppPreviewLocationRoute
-  '/app-preview-membership': typeof AppPreviewMembershipRoute
-  '/app-preview-news': typeof AppPreviewNewsRoute
-  '/app-preview-onboarding': typeof AppPreviewOnboardingRoute
-  '/app-preview-profile': typeof AppPreviewProfileRoute
-  '/app-preview-referral': typeof AppPreviewReferralRoute
-  '/app-preview-settings': typeof AppPreviewSettingsRoute
-  '/app-preview-signin': typeof AppPreviewSigninRoute
-  '/app-preview-signup': typeof AppPreviewSignupRoute
-  '/member-app-preview': typeof MemberAppPreviewRoute
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
   '/app/forgot': typeof AppForgotRoute
@@ -464,20 +352,6 @@ export interface FileRoutesById {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
-  '/app-preview-book': typeof AppPreviewBookRoute
-  '/app-preview-bookings': typeof AppPreviewBookingsRoute
-  '/app-preview-coaches': typeof AppPreviewCoachesRoute
-  '/app-preview-home': typeof AppPreviewHomeRoute
-  '/app-preview-location': typeof AppPreviewLocationRoute
-  '/app-preview-membership': typeof AppPreviewMembershipRoute
-  '/app-preview-news': typeof AppPreviewNewsRoute
-  '/app-preview-onboarding': typeof AppPreviewOnboardingRoute
-  '/app-preview-profile': typeof AppPreviewProfileRoute
-  '/app-preview-referral': typeof AppPreviewReferralRoute
-  '/app-preview-settings': typeof AppPreviewSettingsRoute
-  '/app-preview-signin': typeof AppPreviewSigninRoute
-  '/app-preview-signup': typeof AppPreviewSignupRoute
-  '/member-app-preview': typeof MemberAppPreviewRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -523,20 +397,6 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
-    | '/app-preview-book'
-    | '/app-preview-bookings'
-    | '/app-preview-coaches'
-    | '/app-preview-home'
-    | '/app-preview-location'
-    | '/app-preview-membership'
-    | '/app-preview-news'
-    | '/app-preview-onboarding'
-    | '/app-preview-profile'
-    | '/app-preview-referral'
-    | '/app-preview-settings'
-    | '/app-preview-signin'
-    | '/app-preview-signup'
-    | '/member-app-preview'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -579,20 +439,6 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
-    | '/app-preview-book'
-    | '/app-preview-bookings'
-    | '/app-preview-coaches'
-    | '/app-preview-home'
-    | '/app-preview-location'
-    | '/app-preview-membership'
-    | '/app-preview-news'
-    | '/app-preview-onboarding'
-    | '/app-preview-profile'
-    | '/app-preview-referral'
-    | '/app-preview-settings'
-    | '/app-preview-signin'
-    | '/app-preview-signup'
-    | '/member-app-preview'
     | '/app/auth'
     | '/app/complete-profile'
     | '/app/forgot'
@@ -633,20 +479,6 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
-    | '/app-preview-book'
-    | '/app-preview-bookings'
-    | '/app-preview-coaches'
-    | '/app-preview-home'
-    | '/app-preview-location'
-    | '/app-preview-membership'
-    | '/app-preview-news'
-    | '/app-preview-onboarding'
-    | '/app-preview-profile'
-    | '/app-preview-referral'
-    | '/app-preview-settings'
-    | '/app-preview-signin'
-    | '/app-preview-signup'
-    | '/member-app-preview'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -691,20 +523,6 @@ export interface RootRouteChildren {
   GymOwnerRouteRoute: typeof GymOwnerRouteRouteWithChildren
   PlatformOwnerRouteRoute: typeof PlatformOwnerRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
-  AppPreviewBookRoute: typeof AppPreviewBookRoute
-  AppPreviewBookingsRoute: typeof AppPreviewBookingsRoute
-  AppPreviewCoachesRoute: typeof AppPreviewCoachesRoute
-  AppPreviewHomeRoute: typeof AppPreviewHomeRoute
-  AppPreviewLocationRoute: typeof AppPreviewLocationRoute
-  AppPreviewMembershipRoute: typeof AppPreviewMembershipRoute
-  AppPreviewNewsRoute: typeof AppPreviewNewsRoute
-  AppPreviewOnboardingRoute: typeof AppPreviewOnboardingRoute
-  AppPreviewProfileRoute: typeof AppPreviewProfileRoute
-  AppPreviewReferralRoute: typeof AppPreviewReferralRoute
-  AppPreviewSettingsRoute: typeof AppPreviewSettingsRoute
-  AppPreviewSigninRoute: typeof AppPreviewSigninRoute
-  AppPreviewSignupRoute: typeof AppPreviewSignupRoute
-  MemberAppPreviewRoute: typeof MemberAppPreviewRoute
   GymGymSlugRouteRoute: typeof GymGymSlugRouteRouteWithChildren
   AppAuthRoute: typeof AppAuthRoute
   AppCompleteProfileRoute: typeof AppCompleteProfileRoute
@@ -716,104 +534,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/member-app-preview': {
-      id: '/member-app-preview'
-      path: '/member-app-preview'
-      fullPath: '/member-app-preview'
-      preLoaderRoute: typeof MemberAppPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-signup': {
-      id: '/app-preview-signup'
-      path: '/app-preview-signup'
-      fullPath: '/app-preview-signup'
-      preLoaderRoute: typeof AppPreviewSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-signin': {
-      id: '/app-preview-signin'
-      path: '/app-preview-signin'
-      fullPath: '/app-preview-signin'
-      preLoaderRoute: typeof AppPreviewSigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-settings': {
-      id: '/app-preview-settings'
-      path: '/app-preview-settings'
-      fullPath: '/app-preview-settings'
-      preLoaderRoute: typeof AppPreviewSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-referral': {
-      id: '/app-preview-referral'
-      path: '/app-preview-referral'
-      fullPath: '/app-preview-referral'
-      preLoaderRoute: typeof AppPreviewReferralRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-profile': {
-      id: '/app-preview-profile'
-      path: '/app-preview-profile'
-      fullPath: '/app-preview-profile'
-      preLoaderRoute: typeof AppPreviewProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-onboarding': {
-      id: '/app-preview-onboarding'
-      path: '/app-preview-onboarding'
-      fullPath: '/app-preview-onboarding'
-      preLoaderRoute: typeof AppPreviewOnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-news': {
-      id: '/app-preview-news'
-      path: '/app-preview-news'
-      fullPath: '/app-preview-news'
-      preLoaderRoute: typeof AppPreviewNewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-membership': {
-      id: '/app-preview-membership'
-      path: '/app-preview-membership'
-      fullPath: '/app-preview-membership'
-      preLoaderRoute: typeof AppPreviewMembershipRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-location': {
-      id: '/app-preview-location'
-      path: '/app-preview-location'
-      fullPath: '/app-preview-location'
-      preLoaderRoute: typeof AppPreviewLocationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-home': {
-      id: '/app-preview-home'
-      path: '/app-preview-home'
-      fullPath: '/app-preview-home'
-      preLoaderRoute: typeof AppPreviewHomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-coaches': {
-      id: '/app-preview-coaches'
-      path: '/app-preview-coaches'
-      fullPath: '/app-preview-coaches'
-      preLoaderRoute: typeof AppPreviewCoachesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-bookings': {
-      id: '/app-preview-bookings'
-      path: '/app-preview-bookings'
-      fullPath: '/app-preview-bookings'
-      preLoaderRoute: typeof AppPreviewBookingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app-preview-book': {
-      id: '/app-preview-book'
-      path: '/app-preview-book'
-      fullPath: '/app-preview-book'
-      preLoaderRoute: typeof AppPreviewBookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -1227,20 +947,6 @@ const rootRouteChildren: RootRouteChildren = {
   GymOwnerRouteRoute: GymOwnerRouteRouteWithChildren,
   PlatformOwnerRouteRoute: PlatformOwnerRouteRouteWithChildren,
   SplatRoute: SplatRoute,
-  AppPreviewBookRoute: AppPreviewBookRoute,
-  AppPreviewBookingsRoute: AppPreviewBookingsRoute,
-  AppPreviewCoachesRoute: AppPreviewCoachesRoute,
-  AppPreviewHomeRoute: AppPreviewHomeRoute,
-  AppPreviewLocationRoute: AppPreviewLocationRoute,
-  AppPreviewMembershipRoute: AppPreviewMembershipRoute,
-  AppPreviewNewsRoute: AppPreviewNewsRoute,
-  AppPreviewOnboardingRoute: AppPreviewOnboardingRoute,
-  AppPreviewProfileRoute: AppPreviewProfileRoute,
-  AppPreviewReferralRoute: AppPreviewReferralRoute,
-  AppPreviewSettingsRoute: AppPreviewSettingsRoute,
-  AppPreviewSigninRoute: AppPreviewSigninRoute,
-  AppPreviewSignupRoute: AppPreviewSignupRoute,
-  MemberAppPreviewRoute: MemberAppPreviewRoute,
   GymGymSlugRouteRoute: GymGymSlugRouteRouteWithChildren,
   AppAuthRoute: AppAuthRoute,
   AppCompleteProfileRoute: AppCompleteProfileRoute,
