@@ -44,11 +44,12 @@ function GymOwnerLogin() {
       nav({ to: `/gym/${gym.slug}/admin` });
     } catch {
       await supabase.auth.signOut();
-      toast.error("This portal is for gym staff and admins only");
+      toast.error("This portal is for gyms. Members should use the Nuvo member app.");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-10">
