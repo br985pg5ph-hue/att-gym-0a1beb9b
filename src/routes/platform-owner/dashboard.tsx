@@ -60,6 +60,8 @@ function PlatformDashboard() {
   const fetchGymDetails = useServerFn(getGymDetails);
   const fetchAuditLog = useServerFn(listPlatformAuditLog);
   const impersonate = useServerFn(impersonateGymAdmin);
+  const removeGym = useServerFn(deleteGym);
+
 
   const adminQuery = useQuery({
     queryKey: ["platform-admin-context"],
