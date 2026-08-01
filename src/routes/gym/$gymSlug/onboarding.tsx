@@ -105,6 +105,8 @@ function OnboardingPage() {
   const [gym, setGym] = useState<JoinedGym | null>(null);
   const [waiverSigned, setWaiverSigned] = useState(false);
   const [checking, setChecking] = useState(true);
+  // Members who already completed the questionnaire only need the waiver.
+  const alreadyOnboarded = useRef(false);
 
   const [experience, setExperience] = useState<string>("");
   const [disciplines, setDisciplines] = useState<string[]>([]);
@@ -120,8 +122,25 @@ function OnboardingPage() {
       try {
         const { data: u } = await supabase.auth.getUser();
         if (!u.user) return;
-        const m = await fetchMembershipBySlug(u.user.id, routeSlug);
-        if (cancelled || !m?.gyms) return;
+        const [m, { data: p }] = await Promise.all([
+          fetchMembershipBySlug(u.user.id, routeSlug),
+          supabase
+            .from("profiles")
+            .select("onboarded, experience_level, disciplines, goals, training_frequency, injuries")
+            .eq("id", u.user.id)
+            .maybeSingle(),
+        ]);
+        if (cancelled) return;
+        // Keep previously saved answers so finishing again can never narrow them.
+        if (p) {
+          alreadyOnboarded.current = !!p.onboarded;
+          setExperience(p.experience_level ?? "");
+          setDisciplines(p.disciplines ?? []);
+          setGoals(p.goals ?? []);
+          setFrequency(p.training_frequency ?? "");
+          setInjuries(p.injuries ?? "");
+        }
+        if (!m?.gyms) return;
         setGym({
           id: m.gyms.id,
           slug: m.gyms.slug,
@@ -129,6 +148,11 @@ function OnboardingPage() {
           waiver_text: m.gyms.waiver_text || "",
         });
         setWaiverSigned(!!m.waiver_signed_at);
+        // Existing members who just need the waiver go straight back into the app.
+        if (m.waiver_signed_at && alreadyOnboarded.current) {
+          nav({ to: gymPath(m.gyms.slug, "/home") as any });
+          return;
+        }
         setStep(m.waiver_signed_at ? 2 : 1);
       } finally {
         if (!cancelled) setChecking(false);
@@ -136,6 +160,7 @@ function OnboardingPage() {
     })();
     return () => { cancelled = true; };
   }, [routeSlug]);
+
 
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -273,7 +298,16 @@ function OnboardingPage() {
           <WaiverStep
             gym={gym}
             onBack={() => { setGym(null); setStep(0); }}
-            onSigned={() => { setWaiverSigned(true); setStep(2); }}
+            onSigned={() => {
+              setWaiverSigned(true);
+              if (alreadyOnboarded.current) {
+                toast.success("Waiver signed");
+                nav({ to: gymPath(gym.slug, "/home") as any });
+                return;
+              }
+              setStep(2);
+            }}
+
           />
         )}
 
