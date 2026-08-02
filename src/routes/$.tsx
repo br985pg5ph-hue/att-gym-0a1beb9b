@@ -18,6 +18,9 @@ export const Route = createFileRoute("/$")({
   beforeLoad: ({ params }) => {
     const splat = (params._splat ?? "").replace(/^\/+/, "");
     const head = splat.split("/")[0];
+    if (head === "auth") {
+      throw redirect({ to: "/signin", search: true as any });
+    }
     if (NUVO_ENTRY.includes(head)) {
       throw redirect({ to: `/app/${head}` as any, search: true as any });
     }
