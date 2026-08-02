@@ -8,28 +8,6 @@ export type Space =
   | { kind: "admin"; label: string; sublabel: string; slug: string }
   | { kind: "console"; label: string; sublabel: string };
 
-const LAST_SPACE_KEY = "nuvo:last-space";
-
-export function rememberSpace(key: string) {
-  try {
-    localStorage.setItem(LAST_SPACE_KEY, key);
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-export function lastSpace(): string | null {
-  try {
-    return localStorage.getItem(LAST_SPACE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function spaceKey(s: Space) {
-  return s.kind === "admin" ? `admin:${s.slug}` : s.kind;
-}
-
 type Row = {
   role: string;
   gyms: { slug: string; name: string; status: string } | null;
@@ -91,15 +69,11 @@ export async function spaceDestination(space: Space, userId: string): Promise<st
 }
 
 /**
- * Where a signed-in account lands: straight into its only space, the space it
- * used last, or the picker when there is a real choice to make.
+ * Where a signed-in account lands: straight into its highest-priority space.
+ * Platform console first, then gym admin, then member app.
  */
 export async function resolveEntry(userId: string): Promise<string> {
   const spaces = await resolveSpaces(userId);
   if (spaces.length === 0) return "/app/join";
-  if (spaces.length === 1) {
-    rememberSpace(spaceKey(spaces[0]));
-    return spaceDestination(spaces[0], userId);
-  }
-  return "/spaces";
+  return spaceDestination(spaces[0], userId);
 }
