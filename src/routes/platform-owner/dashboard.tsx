@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { SwitchSpace } from "@/components/SwitchSpace";
 import { NuvoLogo } from "@/components/NuvoLogo";
 import {
   getPlatformAdminContext,
@@ -176,7 +175,6 @@ function PlatformDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-        <SwitchSpace className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-muted-foreground" />
         <button
           onClick={signOut}
           className="flex items-center gap-1.5 rounded-pill border hairline px-3 py-1.5 text-xs font-semibold text-destructive"
