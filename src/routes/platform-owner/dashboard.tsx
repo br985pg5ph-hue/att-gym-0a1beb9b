@@ -42,7 +42,7 @@ export const Route = createFileRoute("/platform-owner/dashboard")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/platform-owner/console" });
+    if (!data.user) throw redirect({ to: "/signin" });
   },
   component: PlatformDashboard,
 });

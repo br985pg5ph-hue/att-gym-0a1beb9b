@@ -77,13 +77,13 @@ function AppSignUpPage() {
       nav({ to: "/app/join" });
     } else {
       toast.message("Check your email", { description: "Confirm your account before signing in." });
-      nav({ to: "/app/auth" });
+      nav({ to: "/signin" });
     }
   };
 
   const oauth = async (provider: "google" | "apple") => {
     const r = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: `${window.location.origin}/app/auth`,
+      redirect_uri: `${window.location.origin}/signin`,
     });
     if (r.error) return toast.error("Sign-in failed");
     if (r.redirected) return;
@@ -140,7 +140,7 @@ function AppSignUpPage() {
           <button onClick={() => oauth("apple")} className="w-full rounded-pill border hairline bg-card py-3 text-sm font-medium">{t.continueWithApple}</button>
         </div>
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          {t.haveAccount} <Link to="/app/auth" className="font-semibold text-primary">{t.signIn}</Link>
+          {t.haveAccount} <Link to="/signin" className="font-semibold text-primary">{t.signIn}</Link>
         </p>
       </div>
     </div>

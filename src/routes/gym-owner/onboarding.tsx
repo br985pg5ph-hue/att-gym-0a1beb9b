@@ -11,7 +11,7 @@ export const Route = createFileRoute("/gym-owner/onboarding")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/gym-owner/login" });
+    if (!data.user) throw redirect({ to: "/signin" });
     const ctx = await getGymSetupContext();
     return { gym: ctx.gym as any };
   },
