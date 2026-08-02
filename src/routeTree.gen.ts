@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpacesRouteImport } from './routes/spaces'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SplatRouteImport } from './routes/$'
@@ -55,6 +56,11 @@ import { Route as GymGymSlugAppProfileEditRouteImport } from './routes/gym/$gymS
 import { Route as GymGymSlugAppProfileChildrenRouteImport } from './routes/gym/$gymSlug/_app/profile.children'
 import { Route as GymGymSlugAppProfileBookingsRouteImport } from './routes/gym/$gymSlug/_app/profile.bookings'
 
+const SpacesRoute = SpacesRouteImport.update({
+  id: '/spaces',
+  path: '/spaces',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/spaces': typeof SpacesRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/spaces': typeof SpacesRoute
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
   '/app/forgot': typeof AppForgotRoute
@@ -387,6 +395,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/spaces': typeof SpacesRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -436,6 +445,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/signin'
     | '/signup'
+    | '/spaces'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -481,6 +491,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/signin'
     | '/signup'
+    | '/spaces'
     | '/app/auth'
     | '/app/complete-profile'
     | '/app/forgot'
@@ -525,6 +536,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/signin'
     | '/signup'
+    | '/spaces'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -573,10 +585,18 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  SpacesRoute: typeof SpacesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/spaces': {
+      id: '/spaces'
+      path: '/spaces'
+      fullPath: '/spaces'
+      preLoaderRoute: typeof SpacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -1056,6 +1076,7 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  SpacesRoute: SpacesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
