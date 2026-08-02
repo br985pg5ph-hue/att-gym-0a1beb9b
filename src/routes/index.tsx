@@ -198,13 +198,9 @@ function NuvoHome() {
       </main>
 
       <footer className="border-t hairline">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
+        <div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-6 py-8 text-xs text-muted-foreground">
           <Wordmark className="text-xl text-foreground" />
-          <p>
-            Members, gyms and coaches all sign in through the same Nuvo app.
-          </p>
         </div>
-
       </footer>
     </div>
   );
