@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Users,
   Building2,
@@ -8,6 +8,8 @@ import {
   BarChart3,
   Smartphone,
   Check,
+  Apple,
+  Play,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -69,22 +71,12 @@ function NuvoHome() {
       <header className="sticky top-0 z-30 border-b hairline bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Wordmark className="text-2xl" />
-          <div className="flex items-center gap-2">
-            <Link
-              to="/gym-owner/login"
-              className="rounded-pill border hairline bg-card px-4 py-2 text-xs font-semibold"
-            >
-              Portal login
-            </Link>
-            <Link
-              to="/gym-owner/signup"
-              className="hidden rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground sm:block"
-            >
-              Sign up your gym
-            </Link>
-          </div>
-
-
+          <a
+            href="#download"
+            className="rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            Get the app
+          </a>
         </div>
       </header>
 
@@ -102,18 +94,18 @@ function NuvoHome() {
             a branded app for your members and a powerful dashboard for your team.
           </p>
           <div className="mx-auto mt-9 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link
-              to="/gym-owner/signup"
+            <a
+              href="#download"
               className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
-              Sign up your gym
-            </Link>
-            <Link
-              to="/gym-owner/login"
+              Download the app
+            </a>
+            <a
+              href="#features"
               className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
-              Portal login
-            </Link>
+              See what's inside
+            </a>
           </div>
         </section>
 
@@ -156,12 +148,12 @@ function NuvoHome() {
               <p className="mt-2 text-sm text-muted-foreground">
                 No per-feature upsells. Every gym on Nuvo gets the full platform, branded as their own.
               </p>
-              <Link
-                to="/gym-owner/signup"
+              <a
+                href="#download"
                 className="mt-7 inline-flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
               >
-                Sign up your gym
-              </Link>
+                Get the app
+              </a>
             </div>
             <ul className="grid gap-3 sm:grid-cols-2 lg:content-center">
               {included.map((i) => (
@@ -174,24 +166,34 @@ function NuvoHome() {
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="mx-auto max-w-6xl px-6 py-16 text-center">
+        {/* Download */}
+        <section id="download" className="mx-auto max-w-6xl px-6 py-16 text-center">
           <Building2 size={22} className="mx-auto text-primary" />
-          <h2 className="font-display mt-4 text-4xl sm:text-5xl">Ready to move your gym to Nuvo?</h2>
+          <h2 className="font-display mt-4 text-4xl sm:text-5xl">One app. Everyone in your gym.</h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground">
+            Members, coaches and owners all use the same Nuvo app — download it, sign in, and you
+            land in your own space.
+          </p>
           <div className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link
-              to="/gym-owner/signup"
-              className="flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
+            <a
+              href="#download"
+              className="flex items-center justify-center gap-2 rounded-pill bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground"
             >
-              Sign up your gym
-            </Link>
-            <Link
-              to="/gym-owner/login"
-              className="flex items-center justify-center rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
+              <Apple size={16} /> App Store
+            </a>
+            <a
+              href="#download"
+              className="flex items-center justify-center gap-2 rounded-pill border hairline bg-card px-7 py-3.5 text-sm font-semibold"
             >
-              Access portal
-            </Link>
+              <Play size={16} /> Google Play
+            </a>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Rather not install anything?{" "}
+            <a href="/signin" className="font-semibold text-primary">
+              Open Nuvo in your browser
+            </a>
+          </p>
         </section>
       </main>
 
@@ -199,10 +201,7 @@ function NuvoHome() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
           <Wordmark className="text-xl text-foreground" />
           <p>
-            Are you a gym member?{" "}
-            <a href="/app/auth" className="font-semibold text-primary">
-              Open the Nuvo member app
-            </a>
+            Members, gyms and coaches all sign in through the same Nuvo app.
           </p>
         </div>
 
