@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as PlatformOwnerRouteRouteImport } from './routes/platform-owner/route'
 import { Route as GymOwnerRouteRouteImport } from './routes/gym-owner/route'
@@ -53,6 +54,11 @@ import { Route as GymGymSlugAppProfileEditRouteImport } from './routes/gym/$gymS
 import { Route as GymGymSlugAppProfileChildrenRouteImport } from './routes/gym/$gymSlug/_app/profile.children'
 import { Route as GymGymSlugAppProfileBookingsRouteImport } from './routes/gym/$gymSlug/_app/profile.bookings'
 
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/signin': typeof SigninRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/signin': typeof SigninRoute
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
   '/app/forgot': typeof AppForgotRoute
@@ -369,6 +377,7 @@ export interface FileRoutesById {
   '/gym-owner': typeof GymOwnerRouteRouteWithChildren
   '/platform-owner': typeof PlatformOwnerRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/signin': typeof SigninRoute
   '/gym/$gymSlug': typeof GymGymSlugRouteRouteWithChildren
   '/app/auth': typeof AppAuthRoute
   '/app/complete-profile': typeof AppCompleteProfileRoute
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
+    | '/signin'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -459,6 +469,7 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
+    | '/signin'
     | '/app/auth'
     | '/app/complete-profile'
     | '/app/forgot'
@@ -501,6 +512,7 @@ export interface FileRouteTypes {
     | '/gym-owner'
     | '/platform-owner'
     | '/$'
+    | '/signin'
     | '/gym/$gymSlug'
     | '/app/auth'
     | '/app/complete-profile'
@@ -547,10 +559,18 @@ export interface RootRouteChildren {
   GymOwnerRouteRoute: typeof GymOwnerRouteRouteWithChildren
   PlatformOwnerRouteRoute: typeof PlatformOwnerRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
+  SigninRoute: typeof SigninRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -1014,6 +1034,7 @@ const rootRouteChildren: RootRouteChildren = {
   GymOwnerRouteRoute: GymOwnerRouteRouteWithChildren,
   PlatformOwnerRouteRoute: PlatformOwnerRouteRouteWithChildren,
   SplatRoute: SplatRoute,
+  SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
