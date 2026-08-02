@@ -4,7 +4,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/gym/$gymSlug/auth")({
   ssr: false,
   beforeLoad: () => {
-    throw redirect({ to: "/app/auth" as any });
+    throw redirect({ to: "/signin" });
   },
   component: () => null,
 });

@@ -9,17 +9,6 @@ export function profileNeedsDetails(
   return !p.name?.trim() || !p.phone?.trim() || !p.gender?.trim();
 }
 
-/**
- * The member app is only for gym members. Gym staff/admin/owner accounts belong
- * in the gym portal, so they are turned away here (unless they are also a member
- * of some gym, e.g. an owner who trains at their own gym).
- */
-export async function isStaffOnlyAccount(userId: string) {
-  const { data } = await supabase.from("gym_members").select("role").eq("user_id", userId);
-  const roles = (data ?? []).map((r) => r.role as string);
-  return roles.length > 0 && roles.every((r) => r !== "member");
-}
-
 
 type MembershipLite = {
   gym_id: string;

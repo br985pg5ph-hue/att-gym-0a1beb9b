@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/complete-profile")({
   }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/app/auth" as any });
+    if (!data.user) throw redirect({ to: "/signin" });
   },
   component: AppCompleteProfilePage,
 });

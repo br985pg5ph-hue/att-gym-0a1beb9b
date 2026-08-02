@@ -19,7 +19,7 @@ export const Route = createFileRoute("/app/join")({
   }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/app/auth" as any });
+    if (!data.user) throw redirect({ to: "/signin" });
     const { data: p } = await supabase
       .from("profiles")
       .select("name, phone, gender, is_parent")

@@ -54,7 +54,7 @@ function PlatformSignup() {
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
       if (signInErr) {
         toast.success("Application submitted! Please sign in to continue setup.");
-        nav({ to: "/gym-owner/login" });
+        nav({ to: "/signin" });
         return;
       }
       toast.success("Application submitted!");
@@ -153,7 +153,7 @@ function PlatformSignup() {
       </form>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Already have an account? <Link to="/gym-owner/login" className="font-semibold text-primary">portal login</Link>
+        Already have an account? <Link to="/signin" className="font-semibold text-primary">sign in</Link>
       </p>
       <p className="mt-2 text-center text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">← Back</Link>

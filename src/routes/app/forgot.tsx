@@ -42,7 +42,7 @@ function AppForgotPage() {
           <button className="w-full rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground">Send reset link</button>
         </form>
       )}
-      <Link to="/app/auth" className="mt-6 text-center text-xs text-muted-foreground">← Back to sign in</Link>
+      <Link to="/signin" className="mt-6 text-center text-xs text-muted-foreground">← Back to sign in</Link>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { createFileRoute, redirect, useNavigate, Link, Outlet, useRouterState } 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SwitchSpace } from "@/components/SwitchSpace";
 import { Logo } from "@/components/Logo";
 import { useAuth, useLang, useTheme } from "@/lib/providers";
 import { useGym, gp } from "@/lib/gym";
@@ -134,6 +135,7 @@ function AdminPage() {
           >
             <ThemeIcon size={18} /> {theme === "dark" ? "Light mode" : "Dark mode"}
           </button>
+          <SwitchSpace />
           <button
             onClick={signOut}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10"
