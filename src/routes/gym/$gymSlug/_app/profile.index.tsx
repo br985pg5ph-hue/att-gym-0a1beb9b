@@ -103,7 +103,6 @@ function ProfilePage() {
               </Link>
             );
           })}
-          <SwitchSpace className="flex w-full items-center gap-3 px-5 py-4 text-start text-sm font-medium" />
           <button onClick={signOut} className="flex w-full items-center gap-3 px-5 py-4 text-start text-destructive">
             <LogOut size={18} />
             <span className="flex-1 text-sm font-medium">{t.signOut}</span>
